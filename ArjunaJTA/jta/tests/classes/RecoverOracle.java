@@ -1,5 +1,7 @@
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
@@ -15,89 +17,75 @@ import com.arjuna.ats.jta.xa.XidImple;
 
 public class RecoverOracle {
 
-    @Test
-    public void recoverOracle() throws SQLException, XAException {
-        String hostName = "tywin.buildnet.ncl.jboss.com";
-        String userName = "dtf11";
-        String password = "dtf11";
-        String recoveryUserName = "dtf11";
-        String recoveryPassword = "dtf11";
-        String databaseName = "ORCL";
+	@Test
+	public void recoverOracle() throws SQLException, XAException {
+		String hostName = "tywin.buildnet.ncl.jboss.com";
+		String userName = "dtf11";
+		String password = "dtf11";
+		String recoveryUserName = "dtf11";
+		String recoveryPassword = "dtf11";
+		String databaseName = "ORCL";
 
-        {
-            oracle.jdbc.xa.client.OracleXADataSource dataSource = new oracle.jdbc.xa.client.OracleXADataSource();
-            dataSource.setDriverType("thin");
-            dataSource.setPortNumber(1521);
-            dataSource.setNetworkProtocol("tcp");
-            dataSource.setUser(recoveryUserName);
-            dataSource.setPassword(recoveryPassword);
-            dataSource.setServerName(hostName);
-            dataSource.setDatabaseName(databaseName);
+		System.out
+				.println("Business logic being executed in JVM2 but in TX under control of JVM1");
+		oracle.jdbc.xa.client.OracleXADataSource dataSource = new oracle.jdbc.xa.client.OracleXADataSource();
+		dataSource.setDriverType("thin");
+		dataSource.setPortNumber(1521);
+		dataSource.setNetworkProtocol("tcp");
+		dataSource.setUser(userName);
+		dataSource.setPassword(password);
+		dataSource.setServerName(hostName);
+		dataSource.setDatabaseName(databaseName);
 
-            XAResource xaResource = dataSource.getXAConnection().getXAResource();
-            Xid[] recover = xaResource.recover(XAResource.TMSTARTRSCAN);
-            for (int i = 0; i < recover.length; i++) {
-                try {
-                    System.out.println("Rolling back: " + new XidImple(recover[i]));
-                    xaResource.rollback(recover[i]);
-                    System.out.println("Rolled back");
-                } catch (XAException e) {
-                    e.printStackTrace();
-                    System.out.println(XAHelper.printXAErrorCode(e));
-                }
-            }
-            xaResource.recover(XAResource.TMENDRSCAN);
-        }
+		XAConnection xaConnection1 = dataSource.getXAConnection();
+		final XAResource xaResource1 = xaConnection1.getXAResource();
+		assertTrue(xaResource1.setTransactionTimeout(2));
+		final Xid xid1 = new XidImple(new Uid(), true, 1);
+		xaResource1.start(xid1, XAResource.TMNOFLAGS);
+		Connection connection1 = xaConnection1.getConnection();
+		ResultSet executeQuery = connection1.createStatement().executeQuery(
+				"select * from testentity for update");
+		assertTrue(executeQuery.next());
 
-        {
-            oracle.jdbc.xa.client.OracleXADataSource dataSource = new oracle.jdbc.xa.client.OracleXADataSource();
-            dataSource.setDriverType("thin");
-            dataSource.setPortNumber(1521);
-            dataSource.setNetworkProtocol("tcp");
-            dataSource.setUser(userName);
-            dataSource.setPassword(password);
-            dataSource.setServerName(hostName);
-            dataSource.setDatabaseName(databaseName);
+		System.out.println("Any JVM");
+		oracle.jdbc.xa.client.OracleXADataSource dataSource2 = new oracle.jdbc.xa.client.OracleXADataSource();
+		dataSource2.setDriverType("thin");
+		dataSource2.setPortNumber(1521);
+		dataSource2.setNetworkProtocol("tcp");
+		dataSource2.setUser(userName);
+		dataSource2.setPassword(password);
+		dataSource2.setServerName(hostName);
+		dataSource2.setDatabaseName(databaseName);
 
-            XAConnection xaConnection = dataSource.getXAConnection();
-            XAResource xaResource2 = xaConnection.getXAResource();
-            XidImple xid = new XidImple(new Uid(), true, 1);
-            xaResource2.start(xid, XAResource.TMNOFLAGS);
-            System.out.println("Preparing: " + xid);
-            xaConnection.getConnection().createStatement().execute("INSERT INTO testentity (id, a) VALUES (1, 1)");
-            System.out.println("Prepared");
-            xaResource2.prepare(xid);
-        }
+		XAConnection xaConnection2 = dataSource2.getXAConnection();
+		XAResource xaResource2 = xaConnection2.getXAResource();
+		Xid xid2 = new XidImple(new Uid(), true, 1);
+		assertTrue(xaResource2.setTransactionTimeout(2));
+		xaResource2.start(xid2, XAResource.TMNOFLAGS);
+		Connection connection2 = xaConnection2.getConnection();
 
-        {
-            oracle.jdbc.xa.client.OracleXADataSource dataSource = new oracle.jdbc.xa.client.OracleXADataSource();
-            dataSource.setDriverType("thin");
-            dataSource.setPortNumber(1521);
-            dataSource.setNetworkProtocol("tcp");
-            dataSource.setUser(recoveryUserName);
-            dataSource.setPassword(recoveryPassword);
-            dataSource.setServerName(hostName);
-            dataSource.setDatabaseName(databaseName);
 
-            XAResource xaResource = dataSource.getXAConnection().getXAResource();
-            Xid[] recover = xaResource.recover(XAResource.TMSTARTRSCAN);
-            int completed = 0;
-            int failed = 0;
-            for (int i = 0; i < recover.length; i++) {
-                try {
-                    System.out.println("Commiting: " + new XidImple(recover[i]));
-                    xaResource.commit(recover[i], false);
-                    System.out.println("Committed");
-                    completed++;
-                } catch (XAException e) {
-                    e.printStackTrace();
-                    System.out.println(XAHelper.printXAErrorCode(e));
-                    failed++;
-                }
-            }
-            xaResource.recover(XAResource.TMENDRSCAN);
-            assertTrue("Completed: " + completed + " Expected: " + 1, completed == 1);
-            assertTrue("Failed: " + failed + " Expected: " + 0, failed == 0);
-        }
-    }
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.currentThread().sleep(10000);
+					xaResource1.prepare(xid1);
+					xaResource1.commit(xid1, false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}).start();
+
+		System.out.println("Crash in JVM1");
+		connection2.createStatement().execute(
+				"UPDATE testentity set a = 2 where id = '1'");
+
+		
+		xaResource2.prepare(xid2);
+		xaResource2.commit(xid2, false);
+	}
 }
