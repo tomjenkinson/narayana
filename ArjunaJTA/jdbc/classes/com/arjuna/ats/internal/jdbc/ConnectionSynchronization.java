@@ -31,11 +31,7 @@
 
 package com.arjuna.ats.internal.jdbc;
 
-import java.sql.Connection;
-
 import javax.transaction.Synchronization;
-
-import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 
 /**
  * A synchronization to close the database connection when the transaction
@@ -47,18 +43,18 @@ import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 public class ConnectionSynchronization implements Synchronization
 {
 
-    public ConnectionSynchronization (Connection conn, TransactionalDriverXAConnection rxac)
+    public ConnectionSynchronization (ConnectionImple conn, TransactionalDriverXAConnection rxac)
     {
 	_theConnection = conn;
-	_recoveryConnection = rxac;
+	_transactionDriverXAConnection = rxac;
     }
 
     public void afterCompletion(int status)
     {
 	try
 	{
-	    if (_theConnection != null && !_theConnection.isClosed()) {
-	        _theConnection.close();
+	    if (_theConnection != null && _transactionDriverXAConnection == null) {
+	        _theConnection.closeImpl();
 	    }
 	}
 	catch (Exception ex)
@@ -66,8 +62,9 @@ public class ConnectionSynchronization implements Synchronization
 	}
 	try
 	{
-	    if (_recoveryConnection != null) {
-	        _recoveryConnection.closeCloseCurrentConnection();
+	    if (_transactionDriverXAConnection != null) {
+	        _transactionDriverXAConnection.closeCloseCurrentConnection();
+			ConnectionManager.remove(_theConnection);
 	    }
 	}
 	catch (Exception ex)
@@ -79,7 +76,7 @@ public class ConnectionSynchronization implements Synchronization
     {
     }
 
-    private Connection _theConnection = null;
-    private TransactionalDriverXAConnection _recoveryConnection;
+    private ConnectionImple _theConnection = null;
+    private TransactionalDriverXAConnection _transactionDriverXAConnection;
 }
 

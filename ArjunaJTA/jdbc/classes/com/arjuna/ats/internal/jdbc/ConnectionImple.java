@@ -298,17 +298,6 @@ public class ConnectionImple implements Connection
 	    try
 	    {
 	        /*
-	         * Need to know whether this particular connection has outstanding
-	         * resources waiting for it. If not then we can close, otherwise we
-	         * can't.
-	         */
-
-	        if (!_transactionalDriverXAConnectionConnection.inuse())
-	        {
-	            ConnectionManager.remove(this); // finalize?
-	        }
-
-	        /*
 	         * Delist resource if within a transaction.
 	         */
 
@@ -366,30 +355,21 @@ public class ConnectionImple implements Connection
 	                    }
 	                }
 
-	                tx.registerSynchronization(new ConnectionSynchronization(null, _transactionalDriverXAConnectionConnection));
+	                tx.registerSynchronization(new ConnectionSynchronization(this, _transactionalDriverXAConnectionConnection));
 	                if (delayClose)
 	                {
-        	                tx.registerSynchronization(new ConnectionSynchronization(_theConnection, null));
-
-                                _theConnection = null;
-	                }
+        	                tx.registerSynchronization(new ConnectionSynchronization(this, null));
+	                } else {
+						closeImpl();
+					}
 	            }
 	            else
 	                throw new SQLException(jdbcLogger.i18NLogger.get_closeerrorinvalidtx(tx.toString()));
 	        } else {
+				closeImpl();
 	            _transactionalDriverXAConnectionConnection.closeCloseCurrentConnection();
+				ConnectionManager.remove(this);
 	        }
-
-	        if (!delayClose)  // close now
-	        {
-	            if (!_theConnection.isClosed()) {
-	                _theConnection.close();
-	            }
-
-	            _theConnection = null;
-	        }
-
-	        // what about connections without xaCon?
 	    }
 	    catch (IllegalStateException ex)
 	    {
@@ -405,6 +385,16 @@ public class ConnectionImple implements Connection
 	        sqlException.initCause(e1);
 	        throw sqlException;
 	    }
+	}
+
+	void closeImpl() throws SQLException {
+		try {
+			if (!_theConnection.isClosed()) {
+				_theConnection.close();
+			}
+		} finally {
+			_theConnection = null;
+		}
 	}
 
 	public boolean isClosed() throws SQLException
@@ -860,15 +850,10 @@ public class ConnectionImple implements Connection
 	{
 		try
 		{
-			if (_theConnection != null)
-				_theConnection.close();
+			closeImpl();
 		}
 		catch (Exception ex)
 		{
-		}
-		finally
-		{
-			_theConnection = null;
 		}
 	}
 

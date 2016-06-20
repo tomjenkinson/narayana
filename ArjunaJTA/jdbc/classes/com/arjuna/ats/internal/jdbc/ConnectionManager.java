@@ -117,9 +117,9 @@ public class ConnectionManager
                 else
                 {
                     // no longer being used by a transaction, so let's discard. JBTM-764
-
-                    if (tx1 == null)
-                        iterator.remove();
+// TODO Make configurable but if you call getConnection it is still open also you aren't cleaning up the connection by just removing it!
+//                    if (tx1 == null)
+//                        iterator.remove();
                 }
             }
         }
