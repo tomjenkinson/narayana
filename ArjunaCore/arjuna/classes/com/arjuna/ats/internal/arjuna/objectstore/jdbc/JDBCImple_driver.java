@@ -628,7 +628,7 @@ public abstract class JDBCImple_driver {
 						.prepareStatement(
 								"SELECT ObjectState, UidString, StateType, TypeName FROM "
 										+ tableName
-										+ " WHERE TypeName = ? AND UidString = ? AND StateType = ?",
+										+ " WHERE TypeName = ? AND UidString = ? AND StateType = ? FOR UPDATE",
 								ResultSet.TYPE_FORWARD_ONLY,
 								ResultSet.CONCUR_UPDATABLE);
 
