@@ -658,6 +658,7 @@ public abstract class JDBCImple_driver {
                         pstmt2.close();
                     }
 				} else {
+                    connection.commit();
 					// not in database, do insert:
 					PreparedStatement pstmt2 = connection
 							.prepareStatement("INSERT INTO "
