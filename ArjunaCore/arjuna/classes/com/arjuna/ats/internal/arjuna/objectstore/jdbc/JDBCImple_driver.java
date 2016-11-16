@@ -744,7 +744,7 @@ public abstract class JDBCImple_driver {
         
         		if (jdbcStoreEnvironmentBean.getDropTable()) {
         			try {
-        				stmt.executeUpdate("DROP TABLE " + tableName);
+        				stmt.executeUpdate("TRUNCATE TABLE " + tableName);
         			} catch (SQLException ex) {
         				checkDropTableException(connection, ex);
         			}
