@@ -155,7 +155,7 @@ public class AtomicObject extends LockManager
         try {
             current.begin();
 
-            if (setlock(new Lock(LockMode.READ), 5) == LockResult.GRANTED) {
+            if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED) {
                 value = _value;
                 current.commit(false);
                 return value;
