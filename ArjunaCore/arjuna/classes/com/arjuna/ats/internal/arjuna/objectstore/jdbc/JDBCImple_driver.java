@@ -744,7 +744,7 @@ public abstract class JDBCImple_driver {
         
         		if (jdbcStoreEnvironmentBean.getDropTable()) {
         			try {
-        				stmt.executeUpdate("TRUNCATE TABLE " + tableName);
+                        deleteTable(stmt, tableName);
         			} catch (SQLException ex) {
         				checkDropTableException(connection, ex);
         			}
@@ -767,6 +767,10 @@ public abstract class JDBCImple_driver {
 
 		this.tableName = tableName;
 	}
+
+	protected void deleteTable(Statement stmt, String tableName) throws SQLException {
+        stmt.executeUpdate("TRUNCATE TABLE " + tableName);
+    }
 
 	/**
 	 * Can be overridden by implementation-specific code to create the store

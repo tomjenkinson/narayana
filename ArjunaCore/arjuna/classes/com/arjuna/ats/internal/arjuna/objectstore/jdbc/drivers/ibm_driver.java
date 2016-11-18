@@ -22,6 +22,7 @@ package com.arjuna.ats.internal.arjuna.objectstore.jdbc.drivers;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * JDBC store implementation driver-specific code. This version for IBM DB2
@@ -48,6 +49,10 @@ public class ibm_driver extends
 		if (!ex.getSQLState().equals("42704") && ex.getErrorCode() != -204) {
 			throw ex;
 		}
-
 	}
+
+    @Override
+    protected void deleteTable(Statement stmt, String tableName) throws SQLException {
+        stmt.executeUpdate("TRUNCATE TABLE " + tableName + " IMMEDIATE");
+    }
 }
