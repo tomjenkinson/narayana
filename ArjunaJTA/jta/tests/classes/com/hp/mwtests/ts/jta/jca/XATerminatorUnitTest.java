@@ -392,7 +392,7 @@ public class XATerminatorUnitTest
         final int THREAD_COUNT = 200;
         final CyclicBarrier gate = new CyclicBarrier(THREAD_COUNT + 1);
 
-        ArrayList<CompletableFuture<SubordinateTransaction>> futures = new ArrayList<>();
+        ArrayList<CompletableFuture<SubordinateTransaction>> futures = new ArrayList<CompletableFuture<SubordinateTransaction>>();
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 
         for (int i = 0; i < TASK_COUNT; i++)
