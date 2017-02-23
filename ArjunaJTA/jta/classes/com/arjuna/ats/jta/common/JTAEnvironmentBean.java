@@ -29,7 +29,12 @@ import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
+import org.jboss.tm.SubordinateTransactionImporter;
+import org.jboss.tm.usertx.UserTransactionOperationsProvider;
+import org.jboss.tm.usertx.client.ServerVMClientUserTransactionOperationsProvider;
+
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecordWrappingPlugin;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.NarayanaSubordinateTransactionImporter;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
 import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import com.arjuna.ats.jta.resources.XAResourceMap;
@@ -109,6 +114,12 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 	private Map<String, Boolean> performImmediateCleanupOfCommitMarkableResourceBranchesMap = new HashMap<String, Boolean>();
 
 	private Map<String, Integer> commitMarkableResourceRecordDeleteBatchSizeMap = new HashMap<String, Integer>();
+
+	private volatile String subordinateTransactionImporterClassName = NarayanaSubordinateTransactionImporter.class.getName();
+	private volatile SubordinateTransactionImporter subordinateTransactionImporter;
+
+    private volatile String userTransactionOperationsProviderClassName = ServerVMClientUserTransactionOperationsProvider.class.getName();
+    private volatile UserTransactionOperationsProvider userTransactionOperationsProvider = null;
 
 	/**
      * Returns true if subtransactions are allowed.
@@ -1225,4 +1236,127 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 			boolean notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches) {
 		this.notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches = notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches;
 	}
+
+	/**
+     * Setting name of class which is taken to be used as transaction importer
+     * when a {@link Xid} needs to be imported as a transaction to currently running TM.<br>
+     * The classname which is set here has to implement {@link TransactionImporter} interface.
+     */
+    public void setSubordinateTransactionImporterClassName(String importerClassName) {
+        synchronized(this)
+        {
+            if(importerClassName == null)
+            {
+                this.subordinateTransactionImporter = null;
+            }
+            else if(!importerClassName.equals(this.subordinateTransactionImporterClassName))
+            {
+                this.subordinateTransactionImporter = null;
+            }
+            this.subordinateTransactionImporterClassName = importerClassName;
+        }
+    }
+
+    public String getSubordinateTransactionImporterClassName(){
+        return this.subordinateTransactionImporterClassName;
+    }
+
+    public void setSubordinateTransactionImporter(SubordinateTransactionImporter importer) {
+        synchronized(this) {
+            SubordinateTransactionImporter oldImporter = this.subordinateTransactionImporter;
+            this.subordinateTransactionImporter = importer;
+
+            if(importer == null)
+            {
+                this.subordinateTransactionImporterClassName = null;
+            }
+            else if(importer != oldImporter)
+            {
+                this.lastResourceOptimisationInterfaceClassName = ClassloadingUtility.getNameForClass(importer);
+            }
+            this.subordinateTransactionImporter = importer;
+        }
+    }
+    
+    /**
+     * Importing subordinate transaction.
+     */
+    public SubordinateTransactionImporter getSubordinateTransactionImporter() {
+        if(subordinateTransactionImporter == null && subordinateTransactionImporterClassName != null) {
+            synchronized(this) {
+                if(subordinateTransactionImporter == null && subordinateTransactionImporterClassName != null) {
+                    subordinateTransactionImporter = ClassloadingUtility.loadAndInstantiateClass(SubordinateTransactionImporter.class,
+                        subordinateTransactionImporterClassName, null);
+                }
+            }
+        }
+
+        return subordinateTransactionImporter;
+    }
+
+    /**
+     * Setting of class name that defines {@link UserTransactionOperationsProvider}.
+     * The provider is later used to get more info about {@link UserTransaction}.
+     *
+     * @param providerClassName  class name implementing {@link UserTransactionOperationsProvider}
+     */
+    public void setUserTransactionOperationsProviderClassName(String providerClassName) {
+        synchronized (this) {
+            if(providerClassName == null)
+            {
+                this.userTransactionOperationsProvider = null;
+            }
+            else if(!providerClassName.equals(this.userTransactionOperationsProviderClassName))
+            {
+                this.userTransactionOperationsProvider = null;
+            }
+            this.userTransactionOperationsProviderClassName = providerClassName;
+        }
+    }
+
+    /**
+     * Get class name that is used as {@link UserTransactionOperationsProvider}
+     *
+     * @return class name implementing {@link UserTransactionOperationsProvider}
+     */
+    public String getUserTransactionOperationsProviderClassName() {
+        return this.userTransactionOperationsProviderClassName;
+    }
+
+    public void setUserTransactionOperationsProvider(UserTransactionOperationsProvider provider) {
+        UserTransactionOperationsProvider oldProvider = this.userTransactionOperationsProvider;
+        this.userTransactionOperationsProvider = provider;
+
+        if(provider == null)
+        {
+            this.userTransactionOperationsProviderClassName = null;
+        }
+        else if (provider != oldProvider)
+        {
+            this.userTransactionOperationsProviderClassName =
+                ClassloadingUtility.getNameForClass(provider);
+        }
+        this.userTransactionOperationsProvider = provider;
+    }
+
+    /**
+     * Returning singleton instance of {@link UserTransactionOperationsProvider} instantiated based
+     * based on name specified by {@link #setUserTransactionOperationsProviderClassName(String)}.<br>
+     * When class name is redefined during runtime there should be instantiated new provider.
+     *
+     * @return instance of class implementing {@link UserTransactionOperationsProvider}
+     */
+    public UserTransactionOperationsProvider getUserTransactionOperationsProvider() {
+
+        if(userTransactionOperationsProvider == null && userTransactionOperationsProviderClassName != null) {
+            synchronized(this) {
+                if(userTransactionOperationsProvider == null && userTransactionOperationsProviderClassName != null) {
+                    userTransactionOperationsProvider = ClassloadingUtility.loadAndInstantiateClass(UserTransactionOperationsProvider.class,
+                        userTransactionOperationsProviderClassName, null);
+                }
+            }
+        }
+
+        return userTransactionOperationsProvider;
+    }
 }

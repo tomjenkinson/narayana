@@ -204,6 +204,7 @@ public class EnvironmentBeanTest
         setter.invoke(bean, new Object[] { proxy }); // setFoo()
         assertSame(getter.invoke(bean, new Object[] {}), proxy); // getFoo
 
+        // setter called with null expecting getter and getter of class name returns null
         setter.invoke(bean, new Object[] { null }); // setFoo()
         assertNull(getter.invoke(bean, new Object[] {})); // getFoo
         assertNull(classNameGetter.invoke(bean, new Object[] {})); // getFooClassName
