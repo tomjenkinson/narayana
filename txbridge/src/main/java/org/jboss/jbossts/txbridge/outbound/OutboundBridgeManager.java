@@ -24,10 +24,12 @@
 package org.jboss.jbossts.txbridge.outbound;
 
 import com.arjuna.ats.jta.TransactionManager;
-import com.arjuna.ats.jta.transaction.Transaction;
 import com.arjuna.ats.arjuna.common.Uid;
 
 import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.xa.XAResource;
@@ -66,18 +68,20 @@ public class OutboundBridgeManager
 
         try
         {
-            Transaction transaction = (Transaction)TransactionManager.transactionManager().getTransaction();
+            Transaction transaction = (Transaction)TransactionManager.transactionManager(new InitialContext()).getTransaction();
 
-            Uid externalTxId = transaction.get_uid();
+            // generating new Uid to get it connected to incoming transaction
+            // the incoming transaction could come from different TM than Narayana is (e.g. Wildfly Transaction client)
+            Uid outboundMappingUid = new Uid();
 
-            if(!outboundBridgeMappings.containsKey(externalTxId)) {
-                createMapping(transaction, externalTxId);
+            if(!outboundBridgeMappings.containsKey(outboundMappingUid)) {
+                createMapping(transaction, outboundMappingUid);
             }
 
-            return outboundBridgeMappings.get(externalTxId);
+            return outboundBridgeMappings.get(outboundMappingUid);
 
         }
-        catch(SystemException e)
+        catch(SystemException | NamingException e)
         {
             txbridgeLogger.logger.error(e);
         }
@@ -88,28 +92,29 @@ public class OutboundBridgeManager
     /**
      * Remove the mapping for the given externalTxId. This should be called for gc when the tx is finished.
      *
-     * @param externalTxId The JTA transaction identifier.
+     * @param outboundMappingUid identifier bound to the JTA transaction
      */
-    public static synchronized void removeMapping(Uid externalTxId)
+    static synchronized void removeMapping(Uid outboundMappingUid)
     {
-        txbridgeLogger.logger.trace("OutboundBridgeManager.removeMapping(externalTxId="+externalTxId+")");
+        txbridgeLogger.logger.trace("OutboundBridgeManager.removeMapping(outboundMappingUid="+outboundMappingUid+")");
 
-        if(externalTxId != null) {
-            outboundBridgeMappings.remove(externalTxId);
+        if(outboundMappingUid != null) {
+            outboundBridgeMappings.remove(outboundMappingUid);
         }
     }
 
     /**
      * Create a WS-AT transaction mapping and support objects for a given JTA transaction context.
      *
-     * @param externalTxId The JTA transaction identifier.
+     * @param externalTransaction  transaction where bridge resource will be registered to
+     * @param outboundMappingUid identifier bound to JTA transaction
      * @throws SystemException
      */
-    private static synchronized void createMapping(Transaction transaction, Uid externalTxId) throws SystemException
+    private static synchronized void createMapping(Transaction externalTransaction, Uid outboundMappingUid) throws SystemException
     {
-        txbridgeLogger.logger.trace("OutboundBridgeManager.createmapping(externalTxId="+externalTxId+")");
+        txbridgeLogger.logger.trace("OutboundBridgeManager.createmapping(outboundMappingUid="+outboundMappingUid+")");
 
-        if(outboundBridgeMappings.containsKey(externalTxId)) {
+        if(outboundBridgeMappings.containsKey(outboundMappingUid)) {
             return;
         }
 
@@ -117,13 +122,13 @@ public class OutboundBridgeManager
         BridgeWrapper bridgeWrapper = BridgeWrapper.create(BRIDGEWRAPPER_PREFIX, 0, false);
 
         org.jboss.jbossts.txbridge.outbound.OutboundBridge outboundBridge = new org.jboss.jbossts.txbridge.outbound.OutboundBridge(bridgeWrapper);
-        XAResource xaResource = new org.jboss.jbossts.txbridge.outbound.BridgeXAResource(externalTxId, bridgeWrapper);
+        XAResource xaResource = new org.jboss.jbossts.txbridge.outbound.BridgeXAResource(outboundMappingUid, bridgeWrapper);
         Synchronization synchronization = new org.jboss.jbossts.txbridge.outbound.BridgeSynchronization(bridgeWrapper);
 
         try
         {
-            transaction.enlistResource(xaResource);
-            transaction.registerSynchronization(synchronization);
+            externalTransaction.enlistResource(xaResource);
+            externalTransaction.registerSynchronization(synchronization);
         }
         catch(RollbackException e)
         {
@@ -131,6 +136,6 @@ public class OutboundBridgeManager
             throw new SystemException(e.toString());
         }
 
-        outboundBridgeMappings.put(externalTxId, outboundBridge);
+        outboundBridgeMappings.put(outboundMappingUid, outboundBridge);
     }
 }
