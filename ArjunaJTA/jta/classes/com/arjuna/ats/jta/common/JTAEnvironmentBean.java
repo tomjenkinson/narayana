@@ -1239,8 +1239,8 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 
 	/**
      * Setting name of class which is taken to be used as transaction importer
-     * when a {@link Xid} needs to be imported as a transaction to currently running TM.<br>
-     * The classname which is set here has to implement {@link TransactionImporter} interface.
+     * when a {@link javax.transaction.xa.Xid} needs to be imported as a transaction to currently running TM.<br>
+     * The classname which is set here has to implement {@link org.jboss.tm.SubordinateTransactionImporter} interface.
      */
     public void setSubordinateTransactionImporterClassName(String importerClassName) {
         synchronized(this)
