@@ -452,7 +452,13 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
     public Transaction getTransaction(Xid xid) throws XAException {
         // first see if the xid is a root coordinator
-        return com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
+        Transaction transaction = com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple
+            .getTransaction(new XidImple(xid).getTransactionUid());
+        // second see if the xid is a subordinate txn
+        if(transaction == null) {
+            transaction = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        }
+        return transaction;
     }
 
     public TransactionImportResult importTransaction(Xid xid, int timeoutIfNew) throws XAException {
