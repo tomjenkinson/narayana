@@ -43,6 +43,8 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransac
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateXidImple;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporter;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
+import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
+import com.arjuna.ats.internal.jts.recovery.transactions.TransactionCache;
 import org.jboss.tm.TransactionImportResult;
 
 public class TransactionImporterImple implements TransactionImporter
@@ -100,7 +102,9 @@ public class TransactionImporterImple implements TransactionImporter
 		if (recovered.baseXid() == null)
 		    throw new IllegalArgumentException();
 
-		return (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
+		SubordinateTransaction toReturn = (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
+		TransactionCache.replayPhase2(actId, ServerTransaction.getType()); // This can move the entry if required
+		return toReturn;
 	}
     
 	/**

@@ -34,30 +34,37 @@ package com.hp.mwtests.ts.jta.jts.jca;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.arjuna.ats.internal.jta.Implementationsx;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
-import com.arjuna.ats.internal.jta.transaction.jts.TransactionImple;
-import com.arjuna.ats.internal.jts.ControlWrapper;
-import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
-import com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction;
-import com.arjuna.ats.jta.xa.XidImple;
-import com.arjuna.ats.jts.extensions.AtomicTransaction;
-import org.junit.Test;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.arjuna.ats.arjuna.common.Uid;
-import com.arjuna.ats.internal.jta.transaction.jts.jca.TransactionImporterImple;
-import com.hp.mwtests.ts.jta.jts.common.TestBase;
-
-import javax.transaction.HeuristicCommitException;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
-import java.lang.reflect.Field;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.objectstore.ObjectStoreIterator;
+import com.arjuna.ats.arjuna.objectstore.StoreManager;
+import com.arjuna.ats.internal.jta.Implementationsx;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporter;
+import com.arjuna.ats.internal.jta.transaction.jts.TransactionImple;
+import com.arjuna.ats.internal.jta.transaction.jts.jca.TransactionImporterImple;
+import com.arjuna.ats.internal.jta.utils.jts.XidUtils;
+import com.arjuna.ats.internal.jts.ControlWrapper;
+import com.arjuna.ats.internal.jts.Implementations;
+import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
+import com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction;
+import com.arjuna.ats.internal.jts.recovery.transactions.AssumedCompleteServerTransaction;
+import com.arjuna.ats.jta.xa.XidImple;
+import com.arjuna.ats.jts.common.jtsPropertyManager;
+import com.arjuna.ats.jts.extensions.AtomicTransaction;
+import com.hp.mwtests.ts.jta.jts.common.TestBase;
+import com.hp.mwtests.ts.jta.subordinate.TestXAResource;
 
 public class TransactionImporterUnitTest extends TestBase
 {
@@ -118,30 +125,13 @@ public class TransactionImporterUnitTest extends TestBase
     }
 
     @Test
-    public void testDifferentInstanceFromRecovery() throws XAException, RollbackException, SystemException, HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException, NoSuchFieldException, IllegalAccessException {
+    public void testDifferentInstanceFromRecovery() throws Exception {
         Uid uid = new Uid();
         XidImple xid = new XidImple(uid);
 
         SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
-        // This is required because it JTS records are stored with a dynamic _savingUid
-        // Normally they are recovered using XATerminator but for this test I would like to stick to testing
-        // transaction importer
-        Field field = TransactionImple.class.getDeclaredField("_theTransaction");
-        field.setAccessible(true);
-        Object o = field.get(subordinateTransaction);
-        field = AtomicTransaction.class.getDeclaredField("_theAction");
-        field.setAccessible(true);
-        o = field.get(o);
-        field = ControlWrapper.class.getDeclaredField("_controlImpl");
-        field.setAccessible(true);
-        o = field.get(o);
-        field = ControlImple.class.getDeclaredField("_transactionHandle");
-        field.setAccessible(true);
-        o = field.get(o);
-        field = ServerTransaction.class.getDeclaredField("_savingUid");
-        field.setAccessible(true);
-        Uid subordinateTransactionUid = (Uid) field.get(o);
+        Uid subordinateTransactionUid = getImportedSubordinateTransactionUid(subordinateTransaction);
         Xid subordinateTransactionXid = subordinateTransaction.baseXid();
 
         SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
@@ -208,5 +198,79 @@ public class TransactionImporterUnitTest extends TestBase
         SubordinateTransaction importedTransaction2 = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
         assertTrue(importedTransaction1 == importedTransaction2);
         importedTransaction2.doCommit();
+    }
+
+    @Test
+    public void testPreparedTransactionMovedToAssumedCompleted() throws Exception {
+        Implementations.initialise();
+        Implementationsx.initialise();
+
+        Uid uid = new Uid();
+        Xid xid = XidUtils.getXid(uid, false);
+
+        TransactionImporter importer = SubordinationManager.getTransactionImporter();
+        SubordinateTransaction subordinateTransaction = importer.importTransaction(xid);
+
+        Uid subordinateTransactionUid = getImportedSubordinateTransactionUid(subordinateTransaction);
+
+        TestXAResource xares = new TestXAResource();
+        xares.setCommitException(new XAException(XAException.XAER_RMFAIL));
+        subordinateTransaction.enlistResource(xares);
+        subordinateTransaction.doPrepare();
+        boolean commitFailed = subordinateTransaction.doCommit();
+        Assert.assertFalse("Commit should fail as XAResource defined XAException on commit being thrown", commitFailed);
+
+        int assumedCompletedRetryOriginalValue = jtsPropertyManager.getJTSEnvironmentBean().getCommitedTransactionRetryLimit();
+        jtsPropertyManager.getJTSEnvironmentBean().setCommitedTransactionRetryLimit(1);
+        try {
+            importer.recoverTransaction(subordinateTransactionUid); // reply commit to move txn status to StatusCommitted
+            importer.recoverTransaction(subordinateTransactionUid); // first check if txn could not be assumed to be completed
+            importer.recoverTransaction(subordinateTransactionUid); // moving to assumed completed
+        } finally {
+            jtsPropertyManager.getJTSEnvironmentBean().setCommitedTransactionRetryLimit(assumedCompletedRetryOriginalValue);
+        }
+
+        try {
+            importer.recoverTransaction(subordinateTransactionUid);
+            Assert.fail("Transaction '" + subordinateTransaction + "' should fail to recover as it should be moved "
+                + "to category AssumedCompleteServerTrasactions");
+        } catch (IllegalArgumentException expected) {
+        }
+
+        ObjectStoreIterator objectStoreIterator = new ObjectStoreIterator(StoreManager.getRecoveryStore(),
+            AssumedCompleteServerTransaction.typeName());
+
+        List<Uid> assumedCompletedUids = new ArrayList<Uid>();
+        Uid iteratedUid = objectStoreIterator.iterate();
+        while(Uid.nullUid().notEquals(iteratedUid)) {
+            assumedCompletedUids.add(iteratedUid);
+            iteratedUid = objectStoreIterator.iterate();
+        }
+        Assert.assertTrue("the subordinate transaction has to be moved under assumed completed in object store",
+            assumedCompletedUids.contains(subordinateTransactionUid));
+    }
+
+    /**
+     * This is required because it JTS records are stored with a dynamic _savingUid
+     * Normally they are recovered using XATerminator but for this test I would like to stick to testing
+     * transaction importer
+     */
+    private Uid getImportedSubordinateTransactionUid(SubordinateTransaction subordinateTransaction) throws Exception {
+        Field field = TransactionImple.class.getDeclaredField("_theTransaction");
+        field.setAccessible(true);
+        Object o = field.get(subordinateTransaction);
+        field = AtomicTransaction.class.getDeclaredField("_theAction");
+        field.setAccessible(true);
+        o = field.get(o);
+        field = ControlWrapper.class.getDeclaredField("_controlImpl");
+        field.setAccessible(true);
+        o = field.get(o);
+        field = ControlImple.class.getDeclaredField("_transactionHandle");
+        field.setAccessible(true);
+        o = field.get(o);
+        field = ServerTransaction.class.getDeclaredField("_savingUid");
+        field.setAccessible(true);
+        Uid subordinateTransactionUid = (Uid) field.get(o);
+        return subordinateTransactionUid;
     }
 }
