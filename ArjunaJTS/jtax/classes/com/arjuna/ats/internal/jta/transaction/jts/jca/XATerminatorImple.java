@@ -42,6 +42,7 @@ import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
+import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
@@ -63,6 +64,7 @@ import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.SubordinateAt
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
 import com.arjuna.ats.internal.jta.utils.jtaxLogger;
+import com.arjuna.ats.internal.jts.recovery.transactions.TransactionCache;
 import com.arjuna.ats.jta.exceptions.UnexpectedConditionException;
 import com.arjuna.ats.jta.xa.XidImple;
 import org.jboss.tm.ExtendedJBossXATerminator;
@@ -91,7 +93,12 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
             if (tx.baseXid() != null) // activate failed?
             {
-                if (onePhase)
+
+                if (tx.getStatus() == Status.STATUS_COMMITTING || tx.getStatus() == Status.STATUS_COMMITTED) {
+                    TransactionCache.replayPhase2(tx.get_uid(), ServerTransaction.getType()); // This can move the entry if required
+                    SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+                }
+                else if (onePhase)
                     tx.doOnePhaseCommit();
                 else
                     if (!tx.doCommit()) {
