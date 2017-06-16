@@ -102,9 +102,7 @@ public class TransactionImporterImple implements TransactionImporter
 		if (recovered.baseXid() == null)
 		    throw new IllegalArgumentException();
 
-		SubordinateTransaction toReturn = (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
-		TransactionCache.replayPhase2(actId, ServerTransaction.getType()); // This can move the entry if required
-		return toReturn;
+		return (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
 	}
     
 	/**
