@@ -80,6 +80,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -321,6 +322,11 @@ public class XATerminatorImpleUnitTest extends TestBase
                         firstAttempt = false;
                     }
                 }
+                if (failedResourceXid != null) {
+                    failedResourceXid = null;
+                } else {
+                    throw new XAException(XAException.XAER_PROTO);
+                }
             }
 
             @Override
@@ -382,58 +388,11 @@ public class XATerminatorImpleUnitTest extends TestBase
         }
         Implementationsx.initialise();
         xa.recover(XAResource.TMSTARTRSCAN);
+        assertNotNull(failedResourceXid);
         try {
             xa.commit(xid, false);
         } finally {
             xa.recover(XAResource.TMENDRSCAN);
-        }
-
-        XARecoveryModule xaRecoveryModule = new XARecoveryModule();
-        xaRecoveryModule.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
-            @Override
-            public boolean initialise(String p) throws Exception {
-                return false;
-            }
-
-            @Override
-            public XAResource[] getXAResources() throws Exception {
-                return new XAResource[] {
-                        new TestXAResource()  {
-                            public Xid[] recover(int var) throws XAException {
-                                if (var == XAResource.TMSTARTRSCAN) {
-                                    if (failedResourceXid != null) {
-                                        return new Xid[]{failedResourceXid};
-                                    }
-                                }
-                                return new Xid[0];
-                            }
-                            @Override
-                            public void commit(Xid xid, boolean b) throws XAException {
-                                failedResourceXid = null;
-                            }
-
-                            @Override
-                            public int prepare(Xid xid) throws XAException {
-                                return 0;
-                            }
-
-                            @Override
-                            public void rollback(Xid xid) throws XAException {
-                                fail("Resource was rolled back");
-                            }
-                        }
-                };
-            }
-        });
-        xaRecoveryModule.periodicWorkFirstPass();
-        Field safetyIntervalMillis = RecoveryXids.class.getDeclaredField("safetyIntervalMillis");
-        safetyIntervalMillis.setAccessible(true);
-        Object o1 = safetyIntervalMillis.get(null);
-        safetyIntervalMillis.set(null, 0);
-        try {
-            xaRecoveryModule.periodicWorkSecondPass();
-        } finally {
-            safetyIntervalMillis.set(null, o1);
         }
         assertNull(failedResourceXid);
     }
