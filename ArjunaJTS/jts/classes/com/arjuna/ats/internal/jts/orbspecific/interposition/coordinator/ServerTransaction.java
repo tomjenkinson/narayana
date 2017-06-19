@@ -235,16 +235,6 @@ public class ServerTransaction extends ArjunaTransactionImple
 
 		org.omg.CosTransactions.Status s = get_status();
 
-		if (s == org.omg.CosTransactions.Status.StatusCommitting || s == org.omg.CosTransactions.Status.StatusCommitted) {
-		    // This can move the entry if required
-		    TransactionCache.ReplayPhaseReturnStatus replayStatus = TransactionCache.replayPhase2(get_uid(), type());
-		    if(replayStatus == TransactionCache.ReplayPhaseReturnStatus.NONE) {
-		        // either the replay does not fully committed or moved under assumed completed state
-		        // returning that we haven't finished yet
-		        return ActionStatus.COMMITTING;
-		    }
-		}
-
 		if (s != org.omg.CosTransactions.Status.StatusPrepared) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_txnotprepared("ServerTransaction.doPhase2Commit", Utility.stringStatus(s));
 
