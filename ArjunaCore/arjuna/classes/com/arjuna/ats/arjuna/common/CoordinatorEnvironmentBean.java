@@ -89,7 +89,6 @@ public class CoordinatorEnvironmentBean implements CoordinatorEnvironmentBeanMBe
     private volatile String communicationStore = HashedActionStore.class.getName();
 
     private volatile boolean finalizeBasicActions = false;
-    private volatile boolean isAllowEarlySyncRegistration = true;
 
     /**
      * Returns true if anynchronous commit behaviour is enabled.
@@ -826,13 +825,6 @@ public class CoordinatorEnvironmentBean implements CoordinatorEnvironmentBeanMBe
     public void setAllowCheckedActionFactoryOverride(
 			boolean allowCheckedActionFactoryOverride) {
 		this.allowCheckedActionFactoryOverride = allowCheckedActionFactoryOverride;
-	}
-
-    public boolean isAllowEarlySyncRegistration() {
-        return isAllowEarlySyncRegistration;
-    }
-
-    public void setAllowEarlySyncRegistration(boolean allowEarlySyncRegistration) {
-        isAllowEarlySyncRegistration = allowEarlySyncRegistration;
-    }
+	}   
+    
 }
