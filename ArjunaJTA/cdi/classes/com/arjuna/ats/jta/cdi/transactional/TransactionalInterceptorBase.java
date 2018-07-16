@@ -38,8 +38,6 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -253,12 +251,7 @@ public abstract class TransactionalInterceptorBase implements Serializable {
     protected TransactionManager getTransactionManager() {
 
         if (transactionManager == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionManager = (TransactionManager) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tm(), e);
-            }
+            transactionManager = jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
         }
         return transactionManager;
     }

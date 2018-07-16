@@ -31,8 +31,6 @@ import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.PassivationCapable;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.*;
 
 import java.lang.annotation.Annotation;
@@ -139,12 +137,7 @@ public class TransactionContext implements Context {
         //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
         // (ie there is no object construction during initialization)
         if (transactionManager == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionManager = (TransactionManager) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tm(), e);
-            }
+            transactionManager = jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
         }
         return transactionManager;
     }
@@ -154,12 +147,7 @@ public class TransactionContext implements Context {
         //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
         // (ie there is no object construction during initialization)
         if (transactionSynchronizationRegistry == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionSynchronizationRegistry = (TransactionSynchronizationRegistry) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tsr(), e);
-            }
+            transactionSynchronizationRegistry = jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry();
         }
         return transactionSynchronizationRegistry;
     }
