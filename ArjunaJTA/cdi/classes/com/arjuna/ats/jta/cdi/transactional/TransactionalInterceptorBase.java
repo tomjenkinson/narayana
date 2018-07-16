@@ -70,7 +70,8 @@ public abstract class TransactionalInterceptorBase implements Serializable {
     @Intercepted
     private Bean<?> interceptedBean;
 
-    private static TransactionManager transactionManager;
+    @Inject
+    private TransactionManager transactionManager;
 
     private final boolean userTransactionAvailable;
 
@@ -80,12 +81,11 @@ public abstract class TransactionalInterceptorBase implements Serializable {
 
     public Object intercept(InvocationContext ic) throws Exception {
 
-        final TransactionManager tm = getTransactionManager();
-        final Transaction tx = tm.getTransaction();
+        final Transaction tx = transactionManager.getTransaction();
 
         boolean previousUserTransactionAvailability = setUserTransactionAvailable(userTransactionAvailable);
         try {
-            return doIntercept(tm, tx, ic);
+            return doIntercept(transactionManager, tx, ic);
         } finally {
             resetUserTransactionAvailability(previousUserTransactionAvailability);
         }
@@ -248,19 +248,6 @@ public abstract class TransactionalInterceptorBase implements Serializable {
         UserTransactionOperationsProvider userTransactionProvider =
             jtaPropertyManager.getJTAEnvironmentBean().getUserTransactionOperationsProvider();
         setAvailability(userTransactionProvider, previousUserTransactionAvailability);
-    }
-
-    protected TransactionManager getTransactionManager() {
-
-        if (transactionManager == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionManager = (TransactionManager) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tm(), e);
-            }
-        }
-        return transactionManager;
     }
 
     private void setAvailability(UserTransactionOperationsProvider userTransactionProvider, boolean available) {

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
@@ -33,7 +34,10 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
+import javax.inject.Singleton;
+import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
+import javax.transaction.TransactionSynchronizationRegistry;
 
 import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorMandatory;
 import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorNever;
@@ -41,6 +45,7 @@ import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorNotSupported
 import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorRequired;
 import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorRequiresNew;
 import com.arjuna.ats.jta.cdi.transactional.TransactionalInterceptorSupports;
+import com.arjuna.ats.jta.common.jtaPropertyManager;
 
 /**
  * @author paul.robinson@redhat.com 01/05/2013
@@ -51,13 +56,19 @@ public class TransactionExtension implements Extension {
 
     private Map<Bean<?>, AnnotatedType<?>> beanToAnnotatedTypeMapping = new HashMap<>();
 
-    public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
-
-        event.addContext(new TransactionContext());
+    public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {        
+        event.addContext(new TransactionContext(() -> {
+            final Bean<?> tmBean = manager.resolve(manager.getBeans(TransactionManager.class));
+            return (TransactionManager)manager.getReference(tmBean, TransactionManager.class, manager.createCreationalContext(tmBean));
+        },
+        () -> {
+            final Bean<?> tsrBean = manager.resolve(manager.getBeans(TransactionSynchronizationRegistry.class));
+            return (TransactionSynchronizationRegistry)manager.getReference(tsrBean, TransactionSynchronizationRegistry.class, manager.createCreationalContext(tsrBean));
+        }));
     }
 
-    public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {
-
+    public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {        
+        
         bbd.addScope(TransactionScoped.class, true, true);
 
         bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorMandatory.class), TransactionalInterceptorMandatory.class.getName() + TX_INTERCEPTOR);
@@ -79,4 +90,24 @@ public class TransactionExtension implements Extension {
     public Map<Bean<?>, AnnotatedType<?>> getBeanToAnnotatedTypeMapping() {
         return beanToAnnotatedTypeMapping;
     }
+
+    // Weld seems to pick this up automatically; this is probably a
+    // bug.  If it is ever fixed, then make sure to do an
+    // addAnnotatedType(Producers.class) above.
+    private static final class Producers {
+
+        @Produces
+        @Singleton
+        private static final TransactionManager produceTransactionManager() {
+            return com.arjuna.ats.jta.TransactionManager.transactionManager();
+        }
+
+        @Produces
+        @Singleton
+        private static final TransactionSynchronizationRegistry produceTransactionSynchronizationRegistry() {
+            return jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry();
+        }
+        
+    }
+
 }

@@ -38,18 +38,26 @@ import javax.transaction.*;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author paul.robinson@redhat.com 01/05/2013
  */
 public class TransactionContext implements Context {
 
-    private static TransactionManager transactionManager;
+    private final Supplier<TransactionManager> transactionManagerSupplier;
 
-    private static TransactionSynchronizationRegistry transactionSynchronizationRegistry;
+    private final Supplier<TransactionSynchronizationRegistry> transactionSynchronizationRegistrySupplier;
+    
+    private final Map<Transaction, TransactionScopeCleanup> transactions = new HashMap<Transaction, TransactionScopeCleanup>();
 
-    private Map<Transaction, TransactionScopeCleanup> transactions = new HashMap<Transaction, TransactionScopeCleanup>();
-
+    public TransactionContext(Supplier<TransactionManager> transactionManagerSupplier,
+                              Supplier<TransactionSynchronizationRegistry> transactionSynchronizationRegistrySupplier) {
+        super();
+        this.transactionManagerSupplier = transactionManagerSupplier;
+        this.transactionSynchronizationRegistrySupplier = transactionSynchronizationRegistrySupplier;
+    }
+    
     @Override
     public Class<? extends Annotation> getScope() {
         return TransactionScoped.class;
@@ -65,7 +73,7 @@ public class TransactionContext implements Context {
         }
 
         PassivationCapable bean = (PassivationCapable) contextual;
-        TransactionSynchronizationRegistry tsr = getTransactionSynchronizationRegistry();
+        TransactionSynchronizationRegistry tsr = this.transactionSynchronizationRegistrySupplier.get();
         Object resource = tsr.getResource(bean.getId());
 
         if (resource != null) {
@@ -134,33 +142,8 @@ public class TransactionContext implements Context {
         }
     }
 
-    protected TransactionManager getTransactionManager() {
-
-        //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
-        // (ie there is no object construction during initialization)
-        if (transactionManager == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionManager = (TransactionManager) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tm(), e);
-            }
-        }
-        return transactionManager;
+    private TransactionManager getTransactionManager() {
+        return this.transactionManagerSupplier.get();
     }
 
-    private TransactionSynchronizationRegistry getTransactionSynchronizationRegistry() {
-
-        //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
-        // (ie there is no object construction during initialization)
-        if (transactionSynchronizationRegistry == null) {
-            try {
-                InitialContext initialContext = new InitialContext();
-                transactionSynchronizationRegistry = (TransactionSynchronizationRegistry) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
-            } catch (NamingException e) {
-                throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tsr(), e);
-            }
-        }
-        return transactionSynchronizationRegistry;
-    }
 }
