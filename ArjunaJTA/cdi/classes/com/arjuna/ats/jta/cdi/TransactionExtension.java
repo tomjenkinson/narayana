@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013, Red Hat, Inc., and individual contributors
+ * Copyright 2013-2018 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,11 +22,16 @@
 
 package com.arjuna.ats.jta.cdi;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
@@ -35,6 +40,10 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.inject.Singleton;
+import javax.naming.CompositeName;
+import javax.naming.InitialContext;
+import javax.naming.InvalidNameException;
+import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
 import javax.transaction.TransactionSynchronizationRegistry;
@@ -49,6 +58,8 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 
 /**
  * @author paul.robinson@redhat.com 01/05/2013
+ *
+ * @author <a href="https://about.me/lairdnelson" target="_parent">Laird Nelson</a>
  */
 public class TransactionExtension implements Extension {
 
@@ -57,6 +68,66 @@ public class TransactionExtension implements Extension {
     private Map<Bean<?>, AnnotatedType<?>> beanToAnnotatedTypeMapping = new HashMap<>();
 
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {        
+
+        boolean maybeAddInitialContextBean = false;
+        
+        Set<Bean<?>> beans = manager.getBeans(TransactionManager.class);
+        if (beans.isEmpty()) {
+            try {
+                event.addBean(new JNDIBean<>(new CompositeName(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext()), TransactionManager.class));
+                maybeAddInitialContextBean = true;
+            } catch (final InvalidNameException invalidNameException) {
+                event.addDefinitionError(invalidNameException);
+            }
+        }
+
+        beans = manager.getBeans(TransactionSynchronizationRegistry.class);
+        if (beans.isEmpty()) {
+            try {
+                event.addBean(new JNDIBean<>(new CompositeName(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext()), TransactionSynchronizationRegistry.class));
+                maybeAddInitialContextBean = true;
+            } catch (final InvalidNameException invalidNameException) {
+                event.addDefinitionError(invalidNameException);
+            }
+        }
+
+        if (maybeAddInitialContextBean) {
+            beans = manager.getBeans(InitialContext.class);
+            if (beans.isEmpty()) {
+                event.addBean(new AbstractBean<InitialContext>() {
+                        @Override
+                        public final Set<Type> getTypes() {
+                            return Collections.singleton(InitialContext.class); // deliberately NOT Context.class
+                        }
+
+                        @Override
+                        public final Class<? extends Annotation> getScope() {
+                            return Singleton.class;
+                        }
+
+                        @Override
+                        public final InitialContext create(final CreationalContext<InitialContext> cc) {
+                            try {
+                                return new InitialContext();
+                            } catch (final NamingException namingException) {
+                                throw new CreationException(namingException.getMessage(), namingException);
+                            }
+                        }
+
+                        @Override
+                        public final void destroy(final InitialContext context, final CreationalContext<InitialContext> cc) {
+                            if (context != null) {
+                                try {
+                                    context.close();
+                                } catch (final NamingException namingException) {
+                                    
+                                }
+                            }
+                        }
+                    });
+            }
+        }
+        
         event.addContext(new TransactionContext(() -> {
             final Bean<?> tmBean = manager.resolve(manager.getBeans(TransactionManager.class));
             return (TransactionManager)manager.getReference(tmBean, TransactionManager.class, manager.createCreationalContext(tmBean));
@@ -89,25 +160,6 @@ public class TransactionExtension implements Extension {
 
     public Map<Bean<?>, AnnotatedType<?>> getBeanToAnnotatedTypeMapping() {
         return beanToAnnotatedTypeMapping;
-    }
-
-    // Weld seems to pick this up automatically; this is probably a
-    // bug.  If it is ever fixed, then make sure to do an
-    // addAnnotatedType(Producers.class) above.
-    private static final class Producers {
-
-        @Produces
-        @Singleton
-        private static final TransactionManager produceTransactionManager() {
-            return com.arjuna.ats.jta.TransactionManager.transactionManager();
-        }
-
-        @Produces
-        @Singleton
-        private static final TransactionSynchronizationRegistry produceTransactionSynchronizationRegistry() {
-            return jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry();
-        }
-        
     }
 
 }
