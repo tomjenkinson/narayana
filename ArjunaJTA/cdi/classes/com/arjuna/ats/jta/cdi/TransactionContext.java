@@ -38,6 +38,7 @@ import javax.transaction.*;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -54,11 +55,35 @@ public class TransactionContext implements Context {
     
     private final Map<Transaction, TransactionScopeCleanup> transactions = new HashMap<Transaction, TransactionScopeCleanup>();
 
+    /**
+     * Creates a new {@link TransactionContext}.
+     *
+     * @deprecated Please use the {@link #TransactionContext(Supplier,
+     * Supplier)} constructor instead.
+     */
+    @Deprecated
+    public TransactionContext() {
+        this(() -> jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager(),
+             () -> jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry());
+    }
+
+    /**
+     * Creates a new {@link TransactionContext}.
+     *
+     * @param transactionManagerSupplier a {@link Supplier} of a
+     * {@link TransactionManager}; must not be {@code null}
+     *
+     * @param transactionSynchronizationRegistrySupplier a {@link
+     * Supplier} of a {@link TransactionSynchronizationRegistry}; must
+     * not be {@code null}
+     *
+     * @exception NullPointerException if either parameter is {@code null}
+     */
     public TransactionContext(Supplier<TransactionManager> transactionManagerSupplier,
                               Supplier<TransactionSynchronizationRegistry> transactionSynchronizationRegistrySupplier) {
         super();
-        this.transactionManagerSupplier = transactionManagerSupplier;
-        this.transactionSynchronizationRegistrySupplier = transactionSynchronizationRegistrySupplier;
+        this.transactionManagerSupplier = Objects.requireNonNull(transactionManagerSupplier);
+        this.transactionSynchronizationRegistrySupplier = Objects.requireNonNull(transactionSynchronizationRegistrySupplier);
     }
     
     @Override
@@ -66,6 +91,7 @@ public class TransactionContext implements Context {
         return TransactionScoped.class;
     }
 
+    @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
 
         if (!isActive()) {
@@ -103,11 +129,13 @@ public class TransactionContext implements Context {
         }
     }
 
+    @Override
     public <T> T get(Contextual<T> contextual) {
 
         return get(contextual, null);
     }
 
+    @Override
     public boolean isActive() {
 
         Transaction transaction = getCurrentTransaction();
@@ -138,15 +166,10 @@ public class TransactionContext implements Context {
     private Transaction getCurrentTransaction() {
 
         try {
-            TransactionManager tm = getTransactionManager();
-            return tm.getTransaction();
+            return this.transactionManagerSupplier.get().getTransaction();
         } catch (SystemException e) {
             throw new RuntimeException(jtaLogger.i18NLogger.get_error_getting_current_tx(), e);
         }
-    }
-
-    private TransactionManager getTransactionManager() {
-        return this.transactionManagerSupplier.get();
     }
 
 }
