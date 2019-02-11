@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013-2018 Red Hat, Inc., and individual contributors
+ * Copyright 2013-2019 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -40,9 +40,7 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.inject.Singleton;
-import javax.naming.CompositeName;
 import javax.naming.InitialContext;
-import javax.naming.InvalidNameException;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
@@ -65,27 +63,43 @@ public class TransactionExtension implements Extension {
 
     public static final String TX_INTERCEPTOR = "-tx-interceptor";
 
-    private Map<Bean<?>, AnnotatedType<?>> beanToAnnotatedTypeMapping = new HashMap<>();
+    private Object tmBean;
+
+    private boolean veto;
+    
+    private final Map<Bean<?>, AnnotatedType<?>> beanToAnnotatedTypeMapping = new HashMap<>();    
+    
+    public Map<Bean<?>, AnnotatedType<?>> getBeanToAnnotatedTypeMapping() {
+        return beanToAnnotatedTypeMapping;
+    }
+  
+    public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {        
+        
+        bbd.addScope(TransactionScoped.class, true, true);
+
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorMandatory.class), TransactionalInterceptorMandatory.class.getName() + TX_INTERCEPTOR);
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorNever.class), TransactionalInterceptorNever.class.getName() + TX_INTERCEPTOR);
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorNotSupported.class), TransactionalInterceptorNotSupported.class.getName() + TX_INTERCEPTOR);
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorRequired.class), TransactionalInterceptorRequired.class.getName() + TX_INTERCEPTOR);
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorRequiresNew.class), TransactionalInterceptorRequiresNew.class.getName() + TX_INTERCEPTOR);
+        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorSupports.class), TransactionalInterceptorSupports.class.getName() + TX_INTERCEPTOR);
+    }
+
+    /**
+     * Gathering information about managed bean to obtain mapping bean to annotated type.
+     * This is needed later when handling Stereotypes in TransactionalInterceptorBase.
+     */
+    public void processManagedBean(@Observes ProcessManagedBean<?> pmb) {
+        beanToAnnotatedTypeMapping.put(pmb.getBean(), pmb.getAnnotatedBeanClass());
+    }
 
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {        
 
-        boolean maybeAddInitialContextBean = false;
-        
-        Set<Bean<?>> beans = manager.getBeans(TransactionManager.class);
-        if (beans.isEmpty()) {
-            event.addBean(new JNDIBean<>(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext(), TransactionManager.class));
-            maybeAddInitialContextBean = true;
-        }
-
-        beans = manager.getBeans(TransactionSynchronizationRegistry.class);
-        if (beans.isEmpty()) {
+        Set<Bean<?>> beans = manager.getBeans(TransactionSynchronizationRegistry.class);
+        if (beans == null || beans.isEmpty()) {
             event.addBean(new JNDIBean<>(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext(), TransactionSynchronizationRegistry.class));
-            maybeAddInitialContextBean = true;
-        }
-
-        if (maybeAddInitialContextBean) {
             beans = manager.getBeans(InitialContext.class);
-            if (beans.isEmpty()) {
+            if (beans == null || beans.isEmpty()) {
                 event.addBean(new AbstractBean<InitialContext>() {
                         @Override
                         public final Set<Type> getTypes() {
@@ -128,30 +142,6 @@ public class TransactionExtension implements Extension {
             final Bean<?> tsrBean = manager.resolve(manager.getBeans(TransactionSynchronizationRegistry.class));
             return (TransactionSynchronizationRegistry)manager.getReference(tsrBean, TransactionSynchronizationRegistry.class, manager.createCreationalContext(tsrBean));
         }));
-    }
-
-    public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {        
-        
-        bbd.addScope(TransactionScoped.class, true, true);
-
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorMandatory.class), TransactionalInterceptorMandatory.class.getName() + TX_INTERCEPTOR);
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorNever.class), TransactionalInterceptorNever.class.getName() + TX_INTERCEPTOR);
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorNotSupported.class), TransactionalInterceptorNotSupported.class.getName() + TX_INTERCEPTOR);
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorRequired.class), TransactionalInterceptorRequired.class.getName() + TX_INTERCEPTOR);
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorRequiresNew.class), TransactionalInterceptorRequiresNew.class.getName() + TX_INTERCEPTOR);
-        bbd.addAnnotatedType(bm.createAnnotatedType(TransactionalInterceptorSupports.class), TransactionalInterceptorSupports.class.getName() + TX_INTERCEPTOR);
-    }
-
-    /**
-     * Gathering information about managed bean to obtain mapping bean to annotated type.
-     * This is needed later when handling Stereotypes in TransactionalInterceptorBase.
-     */
-    public void processManagedBean(@Observes ProcessManagedBean<?> pmb) {
-        beanToAnnotatedTypeMapping.put(pmb.getBean(), pmb.getAnnotatedBeanClass());
-    }
-
-    public Map<Bean<?>, AnnotatedType<?>> getBeanToAnnotatedTypeMapping() {
-        return beanToAnnotatedTypeMapping;
     }
 
 }

@@ -31,9 +31,12 @@ import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.PassivationCapable;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.transaction.*;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+import javax.transaction.TransactionScoped;
+import javax.transaction.TransactionSynchronizationRegistry;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -52,8 +55,8 @@ public class TransactionContext implements Context {
     private final Supplier<TransactionManager> transactionManagerSupplier;
 
     private final Supplier<TransactionSynchronizationRegistry> transactionSynchronizationRegistrySupplier;
-    
-    private final Map<Transaction, TransactionScopeCleanup> transactions = new HashMap<Transaction, TransactionScopeCleanup>();
+
+    private final Map<Transaction, TransactionScopeCleanup<?>> transactions = new HashMap<>();
 
     /**
      * Creates a new {@link TransactionContext}.
@@ -85,7 +88,7 @@ public class TransactionContext implements Context {
         this.transactionManagerSupplier = Objects.requireNonNull(transactionManagerSupplier);
         this.transactionSynchronizationRegistrySupplier = Objects.requireNonNull(transactionSynchronizationRegistrySupplier);
     }
-    
+
     @Override
     public Class<? extends Annotation> getScope() {
         return TransactionScoped.class;
@@ -103,20 +106,22 @@ public class TransactionContext implements Context {
 
         PassivationCapable bean = (PassivationCapable) contextual;
         TransactionSynchronizationRegistry tsr = this.transactionSynchronizationRegistrySupplier.get();
-        Object resource = tsr.getResource(bean.getId());
+        @SuppressWarnings("unchecked")
+        final T resource = (T) tsr.getResource(bean.getId());
 
         if (resource != null) {
-            return (T) resource;
+            return resource;
         } else if (creationalContext != null) {
             Transaction currentTransaction = getCurrentTransaction();
             T t = contextual.create(creationalContext);
             tsr.putResource(bean.getId(), t);
 
             synchronized (transactions) {
-                TransactionScopeCleanup synch = transactions.get(currentTransaction);
+                @SuppressWarnings("unchecked")
+                TransactionScopeCleanup<T> synch = (TransactionScopeCleanup<T>) transactions.get(currentTransaction);
 
                 if (synch == null) {
-                    synch = new TransactionScopeCleanup(this, currentTransaction);
+                    synch = new TransactionScopeCleanup<>(this, currentTransaction);
                     transactions.put(currentTransaction, synch);
                 }
 
