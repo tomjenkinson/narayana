@@ -134,7 +134,7 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
         try {
           temp = new InitialContext();
         } catch (final NamingException namingException) {
-          // TODO: log
+          throw new CreationException(namingException.getMessage(), namingException);
         } finally {
           ic = temp;
         }
@@ -148,6 +148,7 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
         assert initialContextBean != null;
         ic = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
       }
+      assert ic != null;
 
       // Now we have an InitialContext; let's use it.
       
