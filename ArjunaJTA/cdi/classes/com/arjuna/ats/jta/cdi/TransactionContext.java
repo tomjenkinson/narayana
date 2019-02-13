@@ -22,7 +22,6 @@
 
 package com.arjuna.ats.jta.cdi;
 
-
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
@@ -143,6 +142,10 @@ public class TransactionContext implements Context {
     @Override
     public boolean isActive() {
 
+        // Note that scope initialization and destruction events are
+        // fired by NarayanaTransactionManager.  See
+        // https://issues.jboss.org/browse/JBTM-3106 for details.
+        
         Transaction transaction = getCurrentTransaction();
         if (transaction == null) {
             return false;
