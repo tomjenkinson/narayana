@@ -38,6 +38,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import javax.inject.Inject;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -51,6 +52,8 @@ import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
 
 import com.arjuna.ats.jta.common.jtaPropertyManager;
+import com.arjuna.ats.jta.common.JTAEnvironmentBean;
+
 
 /**
  * A {@link DelegatingTransactionManager} in {@linkplain
@@ -110,7 +113,10 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
 
   private static final TransactionManager getDelegate(final BeanManager beanManager) {
     Objects.requireNonNull(beanManager);
+
     final TransactionManager returnValue;
+
+    final boolean useJNDI;
     Set<Bean<?>> beans = beanManager.getBeans(TransactionManager.class);
     if (beans == null || beans.isEmpty()) {
       // There were no beans registered with TransactionManager as
@@ -118,70 +124,80 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
       // case, but not as edgy as you might think.  For example, if
       // someone's portable extension vetoes us but creates us by
       // hand, we might be in this situation.
-      //
-      // Action: find a TransactionManager in JNDI if possible.
+      useJNDI = true;
+    } else {
+      assert beans != null;
+      assert !beans.isEmpty();
+      final Bean<?> bean = beanManager.resolve(beans);
+      assert bean != null;
+      // If the sole bean that was found with TransactionManager as
+      // its bean type is *this class*, we still need to find a
+      // delegate, so we'll fall back to JNDI.
+      useJNDI = NarayanaTransactionManager.class.equals(bean.getBeanClass());
+    }
+    
+    if (useJNDI) {
 
-      final InitialContext ic;
+      // Acquire an InitialContext by looking in CDI first, then by
+      // creating one by hand.
+      final Context initialContext;
       beans = beanManager.getBeans(InitialContext.class);
       if (beans == null || beans.isEmpty()) {
-        // There was no bean registered with InitialContext among its
-        // bean types.
-        //
-        // Action: create a new InitialContext by hand with no
-        // arguments.
-        
         InitialContext temp = null;
         try {
           temp = new InitialContext();
         } catch (final NamingException namingException) {
           throw new CreationException(namingException.getMessage(), namingException);
         } finally {
-          ic = temp;
+          initialContext = temp;
         }
       } else {
-        // There was a bean registered with InitialContext among its
-        // bean types, so use it to get an InitialContext from which
-        // we can look up a TransactionManager.
-        //
-        // Action: resolve the bean and get a contextual reference.
         final Bean<?> initialContextBean = beanManager.resolve(beans);
         assert initialContextBean != null;
-        ic = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
+        initialContext = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
       }
-      assert ic != null;
+      assert initialContext != null;
 
-      // Now we have an InitialContext; let's use it.
-      
+      // Acquire a JTAEnvironmentBean which will give us what name to
+      // use to look up a TransactionManager in JNDI.
+      final JTAEnvironmentBean jtaEnvironmentBean;
+      beans = beanManager.getBeans(JTAEnvironmentBean.class);
+      if (beans == null || beans.isEmpty()) {
+        jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
+      } else {
+        final Bean<?> bean = beanManager.resolve(beans);
+        assert bean != null;
+        jtaEnvironmentBean = (JTAEnvironmentBean)beanManager.getReference(bean, JTAEnvironmentBean.class, beanManager.createCreationalContext(bean));
+      }
+      assert jtaEnvironmentBean != null;
+
+      // Do the JNDI lookup.
       TransactionManager temp = null;
       try {
-        temp = (TransactionManager)ic.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
+        temp = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
       } catch (final NamingException namingException) {
         throw new CreationException(namingException.getMessage(), namingException);
       }
+
+      // If JNDI failed, fall back to the last possible backup
+      // strategy.
       if (temp == null) {
-        // There was no TransactionManager registered in JNDI.  Use a
-        // default instead.
         returnValue = com.arjuna.ats.jta.TransactionManager.transactionManager();
       } else {
         returnValue = temp;
       }
+      
     } else {
-      // There were beans registered with TransactionManager among
-      // their bean types.  Resolve the set.
+      // We're not supposed to use JNDI.  Use the sole
+      // TransactionManager CDI bean that was found as our delegate.
       assert beans != null;
       assert !beans.isEmpty();
       final Bean<?> bean = beanManager.resolve(beans);
       assert bean != null;
-      if (NarayanaTransactionManager.class.equals(bean.getBeanClass())) {
-        // If the bean we found is *us*, then, well, here we are, so
-        // we need to use a default.
-        returnValue = com.arjuna.ats.jta.TransactionManager.transactionManager();
-      } else {
-        // If the bean we found is *not us*, then use it as a
-        // delegate.
-        returnValue = (TransactionManager)beanManager.getReference(bean, TransactionManager.class, beanManager.createCreationalContext(bean));
-      }
+      assert !NarayanaTransactionManager.class.equals(bean.getBeanClass());
+      returnValue = (TransactionManager)beanManager.getReference(bean, TransactionManager.class, beanManager.createCreationalContext(bean));
     }
+    
     return returnValue;
   }
 
