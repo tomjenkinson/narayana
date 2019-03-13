@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.NoInitialContextException;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -116,7 +117,7 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
 
     final TransactionManager returnValue;
 
-    final boolean useJNDI;
+    final boolean tryJNDI;
     Set<Bean<?>> beans = beanManager.getBeans(TransactionManager.class);
     if (beans == null || beans.isEmpty()) {
       // There were no beans registered with TransactionManager as
@@ -124,7 +125,7 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
       // case, but not as edgy as you might think.  For example, if
       // someone's portable extension vetoes us but creates us by
       // hand, we might be in this situation.
-      useJNDI = true;
+      tryJNDI = true;
     } else {
       assert beans != null;
       assert !beans.isEmpty();
@@ -133,10 +134,10 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
       // If the sole bean that was found with TransactionManager as
       // its bean type is *this class*, we still need to find a
       // delegate, so we'll fall back to JNDI.
-      useJNDI = NarayanaTransactionManager.class.equals(bean.getBeanClass());
+      tryJNDI = NarayanaTransactionManager.class.equals(bean.getBeanClass());
     }
     
-    if (useJNDI) {
+    if (tryJNDI) {
 
       // Acquire an InitialContext by looking in CDI first, then by
       // creating one by hand.
@@ -175,6 +176,8 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
       TransactionManager temp = null;
       try {
         temp = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
+      } catch (final NoInitialContextException noInitialContextException) {
+        // Expected in standalone CDI SE situations.
       } catch (final NamingException namingException) {
         throw new CreationException(namingException.getMessage(), namingException);
       }

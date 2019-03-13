@@ -133,6 +133,12 @@
         <version>${version.org.jboss.logging.jboss-logging-processor}</version>
         <scope>provided</scope>
       </dependency>
+      <dependency>
+        <groupId>org.jboss.weld.se</groupId>
+        <artifactId>weld-se-core</artifactId>
+        <version>${version.org.jboss.weld}</version>
+        <scope>test</scope>
+      </dependency>
   </dependencies>
 
     <profiles>
