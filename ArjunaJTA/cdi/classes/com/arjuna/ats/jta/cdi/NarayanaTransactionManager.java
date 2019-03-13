@@ -31,10 +31,13 @@ import javax.enterprise.context.Initialized;
 
 import javax.enterprise.event.Event;
 
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.CreationException;
 
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+
+import javax.enterprise.util.AnnotationLiteral;
 
 import javax.inject.Inject;
 
@@ -55,7 +58,6 @@ import javax.transaction.TransactionScoped;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.common.JTAEnvironmentBean;
 
-
 /**
  * A {@link DelegatingTransactionManager} in {@linkplain
  * ApplicationScoped application scope} that uses the return value
@@ -69,18 +71,38 @@ import com.arjuna.ats.jta.common.JTAEnvironmentBean;
  * @see com.arjuna.ats.jta.TransactionManager#transactionManager()
  */
 @ApplicationScoped
-public class NarayanaTransactionManager extends DelegatingTransactionManager {
+class NarayanaTransactionManager extends DelegatingTransactionManager {
 
   private final Event<Transaction> transactionScopeInitializedBroadcaster;
 
   private final Event<Object> transactionScopeDestroyedBroadcaster;
+
+  /**
+   * Creates a new, possibly <strong>non-functional</strong> {@link
+   * NarayanaTransactionManager}.
+   *
+   * <p>This constructor exists only to conform with <a
+   * href="http://docs.jboss.org/cdi/spec/1.2/cdi-spec.html#unproxyable">section
+   * 3.15 of the CDI specification</a>.</p>
+   *
+   * @deprecated This constructor exists only to conform with <a
+   * href="http://docs.jboss.org/cdi/spec/1.2/cdi-spec.html#unproxyable">section
+   * 3.15 of the CDI specification</a>.
+   */
+  @Deprecated
+  NarayanaTransactionManager() {
+    super(null);
+    this.transactionScopeDestroyedBroadcaster = null;
+    this.transactionScopeInitializedBroadcaster = null;
+  }
   
   /**
    * Creates a new {@link NarayanaTransactionManager}.
    *
    * @param beanManager a {@link BeanManager} to use to find a
    * relevant {@link TransactionManager} to which to delegate all
-   * operations
+   * operations; may be {@code null} in which case JNDI and other
+   * mechanisms may be used instead
    *
    * @param transactionScopeInitializedBroadcaster an {@link Event}
    * for broadcasting the {@linkplain Initialized initialization} of
@@ -102,105 +124,142 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
    * @see TransactionScoped
    */
   @Inject
-  public NarayanaTransactionManager(final BeanManager beanManager,
-                                    @Initialized(TransactionScoped.class)
-                                    final Event<Transaction> transactionScopeInitializedBroadcaster,
-                                    @Destroyed(TransactionScoped.class)
-                                    final Event<Object> transactionScopeDestroyedBroadcaster) {
+  private NarayanaTransactionManager(final BeanManager beanManager,
+                                     @Initialized(TransactionScoped.class)
+                                     final Event<Transaction> transactionScopeInitializedBroadcaster,
+                                     @Destroyed(TransactionScoped.class)
+                                     final Event<Object> transactionScopeDestroyedBroadcaster) {
     super(getDelegate(beanManager));
     this.transactionScopeInitializedBroadcaster = transactionScopeInitializedBroadcaster;
     this.transactionScopeDestroyedBroadcaster = transactionScopeDestroyedBroadcaster;
   }
 
   private static final TransactionManager getDelegate(final BeanManager beanManager) {
-    Objects.requireNonNull(beanManager);
-
     final TransactionManager returnValue;
-
-    final boolean tryJNDI;
-    Set<Bean<?>> beans = beanManager.getBeans(TransactionManager.class);
-    if (beans == null || beans.isEmpty()) {
-      // There were no beans registered with TransactionManager as
-      // their bean type, *including this class*.  This is an edge
-      // case, but not as edgy as you might think.  For example, if
-      // someone's portable extension vetoes us but creates us by
-      // hand, we might be in this situation.
-      tryJNDI = true;
+    
+    Set<Bean<?>> beans;
+    if (beanManager == null) {
+      beans = null;
     } else {
-      assert beans != null;
-      assert !beans.isEmpty();
-      final Bean<?> bean = beanManager.resolve(beans);
-      assert bean != null;
-      // If the sole bean that was found with TransactionManager as
-      // its bean type is *this class*, we still need to find a
-      // delegate, so we'll fall back to JNDI.
-      tryJNDI = NarayanaTransactionManager.class.equals(bean.getBeanClass());
+      beans = beanManager.getBeans(TransactionManager.class, AnyLiteral.INSTANCE);
     }
     
-    if (tryJNDI) {
+    Bean<?> transactionManagerBean = null;
+    final int size = beans == null || beans.isEmpty() ? 0 : beans.size();
+    if (size == 2) {
+      // There are exactly two beans in the container that have
+      // TransactionManager among their bean types.  One of them is
+      // going to be us (most likely).  If there's exactly one other,
+      // use it as our delegate, regardless of its qualifiers.
+      for (final Bean<?> bean : beans) {
+        if (bean != null && !NarayanaTransactionManager.class.equals(bean.getBeanClass())) {
+          transactionManagerBean = bean;
+          break;
+        }
+      }
+    } else {
+      transactionManagerBean = beanManager.resolve(beans);
+      if (transactionManagerBean != null && NarayanaTransactionManager.class.equals(transactionManagerBean.getBeanClass())) {
+        transactionManagerBean = null;
+      }
+    }
+    
+    if (transactionManagerBean == null) {
 
-      // Acquire an InitialContext by looking in CDI first, then by
-      // creating one by hand.
+      // Time to try JNDI, since we didn't find any beans implementing
+      // TransactionManager other than, perhaps, ourselves.
+      
+      // Try to acquire an InitialContext by looking in CDI first,
+      // then by creating one by hand.
       final Context initialContext;
-      beans = beanManager.getBeans(InitialContext.class);
+      if (beanManager == null) {
+        beans = null;
+      } else {
+        beans = beanManager.getBeans(InitialContext.class);
+      }
+      final boolean closeContext;
       if (beans == null || beans.isEmpty()) {
-        InitialContext temp = null;
+        Context temp = null;
         try {
           temp = new InitialContext();
+        } catch (final NoInitialContextException noInitialContextException) {
+          // Expected in certain combinations of JNDI
+          // implementations and CDI SE situations.
         } catch (final NamingException namingException) {
           throw new CreationException(namingException.getMessage(), namingException);
         } finally {
+          closeContext = temp != null;
           initialContext = temp;
         }
-      } else {
+      } else {        
         final Bean<?> initialContextBean = beanManager.resolve(beans);
         assert initialContextBean != null;
         initialContext = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
-      }
-      assert initialContext != null;
-
-      // Acquire a JTAEnvironmentBean which will give us what name to
-      // use to look up a TransactionManager in JNDI.
-      final JTAEnvironmentBean jtaEnvironmentBean;
-      beans = beanManager.getBeans(JTAEnvironmentBean.class);
-      if (beans == null || beans.isEmpty()) {
-        jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
-      } else {
-        final Bean<?> bean = beanManager.resolve(beans);
-        assert bean != null;
-        jtaEnvironmentBean = (JTAEnvironmentBean)beanManager.getReference(bean, JTAEnvironmentBean.class, beanManager.createCreationalContext(bean));
-      }
-      assert jtaEnvironmentBean != null;
-
-      // Do the JNDI lookup.
-      TransactionManager temp = null;
-      try {
-        temp = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
-      } catch (final NoInitialContextException noInitialContextException) {
-        // Expected in standalone CDI SE situations.
-      } catch (final NamingException namingException) {
-        throw new CreationException(namingException.getMessage(), namingException);
-      }
-
-      // If JNDI failed, fall back to the last possible backup
-      // strategy.
-      if (temp == null) {
-        returnValue = com.arjuna.ats.jta.TransactionManager.transactionManager();
-      } else {
-        returnValue = temp;
+        closeContext = false;
       }
       
+      TransactionManager candidateTransactionManager = null;
+      if (initialContext != null) {
+        
+        // Acquire a JTAEnvironmentBean which will give us what name
+        // to use to look up a TransactionManager in JNDI.
+        final JTAEnvironmentBean jtaEnvironmentBean;
+        if (beanManager == null) {
+          beans = null;
+        } else {
+          beans = beanManager.getBeans(JTAEnvironmentBean.class);
+        }
+        if (beans == null || beans.isEmpty()) {
+          jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
+        } else {
+          final Bean<?> bean = beanManager.resolve(beans);
+          assert bean != null;
+          jtaEnvironmentBean = (JTAEnvironmentBean)beanManager.getReference(bean, JTAEnvironmentBean.class, beanManager.createCreationalContext(bean));
+        }
+        assert jtaEnvironmentBean != null;
+        
+        // Do the JNDI lookup.
+        try {
+          candidateTransactionManager = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
+        } catch (final NoInitialContextException noInitialContextException) {
+          // Expected in standalone CDI SE situations.
+        } catch (final NamingException namingException) {
+          throw new CreationException(namingException.getMessage(), namingException);
+        }
+
+        // If we were responsible for creating the InitialContext
+        // instance, close it to be a good citizen.  Otherwise it came
+        // from a CDI bean so leave closing up to the bean.
+        if (closeContext) {
+          try {
+            initialContext.close();
+          } catch (final NamingException namingException) {
+            throw new CreationException(namingException.getMessage(), namingException);
+          }
+        }
+
+      }
+      
+      // If JNDI failed, or there was no InitialContext that could be
+      // interrogated at all, fall back to the last possible backup
+      // strategy.  This is a common case in CDI SE environments.
+      if (candidateTransactionManager == null) {
+        candidateTransactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+      }
+
+      returnValue = candidateTransactionManager;
+
     } else {
+      
       // We're not supposed to use JNDI.  Use the sole
       // TransactionManager CDI bean that was found as our delegate.
-      assert beans != null;
-      assert !beans.isEmpty();
-      final Bean<?> bean = beanManager.resolve(beans);
-      assert bean != null;
-      assert !NarayanaTransactionManager.class.equals(bean.getBeanClass());
-      returnValue = (TransactionManager)beanManager.getReference(bean, TransactionManager.class, beanManager.createCreationalContext(bean));
+      assert beanManager != null;
+      assert transactionManagerBean != null;
+      assert !NarayanaTransactionManager.class.equals(transactionManagerBean.getBeanClass());
+      returnValue = (TransactionManager)beanManager.getReference(transactionManagerBean, TransactionManager.class, beanManager.createCreationalContext(transactionManagerBean));
+      
     }
-    
+
     return returnValue;
   }
 
@@ -309,6 +368,18 @@ public class NarayanaTransactionManager extends DelegatingTransactionManager {
         this.transactionScopeDestroyedBroadcaster.fire(this.toString());
       }
     }
+  }
+
+  private static final class AnyLiteral extends AnnotationLiteral<Any> implements Any {
+
+    private static final long serialVersionUID = 1L;
+    
+    private static final Any INSTANCE = new AnyLiteral();
+
+    private AnyLiteral() {
+      super();
+    }
+    
   }
 
 }

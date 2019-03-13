@@ -52,13 +52,13 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    * Creates a new {@link DelegatingTransactionManager}.
    *
    * @param delegate the {@link TransactionManager} to which all
-   * method invocations will be delegated; must not be {@code null}
-   *
-   * @exception NullPointerException if {@code delegate} is {@code null}
+   * method invocations will be delegated; may be {@code null}, but
+   * all methods in this class will then throw a {@link
+   * SystemException}
    */
   protected DelegatingTransactionManager(final TransactionManager delegate) {
     super();
-    this.delegate = Objects.requireNonNull(delegate);
+    this.delegate = delegate;
   }
 
   /**
@@ -73,6 +73,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void begin() throws NotSupportedException, SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.begin();
   }
 
@@ -103,6 +106,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.commit();
   }
 
@@ -122,6 +128,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public int getStatus() throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     return this.delegate.getStatus();
   }
 
@@ -140,6 +149,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public Transaction getTransaction() throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     return this.delegate.getTransaction();
   }
 
@@ -165,6 +177,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void resume(final Transaction transaction) throws InvalidTransactionException, SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.resume(transaction);
   }
 
@@ -185,6 +200,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void rollback() throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.rollback();
   }
 
@@ -201,6 +219,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void setRollbackOnly() throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.setRollbackOnly();
   }
 
@@ -221,6 +242,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public void setTransactionTimeout(final int seconds) throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     this.delegate.setTransactionTimeout(seconds);
   }
 
@@ -243,6 +267,9 @@ public abstract class DelegatingTransactionManager implements TransactionManager
    */
   @Override
   public Transaction suspend() throws SystemException {
+    if (this.delegate == null) {
+      throw new SystemException("delegate == null");
+    }
     return this.delegate.suspend();
   }
 
