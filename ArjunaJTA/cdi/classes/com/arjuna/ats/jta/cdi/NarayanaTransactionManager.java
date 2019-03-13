@@ -22,7 +22,6 @@
 
 package com.arjuna.ats.jta.cdi;
 
-import java.util.Objects;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -31,13 +30,10 @@ import javax.enterprise.context.Initialized;
 
 import javax.enterprise.event.Event;
 
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.CreationException;
 
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-
-import javax.enterprise.util.AnnotationLiteral;
 
 import javax.inject.Inject;
 
@@ -135,132 +131,87 @@ class NarayanaTransactionManager extends DelegatingTransactionManager {
   }
 
   private static final TransactionManager getDelegate(final BeanManager beanManager) {
-    final TransactionManager returnValue;
-    
+
+    // Try to acquire an InitialContext by looking in CDI first,
+    // then by creating one by hand.
+    final Context initialContext;
     Set<Bean<?>> beans;
     if (beanManager == null) {
       beans = null;
     } else {
-      beans = beanManager.getBeans(TransactionManager.class, AnyLiteral.INSTANCE);
+      beans = beanManager.getBeans(InitialContext.class);
+    }
+    final boolean closeContext;
+    if (beans == null || beans.isEmpty()) {
+      Context temp = null;
+      try {
+        temp = new InitialContext();
+      } catch (final NoInitialContextException noInitialContextException) {
+        // Expected in certain combinations of JNDI
+        // implementations and CDI SE situations.
+      } catch (final NamingException namingException) {
+        throw new CreationException(namingException.getMessage(), namingException);
+      } finally {
+        closeContext = temp != null;
+        initialContext = temp;
+      }
+    } else {        
+      final Bean<?> initialContextBean = beanManager.resolve(beans);
+      assert initialContextBean != null;
+      initialContext = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
+      closeContext = false;
     }
     
-    Bean<?> transactionManagerBean = null;
-    final int size = beans == null || beans.isEmpty() ? 0 : beans.size();
-    if (size == 2) {
-      // There are exactly two beans in the container that have
-      // TransactionManager among their bean types.  One of them is
-      // going to be us (most likely).  If there's exactly one other,
-      // use it as our delegate, regardless of its qualifiers.
-      for (final Bean<?> bean : beans) {
-        if (bean != null && !NarayanaTransactionManager.class.equals(bean.getBeanClass())) {
-          transactionManagerBean = bean;
-          break;
-        }
-      }
-    } else {
-      transactionManagerBean = beanManager.resolve(beans);
-      if (transactionManagerBean != null && NarayanaTransactionManager.class.equals(transactionManagerBean.getBeanClass())) {
-        transactionManagerBean = null;
-      }
-    }
-    
-    if (transactionManagerBean == null) {
-
-      // Time to try JNDI, since we didn't find any beans implementing
-      // TransactionManager other than, perhaps, ourselves.
+    TransactionManager candidateTransactionManager = null;
+    if (initialContext != null) {
       
-      // Try to acquire an InitialContext by looking in CDI first,
-      // then by creating one by hand.
-      final Context initialContext;
+      // Acquire a JTAEnvironmentBean which will give us what name
+      // to use to look up a TransactionManager in JNDI.
+      final JTAEnvironmentBean jtaEnvironmentBean;
       if (beanManager == null) {
         beans = null;
       } else {
-        beans = beanManager.getBeans(InitialContext.class);
+        beans = beanManager.getBeans(JTAEnvironmentBean.class);
       }
-      final boolean closeContext;
       if (beans == null || beans.isEmpty()) {
-        Context temp = null;
-        try {
-          temp = new InitialContext();
-        } catch (final NoInitialContextException noInitialContextException) {
-          // Expected in certain combinations of JNDI
-          // implementations and CDI SE situations.
-        } catch (final NamingException namingException) {
-          throw new CreationException(namingException.getMessage(), namingException);
-        } finally {
-          closeContext = temp != null;
-          initialContext = temp;
-        }
-      } else {        
-        final Bean<?> initialContextBean = beanManager.resolve(beans);
-        assert initialContextBean != null;
-        initialContext = (InitialContext)beanManager.getReference(initialContextBean, InitialContext.class, beanManager.createCreationalContext(initialContextBean));
-        closeContext = false;
+        jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
+      } else {
+        final Bean<?> bean = beanManager.resolve(beans);
+        assert bean != null;
+        jtaEnvironmentBean = (JTAEnvironmentBean)beanManager.getReference(bean, JTAEnvironmentBean.class, beanManager.createCreationalContext(bean));
+      }
+      assert jtaEnvironmentBean != null;
+      
+      // Do the JNDI lookup.
+      try {
+        candidateTransactionManager = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
+      } catch (final NoInitialContextException noInitialContextException) {
+        // Expected in standalone CDI SE situations.
+      } catch (final NamingException namingException) {
+        throw new CreationException(namingException.getMessage(), namingException);
       }
       
-      TransactionManager candidateTransactionManager = null;
-      if (initialContext != null) {
-        
-        // Acquire a JTAEnvironmentBean which will give us what name
-        // to use to look up a TransactionManager in JNDI.
-        final JTAEnvironmentBean jtaEnvironmentBean;
-        if (beanManager == null) {
-          beans = null;
-        } else {
-          beans = beanManager.getBeans(JTAEnvironmentBean.class);
-        }
-        if (beans == null || beans.isEmpty()) {
-          jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
-        } else {
-          final Bean<?> bean = beanManager.resolve(beans);
-          assert bean != null;
-          jtaEnvironmentBean = (JTAEnvironmentBean)beanManager.getReference(bean, JTAEnvironmentBean.class, beanManager.createCreationalContext(bean));
-        }
-        assert jtaEnvironmentBean != null;
-        
-        // Do the JNDI lookup.
+      // If we were responsible for creating the InitialContext
+      // instance, close it to be a good citizen.  Otherwise it came
+      // from a CDI bean so leave closing up to the bean.
+      if (closeContext) {
         try {
-          candidateTransactionManager = (TransactionManager)initialContext.lookup(jtaEnvironmentBean.getTransactionManagerJNDIContext());
-        } catch (final NoInitialContextException noInitialContextException) {
-          // Expected in standalone CDI SE situations.
+          initialContext.close();
         } catch (final NamingException namingException) {
           throw new CreationException(namingException.getMessage(), namingException);
         }
-
-        // If we were responsible for creating the InitialContext
-        // instance, close it to be a good citizen.  Otherwise it came
-        // from a CDI bean so leave closing up to the bean.
-        if (closeContext) {
-          try {
-            initialContext.close();
-          } catch (final NamingException namingException) {
-            throw new CreationException(namingException.getMessage(), namingException);
-          }
-        }
-
       }
-      
-      // If JNDI failed, or there was no InitialContext that could be
-      // interrogated at all, fall back to the last possible backup
-      // strategy.  This is a common case in CDI SE environments.
-      if (candidateTransactionManager == null) {
-        candidateTransactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
-      }
-
-      returnValue = candidateTransactionManager;
-
-    } else {
-      
-      // We're not supposed to use JNDI.  Use the sole
-      // TransactionManager CDI bean that was found as our delegate.
-      assert beanManager != null;
-      assert transactionManagerBean != null;
-      assert !NarayanaTransactionManager.class.equals(transactionManagerBean.getBeanClass());
-      returnValue = (TransactionManager)beanManager.getReference(transactionManagerBean, TransactionManager.class, beanManager.createCreationalContext(transactionManagerBean));
       
     }
-
-    return returnValue;
+    
+    // If JNDI failed, or there was no InitialContext that could be
+    // interrogated at all, fall back to the last possible backup
+    // strategy.  This is a common case in CDI SE environments.
+    if (candidateTransactionManager == null) {
+      candidateTransactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    }
+    
+    return candidateTransactionManager;
   }
 
   /**
@@ -368,18 +319,6 @@ class NarayanaTransactionManager extends DelegatingTransactionManager {
         this.transactionScopeDestroyedBroadcaster.fire(this.toString());
       }
     }
-  }
-
-  private static final class AnyLiteral extends AnnotationLiteral<Any> implements Any {
-
-    private static final long serialVersionUID = 1L;
-    
-    private static final Any INSTANCE = new AnyLiteral();
-
-    private AnyLiteral() {
-      super();
-    }
-    
   }
 
 }
