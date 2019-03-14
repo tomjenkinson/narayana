@@ -42,18 +42,21 @@ import javax.transaction.Transactional;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
 
-import com.arjuna.ats.jta.cdi.TransactionContext;
-import com.arjuna.ats.jta.cdi.TransactionExtension;
+import org.jboss.arquillian.container.test.api.Deployment;
 
-import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.environment.se.WeldContainer;
+import org.jboss.arquillian.junit.Arquillian;
 
-import org.junit.After;
-import org.junit.Before;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -63,6 +66,7 @@ import static org.junit.Assert.fail;
  * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
+@RunWith(Arquillian.class)
 @ApplicationScoped
 public class TransactionScopeLifecycleEventsTest {
 
@@ -70,33 +74,17 @@ public class TransactionScopeLifecycleEventsTest {
 
     private static boolean destroyedObserved;
 
-    private AutoCloseable container;
-
     @Inject
     private TransactionManager transactionManager;
-    
-    @Before
-    public void setUp() throws Exception {
-        this.tearDown();
-        final Weld weld = new Weld()
-            .addExtension(new TransactionExtension())
-            .addBeanClass(this.getClass());
-        this.container = weld.initialize();
-    }
-    
-    @After
-    public void tearDown() throws Exception {
-        if (this.container != null) {
-            this.container.close();
-            this.container = null;
-        }
-        initializedObserved = false;
-        destroyedObserved = false;
-    }
 
-    private static void onStartup(@Observes @Initialized(ApplicationScoped.class) final Object event,
-                                  final TransactionScopeLifecycleEventsTest self) {
-        self.doSomethingTransactional();
+    @Inject
+    private TransactionScopeLifecycleEventsTest self;
+
+    @Deployment
+    public static JavaArchive createTestArchive() {
+        return ShrinkWrap.create(JavaArchive.class, "test.jar")
+            .addClass(TransactionScopeLifecycleEventsTest.class)
+            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
     
     @Transactional
@@ -133,11 +121,12 @@ public class TransactionScopeLifecycleEventsTest {
         }
         destroyedObserved = true;
     }
-    
+
     @Test
-    public void testIt() throws Exception {
+    public void testEffects() {
+        self.doSomethingTransactional();
         assertTrue(initializedObserved);
         assertTrue(destroyedObserved);
     }
-
+    
 }

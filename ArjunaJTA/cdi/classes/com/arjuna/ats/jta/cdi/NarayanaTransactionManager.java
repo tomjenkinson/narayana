@@ -120,11 +120,11 @@ class NarayanaTransactionManager extends DelegatingTransactionManager {
    * @see TransactionScoped
    */
   @Inject
-  private NarayanaTransactionManager(final BeanManager beanManager,
-                                     @Initialized(TransactionScoped.class)
-                                     final Event<Transaction> transactionScopeInitializedBroadcaster,
-                                     @Destroyed(TransactionScoped.class)
-                                     final Event<Object> transactionScopeDestroyedBroadcaster) {
+  NarayanaTransactionManager(final BeanManager beanManager,
+                             @Initialized(TransactionScoped.class)
+                             final Event<Transaction> transactionScopeInitializedBroadcaster,
+                             @Destroyed(TransactionScoped.class)
+                             final Event<Object> transactionScopeDestroyedBroadcaster) {
     super(getDelegate(beanManager));
     this.transactionScopeInitializedBroadcaster = transactionScopeInitializedBroadcaster;
     this.transactionScopeDestroyedBroadcaster = transactionScopeDestroyedBroadcaster;
