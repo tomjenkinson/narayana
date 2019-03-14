@@ -63,10 +63,6 @@ public class TransactionExtension implements Extension {
 
     public static final String TX_INTERCEPTOR = "-tx-interceptor";
 
-    private Object tmBean;
-
-    private boolean veto;
-    
     private final Map<Bean<?>, AnnotatedType<?>> beanToAnnotatedTypeMapping = new HashMap<>();    
     
     public Map<Bean<?>, AnnotatedType<?>> getBeanToAnnotatedTypeMapping() {
