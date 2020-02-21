@@ -46,20 +46,20 @@ public class RecoveryDriverUnitTest
         try
         {
             rd.asynchronousScan();
-            
-            fail();
+
+            fail("Recovery driver asynchronously calls a non-existing host and port 'foobar:0'. Failure is expected.");
         }
-        catch (final Exception ex)
+        catch (final Exception expected)
         {
         }
         
         try
         {
             rd.synchronousScan();
-            
-            fail();
+
+            fail("Recovery driver synchronously calls a non-existing host and port 'foobar:0'. Failure is expected.");
         }
-        catch (final Exception ex)
+        catch (final Exception expected)
         {
         }
     }

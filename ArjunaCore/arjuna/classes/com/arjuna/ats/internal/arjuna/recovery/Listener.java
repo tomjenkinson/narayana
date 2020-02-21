@@ -242,8 +242,8 @@ public class Listener extends Thread
            }
            try {
                wait();
-           } catch (InterruptedException e) {
-               // ignore
+           } catch (InterruptedException ignoredIe) {
+               tsLogger.logger.debug("Waiting for connection close was interrupted", ignoredIe);
            }
        }
       
@@ -251,7 +251,8 @@ public class Listener extends Thread
 
        try {
            this.join();
-       } catch (InterruptedException ie) {
+       } catch (InterruptedException ignoredIe) {
+           tsLogger.logger.debug("Waiting to ensure the listener thread has exited was interrupted", ignoredIe);
        }
    }
 
