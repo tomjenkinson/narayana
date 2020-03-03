@@ -146,10 +146,12 @@ public class RecoverySocketUnitTest {
     @Test
     public void socketNullWrite() throws Exception {
         try (Socket connectorSocket = getSocket()) {
+            BufferedReader fromServer = new BufferedReader(new InputStreamReader(connectorSocket.getInputStream(), StandardCharsets.UTF_8));
             PrintWriter toServer = new PrintWriter(new OutputStreamWriter(connectorSocket.getOutputStream(), StandardCharsets.UTF_8));
-            toServer.println("PING");
+            toServer.print("PING");
+            connectorSocket.shutdownOutput();
             // no flush + waiting for getting NPE
-            Thread.sleep(500);
+            assertEquals("ERROR", fromServer.readLine());
         } catch (final SocketTimeoutException stex) {
             failOnSocketTimeout(stex, RecoveryDriver.SCAN);
         }
