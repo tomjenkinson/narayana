@@ -1338,4 +1338,13 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 	public void setTransactionToThreadListenersEnabled(boolean transactionToThreadListenersEnabled) {
 		this.transactionToThreadListenersEnabled = transactionToThreadListenersEnabled;
 	}
+	
+	/**
+	 * @Deprecated This might need overhaul in Narayana 6
+	 */
+	public void removeCommitMarkableResourceJNDIName(String name) {
+        synchronized (this) {
+            commitMarkableResourceJNDINames.remove(name);
+        }
+    }
 }
