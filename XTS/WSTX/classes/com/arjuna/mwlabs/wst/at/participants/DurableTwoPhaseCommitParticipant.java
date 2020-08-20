@@ -249,7 +249,15 @@ public class DurableTwoPhaseCommitParticipant implements Participant
 					{
 						confirm();
 					}
-					catch (HeuristicHazardException | HeuristicMixedException |  HeuristicCancelException ex)
+					catch (HeuristicHazardException ex)
+					{
+						throw ex;
+					}
+					catch (HeuristicMixedException ex)
+					{
+						throw ex;
+					}
+					catch (HeuristicCancelException ex)
 					{
 						throw ex;
 					}
