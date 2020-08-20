@@ -35,6 +35,7 @@ import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 
 /**
  * i18n log messages for the jta module.
