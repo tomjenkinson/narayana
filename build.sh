@@ -34,6 +34,8 @@ MAVEN_SEARCH_PATH="\
 
 #  Default arguments
 MVN_OPTIONS="-s tools/maven/conf/settings.xml -Dorson.jar.location=`pwd`/ext/ -Demma.jar.location=`pwd`/ext/emma.jar"
+echo "WARNING: SKIPPING JAVADOC BUILDING!!!!!!!!!!!!!!!!!!!!!!"
+MVN_OPTIONS="$MVN_OPTIONS -Dmaven.javadoc.skip=true"
 
 #  Use the maximum available, or set MAX_FD != -1 to use that
 MAX_FD="maximum"
