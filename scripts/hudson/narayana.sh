@@ -124,7 +124,7 @@ function build_as {
 
   cd ${WORKSPACE}
   #rm -rf jboss-as
-  if [ -d jboss-as ];
+  if [ ! -d jboss-as ];
   then
     git clone $GIT_URL -o upstream
     [ $? = 0 ] || fatal "git clone $GIT_URL failed"
