@@ -119,52 +119,17 @@ function build_narayana {
 }
 
 function build_as {
-  echo "Building AS"
-  GIT_URL="https://github.com/jbosstm/jboss-as.git"
-
   cd ${WORKSPACE}
-  #rm -rf jboss-as
-  if [ ! -d jboss-as ];
-  then
-    git clone $GIT_URL -o upstream
-    [ $? = 0 ] || fatal "git clone $GIT_URL failed"
-  fi
-
+  ln -s ~/jboss-as/ jboss-as
   cd jboss-as
-  git fetch --all
-  git branch | grep 4_BRANCH | grep \*
-  if [ $? != 0 ];
-  then
-    git checkout -t upstream/4_BRANCH
-    [ $? = 0 ] || fatal "git checkout 4_BRANCH failed"
-  fi
-  git clean -fdx
-  git reset --hard upstream/4_BRANCH
-  [ $? = 0 ] || fatal "git reset 4_BRANCH failed"
-
-#  UPSTREAM_GIT_URL="https://github.com/jbossas/jboss-as.git"
-#  git remote add upstream $UPSTREAM_GIT_URL
-#  git pull --rebase --ff-only upstream master
-#  while [ $? != 0 ]
-#  do
-#     for i in `git status -s | sed "s/UU \(.*\)/\1/g"`
-#     do 
-#        awk '/^<+ HEAD$/,/^=+$/{next} /^>+ /{next} 1' $i > $i.bak; mv $i.bak $i; git add $i
-#     done
-#     git rebase --continue
-#  done
-#  [ $? = 0 ] || fatal "git rebase failed"
-
-  sed -i "s/2.1.1/2.2/g" testsuite/pom.xml
-  sed -i "s/2.1.1/2.2/g" testsuite/integration/pom.xml
-
-  export MAVEN_OPTS="$MAVEN_OPTS -Xms2048m -Xmx2048m -XX:MaxPermSize=1024m"
-  export JAVA_OPTS="$JAVA_OPTS -Xms1303m -Xmx1303m -XX:MaxPermSize=512m"
-  (cd .. && ./build.sh -f jboss-as/pom.xml clean install -DskipTests -Dts.smoke=false $IPV6_OPTS -Drelease=true -Dversion.org.jboss.jboss-transaction-spi=7.1.0.SP2 -Dversion.org.jboss.jbossts.jbossjts=4.17.44.Final-SNAPSHOT -Dversion.org.jboss.jbossts.jbossjts-integration=4.17.44.Final-SNAPSHOT -Dversion.org.jboss.jbossts.jbossxts=4.17.44.Final-SNAPSHOT $AS_XARGS)
-  [ $? = 0 ] || fatal "AS build failed"
+  
+  cp `find ${WORKSPACE} -name "jbossjts-integration-$NARAYANA_VERSION.jar" | grep -v jboss-as` `find . -name "jbossjts-integration-*jar"`
+  cp `find ${WORKSPACE} -name "jbossjts-jacorb-$NARAYANA_VERSION.jar" | grep -v jboss-as` `find . -name "jbossjts-jacorb-*jar"`
+  cp `find ${WORKSPACE} -name "jbossxts-$NARAYANA_VERSION.jar" | grep -v jboss-as` `find . -name "jbossxts-*jar"`
+  cp `find ${WORKSPACE} -name "jbosstxbridge-$NARAYANA_VERSION.jar" | grep -v jboss-as` `find . -name "jbosstxbridge-*jar"`
   
   #Enable remote debugger
-  echo JAVA_OPTS='"$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"' >> ./build/target/jboss-as-*/bin/standalone.conf
+  echo JAVA_OPTS='"$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"' >> ./build/target/jboss-*/bin/standalone.conf
 
   init_jboss_home
 }
@@ -172,7 +137,7 @@ function build_as {
 function init_jboss_home {
   echo "# init_jboss_home"
   cd $WORKSPACE
-  JBOSS_VERSION=`ls -1 ${WORKSPACE}/jboss-as/build/target | grep jboss-as`
+  JBOSS_VERSION=`ls -1 ${WORKSPACE}/jboss-as/build/target | grep jboss-`
   [ $? = 0 ] || fatal "missing AS - cannot set JBOSS_VERSION"
   export JBOSS_HOME=${WORKSPACE}/jboss-as/build/target/${JBOSS_VERSION}
   [ -d $JBOSS_HOME ] || fatal "missing AS - $JBOSS_HOME is not a directory"
@@ -182,10 +147,7 @@ function init_jboss_home {
 
 function xts_as_tests {
   init_jboss_home
-  echo "#-1. XTS AS Integration Test"
-  cd ${WORKSPACE}/jboss-as
-  (cd ../ && ./build.sh -f ./jboss-as/testsuite/integration/xts/pom.xml -Pxts.integration.tests.profile -Dversion.org.jboss.jboss-transaction-spi=7.1.0.SP2 -Dversion.org.jboss.jbossts.jbossjts=4.17.44.Final-SNAPSHOT -Dversion.org.jboss.jbossts.jbossjts-integration=4.17.44.Final-SNAPSHOT -Dversion.org.jboss.jbossts.jbossxts=4.17.44.Final-SNAPSHOT "$@" test $AS_XARGS)
-  [ $? = 0 ] || fatal "XTS AS Integration Test failed"
+
   cd ${WORKSPACE}
 }
 
