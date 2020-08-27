@@ -124,6 +124,7 @@ function build_narayana {
 function build_as {
   echo "Building AS"
   AS_GIT_URL=${AS_GIT_URL:-"https://github.com/jbosstm/jboss-as.git"}
+  AS_GIT_REF=${AS_GIT_REF:-"4_BRANCH"}
 
   cd ${WORKSPACE}
   #rm -rf jboss-as
@@ -135,18 +136,18 @@ function build_as {
 
   cd jboss-as
 
-  # TODO: find out how to rebase jbosstm/jboss-as on top of the jbossas/jboss-as
-  # git fetch --all
-  # git branch | grep 4_BRANCH | grep \*
-  # if [ $? != 0 ];
-  # then
-  #   git checkout -t upstream/4_BRANCH
-  #   [ $? = 0 ] || fatal "git checkout 4_BRANCH failed"
-  # fi
-  # git clean -fdx
-  # git reset --hard upstream/4_BRANCH
-  # [ $? = 0 ] || fatal "git reset 4_BRANCH failed"
+  git fetch --all
+  git branch | grep ${AS_GIT_REF} | grep \*
+  if [ $? != 0 ];
+  then
+    git checkout -t upstream/${AS_GIT_REF}
+    [ $? = 0 ] || fatal "git checkout 4_BRANCH failed"
+  fi
+  git clean -fdx
+  git reset --hard upstream/${AS_GIT_REF}
+  [ $? = 0 ] || fatal "git reset ${AS_GIT_REF} failed"
 
+  # TODO: find out how to rebase jbosstm/jboss-as on top of the jbossas/jboss-as
   # UPSTREAM_AS_GIT_URL=${UPSTREAM_AS_GIT_URL:-"https://github.com/jbossas/jboss-as.git"}
   # git remote add upstream $UPSTREAM_AS_GIT_URL
   # git pull --rebase --ff-only upstream master
