@@ -1,7 +1,9 @@
 package com.hp.mwtests.ts.arjuna.common;
 
+import com.arjuna.ats.arjuna.common.CoreEnvironmentBeanException;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import org.junit.Test;
 
@@ -9,6 +11,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ArjPropertyManagerTest {
+
+    @Test
+    public void test2() throws CoreEnvironmentBeanException {
+        arjPropertyManager.getCoreEnvironmentBean().setNodeIdentifier("foo");
+        System.out.println(TxControl.getXaNodeNameBytes().length);
+    }
+
     @Test
     public void test() {
         BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "communicationStore").setObjectStoreSync(false);
