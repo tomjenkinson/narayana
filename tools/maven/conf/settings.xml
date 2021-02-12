@@ -256,6 +256,27 @@ under the License.
         </repository>
       </repositories>
     </profile>
+    
+    <profile>
+        <id>httpsdownloads</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <repositories>
+            <repository>
+              <id>download-java-net</id>
+              <url>https://download.java.net/maven/2</url>
+            </repository>
+            <repository>
+                <id>download-jboss-org</id>
+                <url>https://repository.jboss.org/nexus/content/groups/public</url>
+            </repository>
+            <repository>
+                <id>jboss-public-repository-group</id>
+                <url>https://repository.jboss.org/nexus/content/groups/public</url>
+            </repository>
+        </repositories>
+    </profile>
   </profiles>
 
   <!-- activeProfiles
