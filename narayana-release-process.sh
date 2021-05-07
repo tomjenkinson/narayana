@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # You can run this script with 0, 1 or 3 arguments.
 # Arguments are then tranformed to env varibales CURRENT, NEXT and WFLYISSUE
@@ -11,6 +11,12 @@
 #             e.g. pom.xml talks about version 5.7.3.Final-SNAPSHOT, CURRENT is 5.7.3.Final and NEXT is 5.7.4.Final
 # 1 argument: same as 0 argument but taken in care WFLYISSUE thus script don't try to create new issue
 # 3 arguments: `./narayana-release-process.sh CURRENT NEXT WFLYISSUE`
+
+read -p "This script has an experimental feature to not allow warnings, do you have time to recover from any potential issue (y to accept)" EXPERIMENTALOK
+if [[ $EXPERIMENTALOK == y ]]
+then
+  echo "Thank you, if the release is successfull please comment on the experimental handling prompt and adjust the script so that behaviour is carried out in future or report the problem if it does not work"
+fi
 
 command -v ant >/dev/null 2>&1 || { echo >&2 "I require ant but it's not installed.  Aborting."; exit 1; }
 command -v awestruct >/dev/null 2>&1 || { echo >&2 "I require awestruct (http://awestruct.org/getting_started) but it's not installed.  Aborting."; exit 1; }
@@ -110,7 +116,9 @@ then
   crumb=$(curl -s -c "$COOKIE_PATH" 'http://narayanaci1.eng.hst.ams2.redhat.com/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
   curl -v -b "$COOKIE_PATH" -X POST -H "$crumb" http://narayanaci1.eng.hst.ams2.redhat.com/job/release-narayana/build?delay=0sec --data-urlencode json="$json"
   curl -v -b "$COOKIE_PATH" -X POST -H "$crumb" http://narayanaci1.eng.hst.ams2.redhat.com/job/release-narayana-catelyn/build?delay=0sec --data-urlencode json="$json"
-  set +e
+  if [ $EXPERIMENTALOK != y ]; then
+    set +e
+  fi  
   git fetch upstream --tags
   #./scripts/release/update_jira.py -k JBTM -t 5.next -n $CURRENT
 else
