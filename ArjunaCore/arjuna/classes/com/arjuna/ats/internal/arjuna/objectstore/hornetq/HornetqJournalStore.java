@@ -37,6 +37,7 @@ import org.apache.activemq.artemis.core.journal.RecordInfo;
 import org.apache.activemq.artemis.core.io.SequentialFileFactory;
 import org.apache.activemq.artemis.core.journal.TransactionFailureCallback;
 import org.apache.activemq.artemis.core.io.aio.AIOSequentialFileFactory;
+import org.apache.activemq.artemis.nativo.jlibaio.LibaioContext;
 import org.apache.activemq.artemis.core.journal.impl.JournalImpl;
 import org.apache.activemq.artemis.core.io.nio.NIOSequentialFileFactory;
 
@@ -111,6 +112,9 @@ public class HornetqJournalStore
             throw new IOException(tsLogger.i18NLogger.get_dir_create_failed(storeDir.getCanonicalPath()));
         }
         storeDirCanonicalPath = storeDir.getCanonicalPath();
+
+        System.out.println("AIOSequentialFileFactory.isSupported: " + AIOSequentialFileFactory.isSupported());
+        System.out.println("LibaioContext.isLoaded():" + LibaioContext.isLoaded());
 
         SequentialFileFactory sequentialFileFactory;
         if(envBean.isAsyncIO() && AIOSequentialFileFactory.isSupported()) {
