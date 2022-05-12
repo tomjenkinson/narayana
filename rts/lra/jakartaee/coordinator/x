@@ -1,0 +1,104 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jboss.narayana.rts:lra-coordinator-jar-jakartaee:jar:5.12.7.Final-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.jboss.resteasy:resteasy-client:jar -> duplicate declaration of version (?) @ line 103, column 17
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.jboss.resteasy:resteasy-undertow:jar -> duplicate declaration of version (?) @ line 123, column 17
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] Inspecting build with total of 1 modules...
+[INFO] Installing Nexus Staging features:
+[INFO]   ... total of 1 executions of maven-deploy-plugin replaced with nexus-staging-maven-plugin
+[INFO] 
+[INFO] --------< org.jboss.narayana.rts:lra-coordinator-jar-jakartaee >--------
+[INFO] Building LRA Coordinator jar (Jakarta Namespace) 5.12.7.Final-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/rts/lra-service-base-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/rts/lra-service-base-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/rts/lra-service-base-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/rts/lra-service-base-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/rts/lra-parent-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/rts/lra-parent-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/rts/lra-parent-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/rts/lra-parent-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/rts/lra-client-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/rts/lra-client-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/rts/lra-client-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/rts/lra-client-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/rts/narayana-lra-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/rts/narayana-lra-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/rts/narayana-lra-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/rts/narayana-lra-jakarta/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/arjunacore/arjuna/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/arjunacore/arjuna/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/arjunacore/arjuna/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/arjunacore/arjuna/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/arjunacore/arjunacore-all/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/arjunacore/arjunacore-all/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/arjunacore/arjunacore-all/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/arjunacore/arjunacore-all/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-releases-repository-group: https://repository.jboss.org/nexus/content/repositories/releases/org/jboss/narayana/common/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from repo.eclipse.org-snapshots: https://repo.eclipse.org/content/repositories/microprofile-snapshots/org/jboss/narayana/common/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jbossThirdParty: https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/org/jboss/narayana/common/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+Downloading from jboss-public-repository-group: https://repository.jboss.org/nexus/content/groups/public/org/jboss/narayana/common/5.12.7.Final-SNAPSHOT/maven-metadata.xml
+[INFO] 
+[INFO] --- maven-dependency-plugin:3.1.1:tree (default-cli) @ lra-coordinator-jar-jakartaee ---
+[INFO] org.jboss.narayana.rts:lra-coordinator-jar-jakartaee:jar:5.12.7.Final-SNAPSHOT
+[INFO] +- org.jboss.narayana.rts:lra-service-base-jakarta:jar:5.12.7.Final-SNAPSHOT:compile
+[INFO] +- org.jboss.narayana.rts:lra-client-jakarta:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] +- org.jboss.narayana.rts:narayana-lra-jakarta:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] |  \- org.jboss.narayana.rts:narayana-lra:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] |     +- org.jboss.narayana.rts:lra-client:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] |     |  \- org.jboss.narayana.rts:lra-service-base:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] |     |     \- org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:jar:2.0.1.Final:test
+[INFO] |     \- org.jboss.narayana.rts:lra-proxy-api:jar:5.12.7.Final-SNAPSHOT:test
+[INFO] +- org.jboss.narayana.arjunacore:arjuna:jar:5.12.7.Final-SNAPSHOT:compile
+[INFO] |  \- org.jboss.narayana:common:jar:5.12.7.Final-SNAPSHOT:compile
+[INFO] +- org.eclipse.microprofile.lra:microprofile-lra-api:jar:2.0-RC1:compile
+[INFO] +- org.eclipse.microprofile.fault-tolerance:microprofile-fault-tolerance-api:jar:4.0:provided
+[INFO] +- org.eclipse.microprofile.openapi:microprofile-openapi-api:jar:3.0:provided
+[INFO] +- jakarta.ws.rs:jakarta.ws.rs-api:jar:3.1.0:provided
+[INFO] +- org.jboss.resteasy:resteasy-client:jar:6.0.1.Final:test
+[INFO] +- org.jboss.resteasy:resteasy-jackson2-provider:jar:6.0.1.Final:provided
+[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.12.6.1:provided
+[INFO] |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.12.6:provided
+[INFO] |  \- com.fasterxml.jackson.core:jackson-core:jar:2.12.6:provided
+[INFO] +- org.jboss.resteasy:resteasy-core:jar:6.0.1.Final:test
+[INFO] +- org.jboss.resteasy:resteasy-core-spi:jar:6.0.1.Final:test
+[INFO] +- org.jboss.resteasy:resteasy-undertow:jar:6.0.1.Final:test
+[INFO] +- io.undertow:undertow-servlet:jar:2.2.17.Final:test
+[INFO] +- io.undertow:undertow-core:jar:2.2.17.Final:test
+[INFO] +- org.jboss.xnio:xnio-api:jar:3.5.4.Final:test
+[INFO] +- org.jboss.logging:jboss-logging-processor:jar:2.0.0.Final:compile
+[INFO] |  +- org.jboss.logging:jboss-logging-annotations:jar:2.2.1.Final:compile
+[INFO] |  \- org.jboss.jdeparser:jdeparser:jar:2.0.0.Final:compile
+[INFO] +- org.jboss.logging:jboss-logging:jar:3.4.3.Final:compile
+[INFO] +- com.h2database:h2:jar:1.4.195:test
+[INFO] +- org.jboss.spec.jakarta.xml.ws:jboss-jakarta-xml-ws-api_3.0_spec:jar:1.0.1.Final:compile
+[INFO] +- jakarta.json:jakarta.json-api:jar:2.1.0:provided
+[INFO] +- jakarta.servlet:jakarta.servlet-api:jar:5.0.0:provided
+[INFO] +- jakarta.annotation:jakarta.annotation-api:jar:2.1.0:provided
+[INFO] +- jakarta.interceptor:jakarta.interceptor-api:jar:2.1.0:provided
+[INFO] +- jakarta.enterprise:jakarta.enterprise.cdi-api:jar:4.0.0:provided
+[INFO] +- jakarta.ejb:jakarta.ejb-api:jar:4.0.0:provided
+[INFO] +- jakarta.transaction:jakarta.transaction-api:jar:2.0.0:provided
+[INFO] +- jakarta.resource:jakarta.resource-api:jar:2.0.0:provided
+[INFO] +- jakarta.inject:jakarta.inject-api:jar:2.0.1:provided
+[INFO] +- jakarta.jms:jakarta.jms-api:jar:3.0.0:provided
+[INFO] +- org.hamcrest:hamcrest:jar:2.2:test
+[INFO] +- org.hamcrest:hamcrest-library:jar:2.2:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] +- junit:junit:jar:4.13.1:test
+[INFO] +- org.jboss.shrinkwrap:shrinkwrap-impl-base:jar:1.2.6:test
+[INFO] |  +- org.jboss.shrinkwrap:shrinkwrap-api:jar:1.2.6:test
+[INFO] |  \- org.jboss.shrinkwrap:shrinkwrap-spi:jar:1.2.6:test
+[INFO] +- org.jboss.spec.javax.xml.bind:jboss-jaxb-api_2.3_spec:jar:1.0.1.Final:provided
+[INFO] \- javax.annotation:javax.annotation-api:jar:1.2:provided
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.474 s
+[INFO] Finished at: 2022-05-10T17:13:58+01:00
+[INFO] ------------------------------------------------------------------------

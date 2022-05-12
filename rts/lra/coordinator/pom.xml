@@ -18,6 +18,10 @@
             -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</ipv6.server.jvm.args>
     <lra.coordinator.path>lra-coordinator/lra-coordinator</lra.coordinator.path>
     <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
+    <!--
+    <version.org.jboss.resteasy>6.0.1.Final</version.org.jboss.resteasy>
+      -->
+    <version.org.jboss.resteasy>5.0.3.Final</version.org.jboss.resteasy>
   </properties>
 
   <dependencies>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jboss.narayana.rts</groupId>
+    <artifactId>lra-parent-jakarta</artifactId>
+    <version>5.12.7.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lra-test-jakarta</artifactId>
+  <packaging>pom</packaging>
+  <name>LRA tests (Jakarta Namespace)</name>
+  <description>LRA tests running LRA TCKs and Narayana LRA internal testsuite (Jakarta Namespace)</description>
+
+  <modules>
+<!-- TODO
+    <module>tck</module>
+    <module>basic</module>
+    <module>arquillian-extension</module>
+-->
+  </modules>
+
+  <properties>
+    <transformer-input-dir>${project.basedir}/../../test</transformer-input-dir>
+
+    <lra.coordinator.debug.params></lra.coordinator.debug.params>
+    <!-- defined within -Ddebug.coordinator/-Pdebug.lra.coordinator -->
+    <lra.coordinator.debug.port>8788</lra.coordinator.debug.port>
+    <lra.coordinator.exec.plugin.phase>none</lra.coordinator.exec.plugin.phase>
+    <!-- not starting coordinator by default, need -Parq -->
+
+    <!-- currently only defines where to search for the coordinator, it does not change where the coordinator is started -->
+    <lra.coordinator.host>localhost</lra.coordinator.host>
+    <!-- the lra.coordinator.jar.path needs to be redefined at each test sub-module -->
+    <lra.coordinator.jar.path>${project.basedir}/../coordinator-quarkus/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
+
+    <lra.coordinator.log.console.disable></lra.coordinator.log.console.disable>
+    <lra.coordinator.log.file.enable></lra.coordinator.log.file.enable>
+    <lra.coordinator.log.file.level></lra.coordinator.log.file.level>
+    <lra.coordinator.log.file.module.arjuna></lra.coordinator.log.file.module.arjuna>
+    <lra.coordinator.log.file.module.narayana></lra.coordinator.log.file.module.narayana>
+    <lra.coordinator.log.file.path></lra.coordinator.log.file.path>
+    <lra.coordinator.port>8080</lra.coordinator.port>
+    <!-- the property used by NarayanaLRAClient when passed into the container as the JVM parameter -->
+    <lra.coordinator.url>http://${lra.coordinator.host}:${lra.coordinator.port}/lra-coordinator</lra.coordinator.url>
+    <!-- for test executions where coordinator is started as a separate JVM (e.g. for Quarkus) and the test application
+             is deployed at the different JVM; these properties define where the test JVM application is started -->
+    <test.application.host>localhost</test.application.host>
+    <test.application.port>8180</test.application.port>
+
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.rts</groupId>
+      <artifactId>lra-client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.rts</groupId>
+      <artifactId>narayana-lra</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <inherited>false</inherited>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>default-install</id>
+                <phase>install</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

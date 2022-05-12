@@ -27,6 +27,7 @@
     <module>proxy</module>
     <module>test</module>
     <module>jaxrs</module>
+    <module>jakartaee</module>
   </modules>
 
   <properties>

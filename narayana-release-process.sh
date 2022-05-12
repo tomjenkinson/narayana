@@ -220,6 +220,7 @@ echo "building, tagging and pushing podman images to quay.io ..."
   # push the image
   podman push quay.io/jbosstm/lra-coordinator:${CURRENT}
   podman push quay.io/jbosstm/lra-coordinator:latest
+  # to check for vulnerabilities before pushing use https://github.com/quay/clair
   # the image will appear in https://quay.io/repository/jbosstm/lra-coordinator?tab=tags
 #else
 #  echo "alternatively run the above commands manually"

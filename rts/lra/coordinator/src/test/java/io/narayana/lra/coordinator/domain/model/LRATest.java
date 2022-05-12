@@ -29,6 +29,7 @@ import io.narayana.lra.coordinator.internal.LRARecoveryModule;
 import io.narayana.lra.filter.ServerLRAFilter;
 import io.narayana.lra.logging.LRALogger;
 import io.narayana.lra.provider.ParticipantStatusOctetStreamProvider;
+import io.undertow.Undertow;
 import org.eclipse.microprofile.lra.annotation.AfterLRA;
 import org.eclipse.microprofile.lra.annotation.Compensate;
 import org.eclipse.microprofile.lra.annotation.Complete;
@@ -334,7 +335,7 @@ public class LRATest {
     @Before
     public void before() {
         LRALogger.logger.debugf("Starting test %s", testName);
-        server = new UndertowJaxrsServer().start();
+        server = new UndertowJaxrsServer().start(Undertow.builder().addHttpListener(TestPortProvider.getPort(), TestPortProvider.getHost()));
 
         clearObjectStore();
         lraClient = new NarayanaLRAClient();
