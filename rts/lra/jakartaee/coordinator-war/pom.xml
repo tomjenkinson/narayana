@@ -15,7 +15,7 @@
   <description>WAR packaging of the LRA coordinator (Jakarta Namespace)</description>
 
   <properties>
-  <!--
+    <!--
     <transformer-input-dir>${project.basedir}/../../service-base</transformer-input-dir>
     -->
   </properties>

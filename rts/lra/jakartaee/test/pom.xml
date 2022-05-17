@@ -15,15 +15,14 @@
   <description>LRA tests running LRA TCKs and Narayana LRA internal testsuite (Jakarta Namespace)</description>
 
   <modules>
-<!-- TODO
-    <module>tck</module>
     <module>basic</module>
+    <!-- TODO
+    <module>tck</module>
     <module>arquillian-extension</module>
 -->
   </modules>
 
   <properties>
-    <transformer-input-dir>${project.basedir}/../../test</transformer-input-dir>
 
     <lra.coordinator.debug.params></lra.coordinator.debug.params>
     <!-- defined within -Ddebug.coordinator/-Pdebug.lra.coordinator -->
@@ -49,6 +48,9 @@
              is deployed at the different JVM; these properties define where the test JVM application is started -->
     <test.application.host>localhost</test.application.host>
     <test.application.port>8180</test.application.port>
+    <!--
+    <transformer-input-dir>${project.basedir}/../../test</transformer-input-dir>
+    -->
 
   </properties>
 
