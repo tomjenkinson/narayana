@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2017 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss.narayana</groupId>
+    <artifactId>narayana-jakarta-bom</artifactId>
+    <version>5.12.7.Final-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>arjunacore-all-jakarta</artifactId>
+
+  <packaging>pom</packaging>
+
+  <name>Narayana: Arjunacore (Jakarta EE Namespace)</name>
+  <description>Parent for EE transformed Arjunacore modules</description>
+
+  <modules>
+    <module>arjuna</module>
+    <!--
+    <module>txoj</module>
+    <module>arjunacore</module>
+    <module>arjuna/services</module>
+    -->
+  </modules>
+
+  <properties></properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.wildfly.extras.batavia</groupId>
+        <artifactId>transformer-tools-mvn</artifactId>
+        <version>${version.org.wildfly.extras.batavia}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.wildfly.extras.batavia</groupId>
+            <artifactId>transformer-impl-eclipse</artifactId>
+            <version>${version.org.wildfly.extras.batavia}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>transform-sources</id>
+            <goals>
+              <goal>transform-sources</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <source-project>${transformer-input-dir}</source-project>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

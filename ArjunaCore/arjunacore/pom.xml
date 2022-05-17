@@ -23,6 +23,11 @@
   <name>Narayana: ArjunaCore arjunacore</name>
   <description>ArjunaCore packaged module</description>
   <packaging>jar</packaging>
+
+  <properties>
+    <orson.jar.location>${project.basedir}/../../../ext</orson.jar.location>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -84,9 +89,9 @@
               <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
               <artifactSet>
                 <includes>
-                  <include>org.jboss.narayana:common</include>
-                  <include>org.jboss.narayana.arjunacore:arjuna</include>
-                  <include>org.jboss.narayana.arjunacore:txoj</include>
+                  <include>org.jboss.narayana:common-jakarta</include>
+                  <include>org.jboss.narayana.arjunacore:arjuna-jakarta</include>
+                  <include>org.jboss.narayana.arjunacore:txoj-jakarta</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -116,17 +121,17 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
-      <artifactId>common</artifactId>
+      <artifactId>common-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
-      <artifactId>arjuna</artifactId>
+      <artifactId>arjuna-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
-      <artifactId>txoj</artifactId>
+      <artifactId>txoj-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

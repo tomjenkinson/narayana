@@ -118,6 +118,7 @@
     </developer>
   </developers>
   <modules>
+    <module>jakarta-bom</module>
     <module>tools</module>
     <module>ext</module>
     <module>common</module>

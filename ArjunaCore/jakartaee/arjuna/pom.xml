@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
+  LLC, and others contributors as indicated by the @authors tag. All rights 
+  reserved. See the copyright.txt in the distribution for a full listing of 
+  individual contributors. This copyrighted material is made available to anyone 
+  wishing to use, modify, copy, or redistribute it subject to the terms and 
+  conditions of the GNU Lesser General Public License, v. 2.1. This program 
+  is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+  PURPOSE. See the GNU Lesser General Public License for more details. You 
+  should have received a copy of the GNU Lesser General Public License, v.2.1 
+  along with this distribution; if not, write to the Free Software Foundation, 
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.jboss.narayana</groupId>
+    <artifactId>arjunacore-all-jakarta</artifactId>
+    <version>5.12.7.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>arjuna-jakarta</artifactId>
+  <name>Narayana: ArjunaCore arjuna ((Jakarta EE Namespace)</name>
+  <description>Narayana: ArjunaCore Arjuna ((Jakarta EE Namespace)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- unfortunately we have mixed sources -->
+    <transformer-input-dir>${project.basedir}/../../arjuna</transformer-input-dir>
+    <orson.jar.location>${project.basedir}/../../../ext</orson.jar.location>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-journal</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.netty</groupId> 
+          <artifactId>netty</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- jakarta TODO I had to explicitly include the next three in order to load the Journal store -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-artemis-native</artifactId>
+      <version>${version.org.apache.activemq.native}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+      <version>${netty.version}</version>
+      <scope>provided</scope>
+    </dependency>
+      <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-common</artifactId>
+      <version>${netty.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-commons</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- end jakarta TODO -->
+
+    <dependency>
+      <groupId>io.mashona</groupId>
+      <artifactId>mashona-logwriting</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging-processor</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.byteman</groupId>
+      <artifactId>byteman-bmunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.byteman</groupId>
+      <artifactId>byteman-install</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>classes</sourceDirectory>
+    <testSourceDirectory>tests</testSourceDirectory>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${basedir}/resources</directory>
+      </resource>
+      <resource>
+        <directory>../../arjuna/etc</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>                                                                                                                                                                                                                          
+        <directory>src/test/resources</directory>                                                                                                                                                                                             
+      </testResource>                                                                                                                                                                                                                         
+      <testResource>                                                                                                                                                                                                                          
+        <directory>../../arjuna/tests/byteman-scripts</directory>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <useManifestOnlyJar>false</useManifestOnlyJar>
+          <excludes>
+            <!-- bmunit cannot find byteman jar please set environment variable BYTEMAN_HOME -->
+            <exclude>**/LogStoreRecoveryTest.java</exclude>
+            <exclude>**/LogStoreTest2.java</exclude>
+            <exclude>**/ReaperMonitorTest</exclude>
+            <exclude>**/ReaperTestCase</exclude>
+            <exclude>**/ReaperTestCase2</exclude>
+            <exclude>**/ReaperTestCase3</exclude>
+            <exclude>**/RecoveryManagerStartStopTest</exclude>
+	    <!-- hanging tests -->
+            <exclude>**/LogStressTest2.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
+  <profiles>
+    <profile>
+      <id>community</id>
+      <dependencies>
+        <dependency>
+          <groupId>orson</groupId>
+          <artifactId>orson</artifactId>
+          <version>${version.orson}</version>
+          <scope>system</scope>
+          <systemPath>${orson.jar.location}/orson-0.5.0.jar</systemPath>
+        </dependency>
+        <dependency>
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>
+          <version>${version.jfree}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <inherited>false</inherited>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration combine.children="append">
+              <excludes>
+              </excludes>
+            </configuration>
+
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <inherited>false</inherited>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>default-install</id>
+                <phase>install</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
