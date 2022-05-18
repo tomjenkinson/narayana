@@ -89,9 +89,9 @@
               <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
               <artifactSet>
                 <includes>
-                  <include>org.jboss.narayana:common-jakarta</include>
-                  <include>org.jboss.narayana.arjunacore:arjuna-jakarta</include>
-                  <include>org.jboss.narayana.arjunacore:txoj-jakarta</include>
+                  <include>org.jboss.narayana:common</include>
+                  <include>org.jboss.narayana.arjunacore:arjuna</include>
+                  <include>org.jboss.narayana.arjunacore:txoj</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -121,17 +121,17 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
-      <artifactId>common-jakarta</artifactId>
+      <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
-      <artifactId>arjuna-jakarta</artifactId>
+      <artifactId>arjuna</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
-      <artifactId>txoj-jakarta</artifactId>
+      <artifactId>txoj</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
