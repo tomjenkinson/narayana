@@ -29,6 +29,8 @@
   </licenses>
 
   <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <!-- dependencyManagement versions -->
     <ee.maven.groupId>26.0.1</ee.maven.groupId>
     <full.maven.groupId>26.0.1</full.maven.groupId>
