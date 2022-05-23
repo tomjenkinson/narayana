@@ -160,7 +160,9 @@
           <forkMode>pertest</forkMode>
           <excludes>
             <!-- bmunit cannot find byteman jar please set environment variable BYTEMAN_HOME -->
+            <exclude>**/RecoveryManagerStartStopTest.java</exclude>
             <exclude>**/LogStoreTest2.java</exclude>
+            <exclude>**/LogStoreRecoveryTest.java</exclude>
             <exclude>**/ReaperMonitorTest.java</exclude>
             <exclude>**/ReaperTestCase.java</exclude>
             <exclude>**/ReaperTestCase2.java</exclude>
