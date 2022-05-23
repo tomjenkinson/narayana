@@ -29,10 +29,6 @@
     <!-- unfortunately we have mixed sources -->
     <transformer-input-dir>${project.basedir}/../../arjuna</transformer-input-dir>
     <orson.jar.location>${project.basedir}/../../../ext</orson.jar.location>
-    <!-- Caused by: java.lang.ClassNotFoundException: java.sql.SQLException  -->
-    <jvm.args.modular>
-      --add-opens=java.base/java.sql=ALL-UNNAMED
-    </jvm.args.modular>
   </properties>
 
   <dependencies>
@@ -158,9 +154,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <!-- Caused by: java.lang.ClassNotFoundException: java.sql.SQLException  -->
+        <version>2.22.2</version>
         <configuration>
           <forkMode>pertest</forkMode>
-          <argLine>${jvm.args.modular}</argLine>
           <excludes>
             <!-- bmunit cannot find byteman jar please set environment variable BYTEMAN_HOME -->
             <exclude>**/LogStoreTest2.java</exclude>
