@@ -26,4 +26,5 @@ jobs:
           git config --global user.name "Your Name"
           ./mvnw clean install -f jakarta-bom/pom.xml
           ./build.sh -Pcommunity clean install -DskipTests
-          ./mvnw test -Pcommunity -f ArjunaCore/jakartaee/pom.xml
+#          ./mvnw test -Pcommunity -f ArjunaCore/jakartaee/pom.xml
+          ./mvnw install -Pcommunity -f ArjunaCore/jakartaee/pom.xml -DskipTests
