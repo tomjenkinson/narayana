@@ -8,9 +8,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.jboss.narayana</groupId>
-    <artifactId>narayana-jakarta-bom</artifactId>
+    <groupId>org.jboss.narayana.arjunacore</groupId>
+    <artifactId>arjunacore-all</artifactId>
     <version>5.12.7.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>arjunacore-all-jakarta</artifactId>

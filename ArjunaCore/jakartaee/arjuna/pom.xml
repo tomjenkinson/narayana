@@ -14,7 +14,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.jboss.narayana</groupId>
+    <groupId>org.jboss.narayana.arjunacore</groupId>
     <artifactId>arjunacore-all-jakarta</artifactId>
     <version>5.12.7.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
@@ -54,6 +54,7 @@
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>artemis-journal</artifactId>
+      <version>${version.org.apache.activemq}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -62,11 +63,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- jakarta TODO I had to explicitly include the next three in order to load the Journal store -->
+    <!-- jakarta TODO I had to explicitly include the next three in order to load the Journal store
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-artemis-native</artifactId>
-      <version>${version.org.apache.activemq.native}</version>
+      <version>${version.org.apache.activemq}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -81,51 +82,43 @@
       <version>${netty.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>artemis-commons</artifactId>
-      <scope>provided</scope>
-    </dependency>
+ -->
     <!-- end jakarta TODO -->
 
     <dependency>
       <groupId>io.mashona</groupId>
       <artifactId>mashona-logwriting</artifactId>
+      <version>${version.io.mashona}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
+      <version>${version.org.jboss.logging.jboss-logging}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging-processor</artifactId>
+      <version>${version.org.jboss.logging.jboss-logging-processor}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>${version.junit}</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.byteman</groupId>
       <artifactId>byteman-bmunit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.byteman</groupId>
-      <artifactId>byteman-install</artifactId>
+      <version>${version.org.jboss.byteman}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <version>${version.com.h2database}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
