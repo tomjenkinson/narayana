@@ -1,0 +1,29 @@
+name: CORE
+
+on:
+  push:
+    branches: [ JBTM-3588-jakarta-ee-source-transform ]
+
+jobs:
+  core-test:
+    name: CORE test with JDK ${{ matrix.java-version }}
+    timeout-minutes: 120
+    strategy:
+      matrix:
+        java-version: [ 11 ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v1
+        name: Set up JDK ${{ matrix.java-version }}
+        with:
+          java-version: ${{ matrix.java-version }}
+
+      - name: CORE test
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          ./mvnw clean install -f jakarta-bom/pom.xml
+          ./build.sh -Pcommunity clean install -DskipTests
+          ./mvnw test -Pcommunity -f ArjunaCore/jakartaee/pom.xml
