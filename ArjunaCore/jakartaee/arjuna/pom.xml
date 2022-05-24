@@ -11,24 +11,23 @@
   should have received a copy of the GNU Lesser General Public License, v.2.1 
   along with this distribution; if not, write to the Free Software Foundation, 
   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jboss.narayana.arjunacore</groupId>
+    <groupId>org.jboss.narayana</groupId>
     <artifactId>arjunacore-all-jakarta</artifactId>
     <version>5.12.7.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>arjuna-jakarta</artifactId>
+  <packaging>jar</packaging>
   <name>Narayana: ArjunaCore arjuna ((Jakarta EE Namespace)</name>
   <description>Narayana: ArjunaCore Arjuna ((Jakarta EE Namespace)</description>
-  <packaging>jar</packaging>
 
   <properties>
+    <orson.jar.location>${project.basedir}/../../../ext</orson.jar.location>
     <!-- unfortunately we have mixed sources -->
     <transformer-input-dir>${project.basedir}/../../arjuna</transformer-input-dir>
-    <orson.jar.location>${project.basedir}/../../../ext</orson.jar.location>
   </properties>
 
   <dependencies>
@@ -58,16 +57,22 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>io.netty</groupId> 
+          <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- jakarta TODO I had to explicitly include the next three in order to load the Journal store
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-commons</artifactId>
+      <version>${version.org.apache.activemq}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- jakarta TODO I had to explicitly include the next three in order to load the Journal store -->
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-artemis-native</artifactId>
-      <version>${version.org.apache.activemq}</version>
+      <version>${version.org.apache.activemq.native}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -76,13 +81,12 @@
       <version>${netty.version}</version>
       <scope>provided</scope>
     </dependency>
-      <dependency>
+    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-common</artifactId>
       <version>${netty.version}</version>
       <scope>provided</scope>
     </dependency>
- -->
     <!-- end jakarta TODO -->
 
     <dependency>
@@ -124,8 +128,6 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>classes</sourceDirectory>
-    <testSourceDirectory>tests</testSourceDirectory>
     <resources>
       <resource>
         <filtering>false</filtering>
@@ -172,10 +174,10 @@
             <exclude>**/RecoveryTransaction.java</exclude>
             <exclude>**/UserDefFirst0Setup.java</exclude>
             <exclude>**/CachedTest.java</exclude>
-	    <!-- this test is designed to run on demand since it takes 4 hours to run -->
+            <!-- this test is designed to run on demand since it takes 4 hours to run -->
             <exclude>**/LogStressTest2.java</exclude>
-	    <!-- auxilairy code used by reaper test classes -->
-	    <exclude>**/reaper/ReaperTestCaseControl.java</exclude>
+            <!-- auxilairy code used by reaper test classes -->
+            <exclude>**/reaper/ReaperTestCaseControl.java</exclude>
           </excludes>
           <includes>
             <include>**/*.java</include>
@@ -183,6 +185,8 @@
         </configuration>
       </plugin>
     </plugins>
+    <sourceDirectory>classes</sourceDirectory>
+    <testSourceDirectory>tests</testSourceDirectory>
 
   </build>
   <profiles>
@@ -205,13 +209,13 @@
       <build>
         <plugins>
           <plugin>
-            <inherited>false</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
+            <inherited>false</inherited>
             <configuration combine.children="append">
               <excludes>
-	        <exclude>com/arjuna/ats/arjuna/tools/stats/TxPerfGraph.java</exclude>
-		<exclude>com/arjuna/ats/arjuna/tools/stats/TxPerfPlugin.java</exclude>
+                <exclude>com/arjuna/ats/arjuna/tools/stats/TxPerfGraph.java</exclude>
+                <exclude>com/arjuna/ats/arjuna/tools/stats/TxPerfPlugin.java</exclude>
               </excludes>
             </configuration>
           </plugin>

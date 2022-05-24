@@ -118,6 +118,7 @@
     </developer>
   </developers>
   <modules>
+    <module>jakarta-bom</module>
     <module>tools</module>
     <module>ext</module>
     <module>common</module>
@@ -258,7 +259,6 @@
     <version.org.slf4j>1.7.30</version.org.slf4j>
     <version.org.sonatype.plugins.nexus-staging-maven-plugin>1.6.6</version.org.sonatype.plugins.nexus-staging-maven-plugin>
     <version.org.wildfly.arquillian>3.0.1.Final</version.org.wildfly.arquillian>
-    <version.org.wildfly.extras.batavia>1.0.14.Final</version.org.wildfly.extras.batavia>
     <version.postgresql>42.2.20</version.postgresql>
     <version.smallrye-converter-api>1.0.10</version.smallrye-converter-api>
     <version.sortpom>3.0.0</version.sortpom>
