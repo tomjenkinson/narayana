@@ -237,7 +237,6 @@
     <version.org.jacoco>0.8.8</version.org.jacoco>
     <version.org.jacorb.jacorb>2.3.2-jbossorg-5</version.org.jacorb.jacorb>
     <version.org.jacorb.jacorb>3.7</version.org.jacorb.jacorb>
-    <version.org.jacorb.jacorb-idl-compiler>2.3.1</version.org.jacorb.jacorb-idl-compiler>
     <version.org.jacorb.jacorb-idl-compiler>3.7</version.org.jacorb.jacorb-idl-compiler>
     <version.org.jboss.arquillian.container.weld>3.0.2.Final</version.org.jboss.arquillian.container.weld>
     <version.org.jboss.arquillian.core>1.6.0.Final</version.org.jboss.arquillian.core>
