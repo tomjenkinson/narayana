@@ -2,7 +2,7 @@ name: LRA
 
 on:
   push:
-    branches: [ master ]
+    branches: [ JBTM-3607-debug ]
     paths:
       - "rts/lra/**"
   pull_request:

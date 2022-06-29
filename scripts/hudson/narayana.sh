@@ -563,10 +563,14 @@ function rts_tests {
 
 function lra_tests {
   echo "#0. LRA Test"
-  ./build.sh install -pl ArjunaCore/arjunacore,rts -am -DskipTests -Pcommunity "$@"
+  ./build.sh install -pl :lra-test-tck,:lra-coordinator-war -am -DskipTests -Pcommunity "$@"
+  [ $? -eq 0 ] || fatal "LRA build failed"
   cd ./rts/lra/
   echo "#0. Running LRA tests using $ARQ_PROF profile"
-  PRESERVE_WORKING_DIR=true ../../build.sh -fae -B -Pcommunity -P$ARQ_PROF $CODE_COVERAGE_ARGS $ENABLE_LRA_TRACE_LOGS -Dlra.test.timeout.factor="${LRA_TEST_TIMEOUT_FACTOR:-1.5}" "$@"
+  for i in {1..1}; do
+    PRESERVE_WORKING_DIR=true ../../build.sh -pl :lra-test-tck -fae -B -Pcommunity -P$ARQ_PROF $CODE_COVERAGE_ARGS $ENABLE_LRA_TRACE_LOGS -Dlra.test.timeout.factor="${LRA_TEST_TIMEOUT_FACTOR:-1.5}" "$@"
+    rm -rf ObjectStore*
+  done
   lra_arq=$?
   if [ $lra_arq != 0 ] ; then fatal "LRA Test failed with failures in $ARQ_PROF profile" ; fi
 }
