@@ -483,9 +483,7 @@ public class ShadowingStore extends FileSystemStore
     protected boolean remove_state (Uid objUid, String name, int ft)
             throws ObjectStoreException
     {
-        if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("ShadowingStore.remove_state(" + objUid + ", " + name + ", " + StateType.stateTypeString(ft) + ")");
-        }
+        tsLogger.logger.warn("ShadowingStore.remove_state(" + objUid + ", " + name + ", " + StateType.stateTypeString(ft) + ")", new RuntimeException());
 
         boolean removeOk = true;
 
