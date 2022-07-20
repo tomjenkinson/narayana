@@ -440,7 +440,7 @@ function tests_as {
   fi
 
   cd "${WORKSPACE}/jboss-as"
-  JAVA_OPTS="-Xms1303m -Xmx1303m -XX:MaxMetaspaceSize=512m $JAVA_OPTS" ./integration-tests.sh -B $IPV6_OPTS -Dtimeout.factor=300 -Dsurefire.forked.process.timeout=12000 -Dsurefire.extra.args='-Xmx512m' -Dversion.org.jboss.narayana=${NARAYANA_CURRENT_VERSION} -Djboss.dist="$JBOSS_HOME" -DallTests=true -fae "$@" clean verify
+  JAVA_OPTS="-Xms1303m -Xmx1303m -XX:MaxMetaspaceSize=512m $JAVA_OPTS" ./integration-tests.sh -B $IPV6_OPTS -Dts.timeout.factor=300 -Dsurefire.forked.process.timeout=12000 -Dsurefire.extra.args='-Xmx512m' -Dversion.org.jboss.narayana=${NARAYANA_CURRENT_VERSION} -Djboss.dist="$JBOSS_HOME" -DallTests=true -fae "$@" clean verify
   [ $? -eq 0 ] || fatal "AS tests failed"
   cd $WORKSPACE
 }
