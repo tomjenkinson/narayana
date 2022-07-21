@@ -41,6 +41,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: AS_TESTS test
+        timeout-minutes: 600
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
