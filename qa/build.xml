@@ -26,7 +26,6 @@
   <property name="org.jboss.jbossts.qa.ts.home" location="dist"/>
   <property name="narayana.version" value="5.13.1.Final-SNAPSHOT"/>
 
-  <property name="org.jboss.jbossts.qa.server_manager_location" location="ext/jboss-server-manager-0.1.1.GA.jar"/>
   <property name="org.jboss.jbossts.qa.dist.buildroot" location="build"/>
 
   <target name="buildtype">
@@ -68,16 +67,14 @@
   <target name="init" depends="clean">
     <mkdir dir="${org.jboss.jbossts.qa.dist.buildroot}"/>
     <mkdir dir="${org.jboss.jbossts.qa.ts.home}"/>
-    <unzip src="../narayana-full/target/narayana-full-${narayana.version}-bin.zip"
-           dest="${org.jboss.jbossts.qa.ts.home}"/>
-    <copy file="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jts/narayana-jts-idlj.jar"
+    <copy file="ext/narayana-jts-idlj.jar"
           tofile="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jts/narayana-jts-openjdk.jar"/>
     <antcall target="init-jta"/>
     <antcall target="init-jts"/>
   </target>
 
   <target name="init-jta" if="init-jta">
-    <copy file="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jta/narayana-jta.jar"
+    <copy file="ext/narayana-jta.jar"
           tofile="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/narayana-jta.jar"/>
   </target>
 
@@ -85,7 +82,7 @@
 
   <target name="jts.cp">
     <echo>copying ${orbtype} jts</echo>
-    <copy file="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jts/narayana-jts-${orbtype}.jar"
+    <copy file="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jts/narayana-jts-openjdk.jar"
           tofile="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/jbossjts.jar"/>
   </target>
 

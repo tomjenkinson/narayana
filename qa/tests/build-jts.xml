@@ -21,7 +21,7 @@
 <project name="JBossTS JTS QA Suite" default="build">
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
-            <pathelement location="../ant-contrib-1.0b3.jar"/>
+            <pathelement location="../ext/ant-contrib.jar"/>
         </classpath>
     </taskdef>
 
@@ -33,13 +33,15 @@
 	<!-- set properties for AS testing -->
 	<property environment="env"/>
 	<property name="jts.build.dir" value="${basedir}/../../ArjunaJTS"/>
+	<property name="maven.jars" value="${basedir}/../ext"/>
 	<property name="astest.dir" value="org/jboss/jbossts/qa/astests"/>
 
     <!-- TODO cd ArjunaJTS/orbportability; ant -f build-anttasks.xml -->
 	<property name="org.jboss.jbossts.qa.idlcompiler.lib"
 			  location="${jts.build.dir}/orbportability/lib/ext"/>
 
-        <property name="java.corba.patch.jar" location="${jts.build.dir}/idl/idlj.java.corba/target/idlj.java.corba.patch-${narayana.version}.jar"/>
+	<!-- TODO to be removed...no more needed -->
+    <property name="java.corba.patch.jar" location="${jts.build.dir}/idl/idlj.java.corba/target/idlj.java.corba.patch-${narayana.version}.jar"/>
 	<property name="org.jboss.jbossts.qa.buildroot" location="build"/>
 	<property name="org.jboss.jbossts.qa.build.classes" value="${org.jboss.jbossts.qa.buildroot}/classes/"/>
 	<property name="org.jboss.jbossts.qa.build.idl" value="${org.jboss.jbossts.qa.buildroot}/idl/"/>
@@ -56,24 +58,24 @@
             <property name="jts.idl.tests.jar" value="${jts.build.dir}/idl/${orbtype}/target/idlj-idl-${narayana.version}-tests.jar"/>
             <property name="org.jboss.jbossts.qa.orb.home" value="${env.JAVA_HOME}"/>
             <property name="org.jboss.jbossts.qa.orb.classpath" value="${org.jboss.jbossts.qa.orb.home}/lib/ibmorbtools.jar;${org.jboss.jbossts.qa.orb.home}/jre/lib/ibmorb.jar"/>
-            <property name="idl.params1" value="include='${org.jboss.jbossts.qa.orb.home}/lib;${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/idl/;../../ArjunaJTS/idl/src/test/idl/TestModule.idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
-            <property name="idl.params2" value="include='${org.jboss.jbossts.qa.orb.home}/lib;${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
+            <property name="idl.params1" value="include='${org.jboss.jbossts.qa.orb.home}/lib;${org.jboss.jbossts.qa.buildroot}/arjuna_idl;${jts.build.dir}/idl/src/test/idl/TestModule.idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
+            <property name="idl.params2" value="include='${org.jboss.jbossts.qa.orb.home}/lib;${org.jboss.jbossts.qa.buildroot}/arjuna_idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
 
             <property name="is.ibmorb" value="1"/>
         </then>
         <elseif>
 	       <equals arg1="${orbtype}" arg2="openjdk" />
         <then>
-		<unzip src="../ext/openjdk-orb-sources.jar" dest="../ext/lib">
+		<unzip src="${maven.jars}/openjdk-orb-jakarta-sources.jar" dest="${maven.jars}/${orb.idl.path}">
 		    <patternset>
 			    <include name="**/*.idl"/>
 		    </patternset>
 	    </unzip>
             <property name="jts.idl.tests.jar" value="${jts.build.dir}/idl/idlj-openjdk/target/idlj-idl-openjdk-${narayana.version}-tests.jar"/>
 	    <property name="org.jboss.jbossts.qa.orb.home" value="ext"/>
-	    <property name="org.jboss.jbossts.qa.orb.classpath" value="${org.jboss.jbossts.qa.orb.home}/lib/idl.jar;../ext/openjdk-orb.jar;${org.jboss.jbossts.qa.orb.home}/lib/logkit-1.2.jar;ext/openjdk-orb.jar;ext/openjdk-orb-sources.jar"/>
-	    <property name="idl.params1" value="include='${org.jboss.jbossts.qa.orb.home}/${orb.idl.path}/com/sun/tools/corba/se/idl;${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/idl/;${jts.build.dir}/idl/src/test/idl/TestModule.idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
-	    <property name="idl.params2" value="include='${org.jboss.jbossts.qa.orb.home}/${orb.idl.path}/com/sun/tools/corba/se/idl;${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
+	    <property name="org.jboss.jbossts.qa.orb.classpath" value="${maven.jars}/lib/idl.jar;${maven.jars}/openjdk-orb-jakarta.jar;${maven.jars}/openjdk-orb-jakarta.jar;${maven.jars}/openjdk-orb-jakarta-sources.jar"/>
+	    <property name="idl.params1" value="include='${maven.jars}/${orb.idl.path}/com/sun/tools/corba/se/idl;${org.jboss.jbossts.qa.buildroot}/arjuna_idl;${jts.build.dir}/idl/src/test/idl/TestModule.idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
+	    <property name="idl.params2" value="include='${maven.jars}/${orb.idl.path}/com/sun/tools/corba/se/idl;${org.jboss.jbossts.qa.buildroot}/arjuna_idl',classpath='${org.jboss.jbossts.qa.orb.classpath}'"/>
 
             <property name="is.sunorb" value="1"/>
         </then>
@@ -91,16 +93,17 @@
             <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/">
                 <include name="jbossjts.jar"/>
             </fileset>
-            <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/ext">
-                <include name="jboss-transaction-api_1.2_spec.jar"/>
-	        <include name="jboss-logging.jar"/>
-                <include name="openjdk-orb.jar" if="is.sunorb" />
+            <fileset dir="${maven.jars}">
+                <include name="jakarta.transaction-api.jar"/>
+	            <include name="jboss-logging.jar"/>
+                <include name="openjdk-orb-jakarta.jar" if="is.sunorb" />
             </fileset>
             <pathelement location="${jts.build.dir}/orbportability/config"/>
             <!--<fileset file="${org.jboss.jbossts.qa.server_manager_location}" />-->
             <pathelement path="${org.jboss.jbossts.qa.orb.classpath}"/>
             <pathelement location="../ext/junit.jar"/>
             <pathelement location="../ext/jboss-profiler-jvmti.jar"/>
+			<pathelement location="../ext/test-utils.jar"/>
             <pathelement location="${jts.build.dir}/jts/build/lib/jts_tests.jar"/>
             <!-- added this for j9 since the orb type name is slightly inconsistent. Also retest on the other orbtypes -->
             <pathelement location="${jts.idl.tests.jar}"/>
@@ -110,12 +113,19 @@
 	<target name="org.jboss.jbossts.qa.init" depends="setIdlProps,org.jboss.jbossts.qa.clean">
 
 		<mkdir dir="${org.jboss.jbossts.qa.buildroot}"/>
+		<mkdir dir="${org.jboss.jbossts.qa.buildroot}/arjuna_idl"/>
 		<mkdir dir="${org.jboss.jbossts.qa.build.classes}"/>
 		<mkdir dir="${org.jboss.jbossts.qa.build.idl}"/>
 
 		<copy todir="${org.jboss.jbossts.qa.build.classes}">
 			<fileset dir="${org.jboss.jbossts.qa.src}/${astest.dir}/resources"/>
 			<fileset dir="../../tools/target/classes"/>
+		</copy>
+
+		<echo>copying arjuna's idl files</echo>
+		<copy todir="${org.jboss.jbossts.qa.buildroot}/arjuna_idl">
+			<fileset dir="${jts.build.dir}/idl/src/main/idl/arjuna"/>
+			<fileset dir="${jts.build.dir}/idl/src/main/idl/omg"/>
 		</copy>
 	</target>
 
@@ -223,7 +233,7 @@
 				 classpathref="jts.classpath"/>
 
 		    <idl-build-list inproperty="idl.buildlist">
-            <element src="${org.jboss.jbossts.qa.ts.home}/../../ArjunaJTS/idl/src/test/idl/TestModule.idl" package="com.hp.mwtests.ts.jts"
+            <element src="${jts.build.dir}/idl/src/test/idl/TestModule.idl" package="com.hp.mwtests.ts.jts"
                      mappings="CosTransactions=org.omg;TestModule=com.hp.mwtests.ts.jts;CORBA=org.omg"/>
         </idl-build-list>
 
@@ -276,21 +286,16 @@
     </target>
 
     <path id="as.classpath">
-                <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/">
-                        <include name="jbossjts.jar"/>
-                </fileset>
-                <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/ext">
-                        <include name="jbossts-common.jar"/>
-                        <include name="jta-1_1-classes.zip"/>
-                </fileset>
-                <!-- include classes for AS tests -->
-                <fileset dir="../../ext">
-                    <include name="jboss-server-manager.jar"/>
-                    <include name="jboss-transaction-api_1.2_spec.jar"/>
-                    <include name="jboss-ejb-api_3.1_spec.jar"/>
-                    <include name="jboss-transaction-spi.jar"/>
-                    <include name="jboss-remoting.jar"/>
-                </fileset>
+		<fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/">
+				<include name="jbossjts.jar"/>
+		</fileset>
+		<!-- include classes for AS tests -->
+		<fileset dir="../../ext">
+			<include name="jakarta.transaction-api.jar"/>
+			<include name="jakarta.ejb-api.jar"/>
+			<include name="jboss-transaction-spi-jakarta.jar"/>
+			<include name="jboss-remoting.jar"/>
+		</fileset>
 	</path>
 
     <target name="as-ejbjar.compile" if="integration.build">

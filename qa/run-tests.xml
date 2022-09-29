@@ -51,7 +51,7 @@
          xmlns:jacoco="antlib:org.jacoco.ant">
   <taskdef resource="net/sf/antcontrib/antlib.xml">
       <classpath>
-          <pathelement location="ant-contrib-1.0b3.jar"/>
+          <pathelement location="ext/ant-contrib.jar"/>
       </classpath>
   </taskdef>
 
@@ -62,11 +62,12 @@
   <property name="output.exec.file" location="${output.dir}/jacoco-qa.exec" />
 
   <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-      <classpath path="../ext/jacocoant.jar" />
+      <classpath path="ext/org.jacoco.ant.jar; ext/org.jacoco.core.jar; ext/org.jacoco.report.jar" />
   </taskdef>
 
   <!-- set this property to the location of a JBossTS core build -->
   <property name="org.jboss.jbossts.qa.ts.home" location="dist"/>
+  <property name="maven.libraries" location="ext"/>
   <property name="narayana.version" value="5.13.1.Final-SNAPSHOT"/>
   <property name="working.dir" location="build"/>
   <property name="testoutput.zipname" value="testoutput.zip"/>
@@ -261,15 +262,15 @@
     <fail if="failed-tests" message="some tests failed"/>
   </target>
   <target name="junit-jdbc-testsuite">
-    <install-dbdriver files="ojdbc8.jar"/>
-    <junit-tests tests="jdbcresources01_oracle_thin_jndi"/>
-    <junit-tests tests="jdbcresources02_oracle_thin_jndi"/>
-    <install-dbdriver files="postgresql.jar"/>
-    <junit-tests tests="jdbcresources01_pgsql_jndi"/>
-    <junit-tests tests="jdbcresources02_pgsql_jndi"/>
-    <install-dbdriver files="mysql-connector-java.jar"/>
-    <junit-tests tests="jdbcresources01_mysql_jndi"/>
-    <junit-tests tests="jdbcresources02_mysql_jndi"/>
+<!--    <install-dbdriver files="ojdbc8.jar"/>-->
+<!--    <junit-tests tests="jdbcresources01_oracle_thin_jndi"/>-->
+<!--    <junit-tests tests="jdbcresources02_oracle_thin_jndi"/>-->
+<!--    <install-dbdriver files="postgresql.jar"/>-->
+<!--    <junit-tests tests="jdbcresources01_pgsql_jndi"/>-->
+<!--    <junit-tests tests="jdbcresources02_pgsql_jndi"/>-->
+<!--    <install-dbdriver files="mysql-connector-java.jar"/>-->
+<!--    <junit-tests tests="jdbcresources01_mysql_jndi"/>-->
+<!--    <junit-tests tests="jdbcresources02_mysql_jndi"/>-->
     <install-dbdriver files="jcc.jar"/>
     <junit-tests tests="jdbcresources01_ibmdb2_jndi"/>
     <junit-tests tests="jdbcresources02_ibmdb2_jndi"/>
@@ -398,16 +399,15 @@
     <fileset dir="tests/build">
       <include name="jbossts-*-qa.jar"/>
     </fileset>
-    <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib">
+    <fileset dir="${maven.libraries}">
       <exclude name="narayana-jts-idlj.jar"/>
       <exclude name="narayana-jts-ibmorb.jar"/>
       <include name="*.jar"/>
     </fileset>
-    <fileset dir="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/lib/ext">
+    <fileset dir="${maven.libraries}">
       <include name="*.jar"/>
       <include name="*.zip"/>
     </fileset>
-    <pathelement location="${org.jboss.jbossts.qa.ts.home}/narayana-full-${narayana.version}/etc"/>
   </path>
 
   <macrodef name="junit-tests">
@@ -588,11 +588,6 @@
             <exclude name="**/idlj/**"/>
             <exclude name="**/ArjunaJTS/narayana-jts-idlj/**"/>
             <exclude name="**/XTS/localjunit/unit/**"/>
-            <exclude name="**/blacktie/blacktie-admin-services/**"/>
-            <exclude name="**/blacktie/blacktie/**"/>
-            <exclude name="**/blacktie/integration-tests/**"/>
-            <exclude name="**/blacktie/wildfly*/**"/>
-            <exclude name="**/blacktie/btadmin/**"/>
             <exclude name="**/jboss-as/**"/>
             <exclude name="**/narayana-full/**"/>
             <exclude name="**/qa/**"/>
@@ -602,7 +597,7 @@
             <exclude name="**/lra*/**"/>
             <exclude name="**/vertx/**"/>
             <exclude name="**/openjdk-orb-**.jar"/>
-            <exclude name="**/ext/jacocoant.jar"/>
+            <exclude name="**/ext/org.jacoco.ant.jar"/>
             <exclude name="**/dependenc*/**.jar"/>
           </fileset>
         </classfiles>
