@@ -63,16 +63,22 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.narayana.rts</groupId>
+      <artifactId>restat-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-core-spi</artifactId>
       <version>${version.org.jboss.resteasy}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-      <version>${version.javax.ws.rs-api}</version>
-      <scope>provided</scope>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>3.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -96,6 +102,11 @@
     </dependency>
 
     <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.spec.javax.transaction</groupId>
       <artifactId>jboss-transaction-api_1.2_spec</artifactId>
       <version>${version.org.jboss.spec.javax.transaction}</version>
@@ -103,10 +114,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.ejb</groupId>
-      <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.ejb}</version>
-      <scope>provided</scope>
+      <groupId>jakarta.ejb</groupId>
+      <artifactId>jakarta.ejb-api</artifactId>
+      <version>4.0.1</version>
     </dependency>
 
     <dependency>
@@ -154,6 +164,18 @@
       <version>${version.org.jboss.byteman}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>4.0.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -226,7 +248,7 @@
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
+          <artifactId>arquillian-protocol-servlet-jakarta</artifactId>
           <version>${version.org.jboss.arquillian.core}</version>
           <scope>test</scope>
         </dependency>
