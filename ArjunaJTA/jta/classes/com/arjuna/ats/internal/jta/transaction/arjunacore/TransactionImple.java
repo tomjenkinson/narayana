@@ -55,7 +55,6 @@ import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
-import com.arjuna.ats.arjuna.coordinator.ExceptionDeferrer;
 import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
@@ -1688,6 +1687,11 @@ public class TransactionImple implements jakarta.transaction.Transaction,
         return Collections.unmodifiableMap(_transactions);
     }
 
+	public static Map<Uid, com.arjuna.ats.jta.transaction.Transaction> getArjunaTransactions()
+	{
+		return Collections.unmodifiableMap(_transactions);
+	}
+
     public Map<XAResource, TxInfo> getResources()
     {
         return Collections.unmodifiableMap(_resources);
@@ -1743,7 +1747,7 @@ public class TransactionImple implements jakarta.transaction.Transaction,
         }
 	}
 
-	private static final ConcurrentHashMap _transactions = new ConcurrentHashMap();
+	private static final ConcurrentHashMap<Uid, TransactionImple> _transactions = new ConcurrentHashMap<>();
 	
 	private static final List<String> commitMarkableResourceJNDINames = BeanPopulator
 			.getDefaultInstance(JTAEnvironmentBean.class)

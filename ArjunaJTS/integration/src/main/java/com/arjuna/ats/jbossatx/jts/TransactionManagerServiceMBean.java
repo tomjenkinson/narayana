@@ -30,6 +30,8 @@
  */
 package com.arjuna.ats.jbossatx.jts;
 
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.jta.transaction.Transaction;
 import org.jboss.tm.JBossXATerminator;
 import org.jboss.tm.XAExceptionFormatter;
 
@@ -37,6 +39,7 @@ import jakarta.transaction.TransactionManager;
 import jakarta.transaction.UserTransaction;
 import jakarta.transaction.TransactionSynchronizationRegistry;
 import java.net.InetAddress;
+import java.util.Map;
 
 /**
  * The MBean interface for the TransactionManager JBoss service.
@@ -99,5 +102,14 @@ public interface TransactionManagerServiceMBean
      * As we do not support exception formatters just display a warning for the moment.
      */
     public void unregisterXAExceptionFormatter(Class c);
+
+    /**
+     * Returns all Arjuna Transactions currently in the system. As {@link Transaction} extends
+     * {@link jakarta.transaction.Transaction}, the return {@code Map} can also be handled with
+     * the Jakarta {@link jakarta.transaction.Transaction} interface.
+     *
+     * @return a {@code Map} of {@link Uid} and {@link Transaction} pairs.
+     */
+    public Map<Uid, Transaction> getTransactions();
 }
 

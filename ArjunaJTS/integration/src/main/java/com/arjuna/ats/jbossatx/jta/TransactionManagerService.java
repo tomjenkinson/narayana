@@ -30,6 +30,9 @@
  */
 package com.arjuna.ats.jbossatx.jta;
 
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple;
+import com.arjuna.ats.jta.transaction.Transaction;
 import org.jboss.tm.*;
 
 import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
@@ -39,6 +42,8 @@ import com.arjuna.common.util.ConfigurationInfo;
 import jakarta.transaction.TransactionManager;
 import jakarta.transaction.UserTransaction;
 import jakarta.transaction.TransactionSynchronizationRegistry;
+
+import java.util.Map;
 
 /**
  * JBoss Transaction Manager Service.
@@ -154,5 +159,10 @@ public class TransactionManagerService implements TransactionManagerServiceMBean
     public void unregisterXAExceptionFormatter(Class c)
     {
         // Ignore
+    }
+
+    public Map<Uid, Transaction> getTransactions()
+    {
+        return TransactionImple.getArjunaTransactions();
     }
 }
