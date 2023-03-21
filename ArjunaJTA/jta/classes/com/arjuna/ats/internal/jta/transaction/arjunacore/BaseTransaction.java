@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.internal.jta.transaction.arjunacore;
 
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -40,6 +41,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.arjuna.ats.internal.jta.Implementations;
 import jakarta.transaction.InvalidTransactionException;
 import jakarta.transaction.NotSupportedException;
 
@@ -63,41 +65,55 @@ public class BaseTransaction
 		 * programmer use them. Strict conformance will always say no.
 		 */
 
-		if (!_supportSubtransactions)
+		boolean alreadyAssociated;
+
+		try
 		{
-		    try
-		    {
-		        checkTransactionState();
-		    }
-		    catch (IllegalStateException e1)
-		    {
-		        NotSupportedException notSupportedException = new NotSupportedException(
-		                e1.getMessage());
-		        notSupportedException.initCause(e1);
-		        throw notSupportedException;
-		    }
-		    catch (Exception e2)
-		    {
-		        jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(
-		                e2.toString());
-		        systemException.initCause(e2);
-		        throw systemException;
-		    }
+			alreadyAssociated = checkTransactionState();
+			if (alreadyAssociated && !_supportSubtransactions)
+			{
+				throw new NotSupportedException("BaseTransaction.begin - " +
+						jtaLogger.i18NLogger.get_transaction_arjunacore_alreadyassociated());
+			}
+		}
+		catch (NotSupportedException notSupportedException) {
+			throw notSupportedException;
+		}
+		catch (Exception rootException)
+		{
+			jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(rootException.toString());
+			systemException.initCause(rootException);
+			throw systemException;
 		}
 
-		Integer value = _timeouts.get();
-		int v;
-
-		if (value != null)
+		/*
+		 * If we are here, it means that either there isn't any transaction associated to this thread
+		 * or sub-transactions are allowed. If support for sub-transactions is enabled and there is already
+		 * a transaction associated with this thread then Implementations.getAllowTransactionCreation()
+		 * is overruled
+		 */
+		if (Implementations.getAllowTransactionCreation() || (_supportSubtransactions && alreadyAssociated))
 		{
-			v = value.intValue();
+
+			Integer value = _timeouts.get();
+			int v;
+
+			if (value != null)
+			{
+				v = value.intValue();
+			}
+			else
+			{
+				v = TxControl.getDefaultTimeout();
+			}
+			// TODO set default timeout
+
+			TransactionImple.putTransaction(new TransactionImple(v));
 		}
 		else
-		    v = TxControl.getDefaultTimeout();
-
-		// TODO set default timeout
-
-		TransactionImple.putTransaction(new TransactionImple(v));
+		{
+			jtaLogger.i18NLogger.warn_no_new_transactions();
+		}
 	}
 
 	/**
@@ -214,19 +230,19 @@ public class BaseTransaction
 
 		try
 		{
-			checkTransactionState();
+			if (checkTransactionState())
+			{
+				throw new NotSupportedException(jtaLogger.i18NLogger.get_transaction_arjunacore_alreadyassociated());
+			}
 		}
-		catch (IllegalStateException e1)
-		{
-            NotSupportedException notSupportedException = new NotSupportedException();
-            notSupportedException.initCause(e1);
-            throw notSupportedException;
+		catch (NotSupportedException notSupportedException) {
+			throw notSupportedException;
 		}
-		catch (Exception e2)
+		catch (Exception exception)
 		{
-            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e2.toString());
-            systemException.initCause(e2);
-            throw systemException;
+			jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(exception.toString());
+			systemException.initCause(exception);
+			throw systemException;
 		}
 
 		Integer value = _timeouts.get();
@@ -247,29 +263,26 @@ public class BaseTransaction
 	}
 
 	/**
-	 * Called when we want to make sure this thread does not already have a
-	 * transaction associated with it.
+	 * Called when we want to make sure this thread does not already have a transaction associated with it.
+	 *
+	 * @return false when there is no transaction associated with this thread, true otherwise
 	 */
-
-	final void checkTransactionState() throws IllegalStateException,
-			jakarta.transaction.SystemException
+	final boolean checkTransactionState() throws jakarta.transaction.SystemException
 	{
-		// ok, no transaction currently associated with thread.
+		// false => no transaction is currently associated to this thread
+		boolean returnValue = false;
 
 		TransactionImple theTransaction = TransactionImple.getTransaction();
 
-		if (theTransaction == null)
-			return;
-		else
+		if (!Objects.isNull(theTransaction))
 		{
-			if ((theTransaction.getStatus() != jakarta.transaction.Status.STATUS_NO_TRANSACTION)
-					&& !_supportSubtransactions)
+			if ((theTransaction.getStatus() != jakarta.transaction.Status.STATUS_NO_TRANSACTION) && !_supportSubtransactions)
 			{
-				throw new IllegalStateException(
-						"BaseTransaction.checkTransactionState - "
-								+ jtaLogger.i18NLogger.get_transaction_arjunacore_alreadyassociated());
+				returnValue = true;
 			}
 		}
+
+		return returnValue;
 	}
 
 

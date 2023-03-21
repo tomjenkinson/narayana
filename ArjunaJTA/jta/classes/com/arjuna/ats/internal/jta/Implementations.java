@@ -37,6 +37,8 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 import com.arjuna.ats.internal.jta.resources.arjunacore.CommitMarkableResourceRecord;
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecord;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 class CommitMarkableResourceRecordMap implements RecordTypeMap
 {
     @SuppressWarnings("unchecked")
@@ -87,11 +89,36 @@ public class Implementations
 	}
     }
 
+    /**
+     * Returns true if new root transactions are allowed, false otherwise. It should be noted
+     * that sub-transactions will be created anyway.
+     *
+     * @return true if new root transactions are allowed, false otherwise.
+     */
+    public static boolean getAllowTransactionCreation()
+    {
+        return _allowTransactionCreation.get();
+    }
+
+    /**
+     * When {@code value} is true, the creation of new root transactions will be allowed.
+     * On the other hand, when {@code value} is false, it will not be possible to create new
+     * root transactions. It should be noted that sub-transactions will be created anyway.
+     *
+     * @param value true to enable the creation of root transactions, false to disable.
+     */
+    public static void setAllowTransactionCreation(boolean value)
+    {
+        Implementations._allowTransactionCreation.getAndSet(value);
+    }
+
     private Implementations ()
     {
     }
 
     private static boolean _added = false;
+
+    private static AtomicBoolean _allowTransactionCreation = new AtomicBoolean(true);
 
     /**
      * Static block triggers initialization of XAResourceRecordMap.

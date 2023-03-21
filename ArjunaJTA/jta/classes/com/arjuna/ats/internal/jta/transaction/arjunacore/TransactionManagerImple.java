@@ -93,12 +93,12 @@ public class TransactionManagerImple extends BaseTransaction implements
             jtaLogger.logger.trace("TransactionImpleManager.resume");
         }
 
-		super.checkTransactionState();
+		if (super.checkTransactionState())
+		{
+			throw new IllegalStateException(jtaLogger.i18NLogger.get_transaction_arjunacore_alreadyassociated());
+		}
 
-		/*
-		 * If we are here then there is no transaction associated with the
-		 * thread.
-		 */
+		 // If we are here then there is no transaction associated with the thread.
 
 		if ((which == null) || (which instanceof TransactionImple))
 		{

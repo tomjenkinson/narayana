@@ -616,6 +616,10 @@ public interface jtaI18NLogger {
     @Message(id = 16153, value = "Transaction is not allowed for invocation", format = MESSAGE_FORMAT)
     public String get_tx_never();
 
+	@Message(id = 16154, value = "New transactions are not allowed", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_no_new_transactions();
+
     /*
         Allocate new messages directly above this notice.
           - id: use the next id number in sequence. Don't reuse ids.
