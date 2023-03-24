@@ -9,6 +9,10 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.BackingSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.SharedSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
+import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import io.narayana.lra.logging.LRALogger;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
@@ -273,6 +277,20 @@ public class LRARecoveryModule implements RecoveryModule {
         if (getUids(FailedLongRunningAction.FAILED_LRA_TYPE, aa_uids)) {
             forEach(aa_uids, failedLRACreator, FailedLongRunningAction.FAILED_LRA_TYPE);
         }
+    }
+
+    public synchronized boolean migrate(String targetNodeId) {
+        SlotStoreEnvironmentBean env = BeanPopulator.getDefaultInstance(SlotStoreEnvironmentBean.class);
+        BackingSlots slotImpl = env.getBackingSlots();
+
+        if (slotImpl instanceof SharedSlots) {
+            SharedSlots impl = (SharedSlots) slotImpl;
+
+            // periodic recovery is blocked since this method and the recovery methods are synchronized
+            return impl.migrate(targetNodeId);
+        }
+
+        return false;
     }
 
     private boolean getUids(final String type, InputObjectState aa_uids) {

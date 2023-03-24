@@ -425,6 +425,10 @@ public class LRAService {
         return failedLRAs.values().stream().map(LongRunningAction::getLRAData).collect(toList());
     }
 
+    public boolean migrate(String targetNodeId) {
+        return getRM().migrate(targetNodeId);
+    }
+
     private LRARecoveryModule getRM() {
         // since this method is reentrant we do not need any synchronization
         if (recoveryModule != null) {
