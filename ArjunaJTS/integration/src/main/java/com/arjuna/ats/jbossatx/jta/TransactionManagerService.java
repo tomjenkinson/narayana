@@ -31,6 +31,7 @@
 package com.arjuna.ats.jbossatx.jta;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.internal.jta.Implementations;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple;
 import com.arjuna.ats.jta.transaction.Transaction;
 import org.jboss.tm.*;
@@ -159,6 +160,16 @@ public class TransactionManagerService implements TransactionManagerServiceMBean
     public void unregisterXAExceptionFormatter(Class c)
     {
         // Ignore
+    }
+
+    public void enableTransactionCreation()
+    {
+        Implementations.setAllowTransactionCreation(true);
+    }
+
+    public void disableTransactionCreation()
+    {
+        Implementations.setAllowTransactionCreation(false);
     }
 
     public Map<Uid, Transaction> getTransactions()

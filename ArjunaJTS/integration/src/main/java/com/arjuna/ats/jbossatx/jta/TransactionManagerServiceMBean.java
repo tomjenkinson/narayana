@@ -91,6 +91,17 @@ public interface TransactionManagerServiceMBean
     public void unregisterXAExceptionFormatter(Class c);
 
     /**
+     * This method allows the creation of new root transactions.
+     */
+    public void enableTransactionCreation();
+
+    /**
+     * This method prevents the creation of new root transactions. It should be noted that the creation of
+     * sub-transactions is always allowed.
+     */
+    public void disableTransactionCreation();
+
+    /**
      * Returns all Arjuna Transactions currently in the system. As {@link Transaction} extends
      * {@link jakarta.transaction.Transaction}, the return {@code Map} can also be handled with
      * the Jakarta {@link jakarta.transaction.Transaction} interface.

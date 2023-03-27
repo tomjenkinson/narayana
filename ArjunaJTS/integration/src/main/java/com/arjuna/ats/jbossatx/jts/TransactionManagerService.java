@@ -32,6 +32,7 @@ package com.arjuna.ats.jbossatx.jts;
 
 import com.arjuna.ats.internal.jbossatx.jts.PropagationContextWrapper;
 
+import com.arjuna.ats.internal.jta.Implementationsx;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
@@ -118,5 +119,17 @@ public class TransactionManagerService extends com.arjuna.ats.jbossatx.jta.Trans
     public boolean getPropagateFullContext()
     {
         return PropagationContextWrapper.getPropagateFullContext();
+    }
+
+    @Override
+    public void enableTransactionCreation()
+    {
+        Implementationsx.setAllowTransactionCreation(true);
+    }
+
+    @Override
+    public void disableTransactionCreation()
+    {
+        Implementationsx.setAllowTransactionCreation(false);
     }
 }
