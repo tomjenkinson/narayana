@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.internal.jta.transaction.jts;
 
+import com.arjuna.ats.internal.jta.Implementationsx;
 import jakarta.transaction.NotSupportedException;
 
 import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
@@ -65,42 +66,57 @@ public class BaseTransaction
 		 * programmer use them. Strict conformance will always say no.
 		 */
 
-		if (!_supportSubtransactions)
+		boolean alreadyAssociated;
+
+		try
 		{
-			try
+			alreadyAssociated = checkTransactionState();
+			if (alreadyAssociated && this._supportSubtransactions)
 			{
-				checkTransactionState();
+					throw new NotSupportedException("BaseTransaction.begin - " +
+							jtaxLogger.i18NLogger.get_jtax_transaction_jts_alreadyassociated());
 			}
-			catch (IllegalStateException e1)
-			{
-                NotSupportedException notSupportedException = new NotSupportedException(e1.getMessage());
-                notSupportedException.initCause(e1);
-				throw notSupportedException;
-			}
-			catch (org.omg.CORBA.SystemException e2)
-			{
-                jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e2.toString());
-                systemException.initCause(e2);
-				throw systemException;
-			}
+		}
+		catch (NotSupportedException e1) {
+			throw e1;
+		}
+		catch (org.omg.CORBA.SystemException e2)
+		{
+			jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e2.toString());
+			systemException.initCause(e2);
+			throw systemException;
+		}
+		catch (Exception e3)
+		{
+			jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e3.toString());
+			systemException.initCause(e3);
+			throw systemException;
 		}
 
 		try
 		{
-			TransactionImple.putTransaction(new TransactionImple());
+			/*
+			 * If we are here, it means that either there isn't any transaction associated to this thread
+			 * or sub-transactions are allowed. If support for sub-transactions is enabled and there is already
+			 * a transaction associated with this thread then Implementationsx.getAllowTransactionCreation()
+			 * is overruled
+			 */
+			if (Implementationsx.getAllowTransactionCreation() || (_supportSubtransactions && alreadyAssociated)) {
+				TransactionImple.putTransaction(new TransactionImple());
+			}
 		}
-		catch (org.omg.CosTransactions.SubtransactionsUnavailable e3)
+		catch (org.omg.CosTransactions.SubtransactionsUnavailable e4)
 		{
 			// shouldn't happen if we get here from the previous checks!
 
-            NotSupportedException notSupportedException = new NotSupportedException(e3.getMessage());
-            notSupportedException.initCause(e3);
+            NotSupportedException notSupportedException = new NotSupportedException(e4.getMessage());
+            notSupportedException.initCause(e4);
             throw notSupportedException;
 		}
-		catch (org.omg.CORBA.SystemException e4)
+		catch (org.omg.CORBA.SystemException e5)
 		{
-            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e4.toString());
-            systemException.initCause(e4);
+            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e5.toString());
+            systemException.initCause(e5);
             throw systemException;
 		}
 	}
@@ -257,9 +273,12 @@ public class BaseTransaction
 	 * transaction associated with it.
 	 */
 
-	final void checkTransactionState () throws IllegalStateException,
+	final boolean checkTransactionState () throws IllegalStateException,
 			jakarta.transaction.SystemException
 	{
+		// false => no transaction is currently associated to this thread
+		boolean returnValue = false;
+
 		try
 		{
 			Control cont = OTSManager.get_current().get_control();
@@ -277,9 +296,7 @@ public class BaseTransaction
 					if ((coord.get_status() == org.omg.CosTransactions.Status.StatusActive)
 							&& (!_supportSubtransactions))
 					{
-						throw new IllegalStateException(
-                                "BaseTransaction.checkTransactionState - "
-                                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_alreadyassociated());
+						returnValue = true;
 					}
 				}
 
@@ -300,6 +317,8 @@ public class BaseTransaction
 		{
 			// ok, no transaction currently associated with thread.
 		}
+
+		return returnValue;
 	}
 
 	private static boolean _supportSubtransactions = jtaPropertyManager.getJTAEnvironmentBean()
