@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: LGPL-2.1-only
  */
-package com.arjuna.ats.internal.arjuna.objectstore.slot;
+package com.arjuna.ats.internal.arjuna.objectstore.slot.redis;
 
 public interface SharedSlots {
     String getNodeId(); // the nodeIds that this RecoveryManager will manage

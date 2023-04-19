@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package com.arjuna.ats.internal.arjuna.objectstore.slot;
+package com.arjuna.ats.internal.arjuna.objectstore.slot.redis;
 
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
 import com.arjuna.ats.arjuna.logging.tsLogger;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.BackingSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Connection;
@@ -31,8 +33,23 @@ import java.util.Set;
 import static redis.clients.jedis.params.ScanParams.SCAN_POINTER_START;
 
 /**
- * Redis backed implementation of the SlotStore backend.
- * Ensure that your Redis installation is configured for
+ * Redis backed implementation of the SlotStore backend suitable for installations where nodes hosting the store
+ * can come and go, so is well suited for cloud based deployments of the Recovery Manager.
+ *
+ * In the context of the CAP theorem of distributed computing, the recovery store needs to behave as a CP system -
+ * ie it needs to be able to tolerate network Partitions and yet continue to provide Strong Consistency.
+ * Redis can provide the strong consistency guarantee if the RedisRaft module is used and if Redis runs
+ * in cluster mode. RedisRaft achieves consistency and partition tolerance by ensuring that:
+ *
+ * - acknowledged writes are guaranteed to be committed and never lost,
+ * - reads will always return the most up-to-date committed write,
+ * - the cluster is sized correctly (a RedisRaft cluster of 3 nodes can tolerate a single node failure and a cluster
+ *   of 5 can tolerate 2 node failures, ... ie 2*N+1, where N is number of nodes the cluster can lose so the minimum
+ *   cluster size should be 3). An odd number of nodes should be used in order to avoid "split brain" scenarios.
+ *
+ * The documentation at the RedisRaft github repository includes
+ * <a href="https://github.com/RedisLabs/redisraft/blob/master/docs/Deployment.md#deploying-redisraft">
+ *     instructions on setting up clusters</a>.
  */
 public class RedisSlots implements BackingSlots, SharedSlots {
     private CloudId cloudId;
@@ -59,7 +76,6 @@ public class RedisSlots implements BackingSlots, SharedSlots {
         Set<String> keys;
 
         if (clustered) {
-//            jedisCluster = new JedisCluster(hostAndPort);
             initJedis();
             keys = loadClustered();
         } else {

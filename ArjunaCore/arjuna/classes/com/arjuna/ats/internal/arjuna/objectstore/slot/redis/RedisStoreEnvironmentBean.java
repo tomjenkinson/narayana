@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package com.arjuna.ats.internal.arjuna.objectstore.slot;
+package com.arjuna.ats.internal.arjuna.objectstore.slot.redis;
 
+import com.arjuna.ats.internal.arjuna.objectstore.slot.BackingSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
 public class RedisStoreEnvironmentBean {
