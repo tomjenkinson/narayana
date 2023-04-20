@@ -7,8 +7,8 @@ package io.narayana.lra.coordinator.domain.model;
 
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
-import com.arjuna.ats.internal.arjuna.objectstore.slot.RedisSlots;
-import com.arjuna.ats.internal.arjuna.objectstore.slot.RedisStoreEnvironmentBean;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.redis.RedisSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.redis.RedisStoreEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStore;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;

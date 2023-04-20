@@ -5,12 +5,15 @@
 
 package io.narayana.lra.coordinator.internal;
 
+import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.BackingSlots;
-import com.arjuna.ats.internal.arjuna.objectstore.slot.SharedSlots;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.redis.CloudId;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.redis.RedisStoreEnvironmentBean;
+import com.arjuna.ats.internal.arjuna.objectstore.slot.redis.SharedSlots;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import io.narayana.lra.logging.LRALogger;
@@ -280,14 +283,17 @@ public class LRARecoveryModule implements RecoveryModule {
     }
 
     public synchronized boolean migrate(String targetNodeId) {
-        SlotStoreEnvironmentBean env = BeanPopulator.getDefaultInstance(SlotStoreEnvironmentBean.class);
-        BackingSlots slotImpl = env.getBackingSlots();
+        SlotStoreEnvironmentBean slotEnv = BeanPopulator.getDefaultInstance(SlotStoreEnvironmentBean.class);
+        BackingSlots slotImpl = slotEnv.getBackingSlots();
 
         if (slotImpl instanceof SharedSlots) {
+            RedisStoreEnvironmentBean redisEnv = BeanPopulator.getDefaultInstance(RedisStoreEnvironmentBean.class);
+            String nodeId = BeanPopulator.getDefaultInstance(CoreEnvironmentBean.class).getNodeIdentifier();
             SharedSlots impl = (SharedSlots) slotImpl;
+            CloudId cloudId = new CloudId(nodeId, redisEnv.getFailoverId());
 
             // periodic recovery is blocked since this method and the recovery methods are synchronized
-            return impl.migrate(targetNodeId);
+            return impl.migrate(cloudId);
         }
 
         return false;

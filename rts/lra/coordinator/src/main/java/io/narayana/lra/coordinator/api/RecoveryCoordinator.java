@@ -212,7 +212,8 @@ public class RecoveryCoordinator {
     @Operation(summary = "Migrate recovering LRAs to a new node. Only supported by particular stores")
     public Response migrateLRAs(
             @Parameter(name = "NodeId",
-                    description = "The target nodeId", required = true)
+                    description = "The target nodeId to migrate the logs maintained by this coordinator to",
+                    required = true)
             @PathParam("NodeId")String targetNodeId) {
 
         boolean supported = lraService.migrate(targetNodeId);

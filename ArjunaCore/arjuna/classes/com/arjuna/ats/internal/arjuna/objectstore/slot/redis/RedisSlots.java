@@ -20,17 +20,14 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisClientConfig;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisException;
-import redis.clients.jedis.params.ScanParams;
-import redis.clients.jedis.resps.ScanResult;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import static redis.clients.jedis.params.ScanParams.SCAN_POINTER_START;
 
 /**
  * Redis backed implementation of the SlotStore backend suitable for installations where nodes hosting the store
@@ -55,13 +52,17 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     private CloudId cloudId;
     private byte[][] slots = null;
     private boolean clustered;
-    private JedisPool jedisPool; // Java API for Redis
-    private JedisCluster jedisCluster; // Java API for Redis TODO do we need a pool
+    private JedisPool jedisPool;
+    private JedisCluster jedisCluster;
     private HostAndPort hostAndPort;
 
     @Override
     public void init(SlotStoreEnvironmentBean slotStoreConfig) throws IOException {
         if (slots != null) {
+            if (tsLogger.logger.isInfoEnabled()) {
+                tsLogger.logger.info("RedisSlots.init(): already initialised");
+            }
+
             throw new IllegalStateException("already initialized");
         }
 
@@ -76,19 +77,27 @@ public class RedisSlots implements BackingSlots, SharedSlots {
         Set<String> keys;
 
         if (clustered) {
-            initJedis();
+            // provide one of the master instances (the others will be auto discovered)
+            jedisCluster = new JedisCluster(hostAndPort);
             keys = loadClustered();
+            // to enable pooling one needs to build the cluster by hand:
+/*            Set<HostAndPort> jedisClusterNodes = new HashSet<> ();
+
+            jedisClusterNodes.add(new HostAndPort("127.0.0.1", 30001));
+            jedisClusterNodes.add(new HostAndPort("127.0.0.1", 30002));
+            jedisClusterNodes.add(new HostAndPort("127.0.0.1", 30003));
+
+            GenericObjectPoolConfig<Connection> jedisPoolConfig = new GenericObjectPoolConfig<> ();
+            JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder().timeoutMillis(50).build();
+
+            jedisCluster = new JedisCluster(jedisClusterNodes, jedisClientConfig,2, jedisPoolConfig);*/
         } else {
             // nb jedis instances are single threaded
-            jedisPool = new JedisPool(env.getRedisURI()); // TODO pass in JedisClientConfig()
+            jedisPool = new JedisPool(env.getRedisURI()); // pass in JedisClientConfig() based on the env bean
             keys = loadSingle();
         }
 
         load(keys);
-    }
-    private void initJedis() {
-        // provide one of the master instances (the others will be auto discovered)
-        jedisCluster = new JedisCluster(new HostAndPort("127.0.0.1", 30001));
     }
 
     private void initJedis2() {
@@ -99,10 +108,9 @@ public class RedisSlots implements BackingSlots, SharedSlots {
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 30003));
 
         GenericObjectPoolConfig<Connection> jedisPoolConfig = new GenericObjectPoolConfig<> ();
-//        jedisPoolConfig.setsetMaxWaitMillis(10);
         JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder().timeoutMillis(50).build();
 
-        jedisCluster = new JedisCluster(jedisClusterNodes,jedisClientConfig,2,jedisPoolConfig);
+        jedisCluster = new JedisCluster(jedisClusterNodes, jedisClientConfig,2, jedisPoolConfig);
     }
 
     public void fini() {
@@ -116,17 +124,14 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     }
 
     private Set<String> loadClustered() {
-        int i = 0;
         Set<String> keys = new HashSet<>();
 
         for (ConnectionPool node : jedisCluster.getClusterNodes().values()) {
             try (Jedis j = new Jedis(node.getResource())) {
                 // load keys matching this recovery manager
-//                String pattern = String.format("{%s}:%s:*", cloudId.failoverGroupId, cloudId.nodeId);
-                Set<String> candidates = j.keys(cloudId.allKeysPattern()); //cloudId.keyPattern);
+                Set<String> candidates = j.keys(cloudId.allKeysPattern());
                 // filter out candidates that don't match this managers node id
-//"{0}:migration-node:6"
-//                Collection actuals = candidates.stream().filter(s -> s.matches(pattern)).collect(Collectors.toList());
+                // Collection actuals = candidates.stream().filter(s -> s.matches(pattern)).collect(Collectors.toList());
                 keys.addAll(candidates);
             }
         }
@@ -136,7 +141,7 @@ public class RedisSlots implements BackingSlots, SharedSlots {
 
     private Set<String> loadSingle() {
         try (Jedis jedis = jedisPool.getResource()) {
-            return jedis.keys(cloudId.keyPattern);
+            return jedis.keys(cloudId.allKeysPattern());
         }
     }
 
@@ -148,7 +153,7 @@ public class RedisSlots implements BackingSlots, SharedSlots {
                 slots[i] = key.getBytes(StandardCharsets.UTF_8);
                 i += 1;
             } else {
-                tsLogger.logger.info("Too many redis keys: ignoring remaining keys from " + key);
+                tsLogger.logger.infof("Too many redis keys: ignoring remaining keys from slot %d (key=%s)", i, key);
                 break;
             }
         }
@@ -159,7 +164,6 @@ public class RedisSlots implements BackingSlots, SharedSlots {
             // (using the curly brace notation) so that they will be stored on the same redis node
             // In this way we can perform multikey operations on a slot
             // see https://redis.io/docs/reference/cluster-spec/ section "Key distribution model" for more info
-//            slots[i] = String.format("{%s}:%d", cloudId.id, i).getBytes(StandardCharsets.UTF_8);
             slots[i] = String.format("{%s}:%s:%d", cloudId.failoverGroupId, cloudId.nodeId, i).getBytes(StandardCharsets.UTF_8);
             i += 1;
         }
@@ -169,53 +173,27 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     public void write(int slot, byte[] data, boolean sync) throws IOException {
         if (!clustered) {
             try (Jedis jedis = jedisPool.getResource()) { // or use JedisPooled to avoid the try with resources
-                String ok = jedis.set(slots[slot], data);
-
-                if (ok == null) { // ok == "OK" implies success
+                if (!"OK".equals(jedis.set(slots[slot], data))) {
+                    if (tsLogger.logger.isInfoEnabled()) {
+                        tsLogger.logger.info("RedisSlots.write(): write failed");
+                    }
                     throw new IOException("redis write failed for slot " + slot);
                 }
             }
         } else {
-            String ok = jedisCluster.set(slots[slot], data);
-            System.out.printf("write: %s%n", ok);
-//            try (JedisCluster jedis = new , JedisCluster(hostAndPort)) {
-//                String ok = jedis.set(slots[slot], data);
-
-                /*
-                 * Replication is asynchronous by default, but we need it to be synchronous (to satisfy consistency
-                 * and partition tolerance) so do not return until we know a majority of replicas have received the
-                 * update.
-                 *
-                 * TODO as well as using synchronous replication we need to verify that there has not been a failover event.
-                 *    We also need to pass in the correct replica count, here I use 1 to just get the durability
-                 * guarantee since the wait won't return until the write has been made durable.
-                 * This store is experimental since more analysis needs to be carried out to determine whether or not
-                 * Redis is a suitable back end for storing transaction logs - ie is it safe with respect to CAP
-                 *
-                 * NB enable clustering and AOF in /etc/redis/redis.conf
-                 * cluster-enabled yes
-                 * appendonly yes
-                 */
-//                long replicaResponses = jedis.waitReplicas(slots[slot], 1, 0);
-
-//                if (replicaResponses == 0) {
-//                    System.out.printf("failed%n");
-//                }
-//            }
+            if (!"OK".equals(jedisCluster.set(slots[slot], data))) {
+                if (tsLogger.logger.isInfoEnabled()) {
+                    tsLogger.logger.info("RedisSlots.write(): write failed");
+                }
+                throw new IOException("redis write failed for slot " + slot);
+            }
         }
     }
 
     @Override
     public byte[] read(int slot) throws IOException {
         if (clustered) {
-                    return jedisCluster.get(slots[slot]);
-/*            try (JedisCluster jedis = new JedisCluster(hostAndPort)) {
-                try {
-                    return jedis.get(slots[slot]);
-                } catch (Exception e) {
-                    throw new IOException(e);
-                }
-            }*/
+            return jedisCluster.get(slots[slot]);
         } else {
             try (Jedis jedis = jedisPool.getResource()) {
                 return jedis.get(slots[slot]);
@@ -226,9 +204,7 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     @Override
     public void clear(int slot, boolean sync) throws IOException {
         if (clustered) {
-            try (JedisCluster jedis = new JedisCluster(hostAndPort)) {
-                jedis.del(slots[slot]);
-            }
+            jedisCluster.del(slots[slot]);
         } else {
             try (Jedis jedis = jedisPool.getResource()) {
                 jedis.del(slots[slot]);
@@ -249,43 +225,73 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     @Override
     public boolean migrate(CloudId from, CloudId to) {
         if (!clustered) {
-            // in Cluster mode, only keys in the same hash slot (ie they have the same hash tag) can be reliably renamed
+            // in Cluster mode, only keys in the same hash slot (ie they have the same hashtag) can be reliably renamed
+            if (tsLogger.logger.isInfoEnabled()) {
+                tsLogger.logger.info("RedisSlots.migrate(): not supported");
+            }
+
             throw new UnsupportedOperationException("migrating logs is only supported by Redis Cluster");
         }
 
         if (from.failoverGroupId != to.failoverGroupId) {
+            if (tsLogger.logger.isInfoEnabled()) {
+                tsLogger.logger.info("RedisSlots.migrate(): target node is in a different failover group");
+            }
+
             throw new UnsupportedOperationException("migrating logs is only supported if they belong to the same failover group");
         }
 
-        String keyPattern = from.allKeysPattern();
+        for (String key : jedisCluster.keys(from.allKeysPattern())) {
+            String newKey = key.replace(from.nodeId, to.nodeId);
+
+            try {
+                if (!"OK".equals(jedisCluster.rename(key, newKey))) {
+                    if (tsLogger.logger.isInfoEnabled()) {
+                        tsLogger.logger.info("RedisSlots.migrate(): rename failed");
+                    }
+                }
+            } catch (JedisException e) {
+                if (tsLogger.logger.isInfoEnabled()) {
+                    tsLogger.logger.infof("RedisSlots.migrate(): %s", e.getMessage());
+                }
+                return false;
+            }
+        }
+
+/*        String keyPattern = from.allKeysPattern();
 
         try (JedisCluster jedis = new JedisCluster(hostAndPort)) {
             for (String key : getKeys(keyPattern)) {
                 String newKey = key.replace(from.nodeId, to.nodeId);
 
                 try {
-                    String res = jedis.rename(key, newKey);
-                    System.out.printf("%s%n", res);
+                    if (!"OK".equals(jedis.rename(key, newKey))) {
+                        if (tsLogger.logger.isInfoEnabled()) {
+                            tsLogger.logger.info("RedisSlots.migrate(): rename failed");
+                        }
+                    }
                 } catch (JedisException e) {
-                    System.out.printf("%s%n", e.getMessage());
+                    if (tsLogger.logger.isInfoEnabled()) {
+                        tsLogger.logger.infof("RedisSlots.migrate(): %s", e.getMessage());
+                    }
                     return false;
                 }
             }
-        }
+        }*/
 
         return true;
     }
 
-    private void getKeys(Jedis node, String keyPattern, Set<String> keySet) {
-        ScanParams scanParams = new ScanParams().count(100).match(keyPattern);
-        String cursor = SCAN_POINTER_START;
+    private Transaction getTransaction() {
+        Collection<ConnectionPool> nodes = jedisCluster.getClusterNodes().values();
 
-        do {
-            ScanResult<String> scanResult = node.scan(cursor, scanParams);
-            List<String> keys = scanResult.getResult();
-            keySet.addAll(keys);
-            cursor = scanResult.getCursor();
-        } while (!cursor.equals(SCAN_POINTER_START));
+        for (ConnectionPool node : jedisCluster.getClusterNodes().values()) {
+            try (Jedis jedis = new Jedis(node.getResource())) {
+                return jedis.multi();
+            }
+        }
+
+        return null;
     }
 
     private Set<String> getKeys(String keyPattern) {
