@@ -31,12 +31,12 @@ import java.util.Set;
 
 /**
  * Redis backed implementation of the SlotStore backend suitable for installations where nodes hosting the store
- * can come and go, so is well suited for cloud based deployments of the Recovery Manager.
+ * can come and go so is well suited for cloud based deployments of the Recovery Manager.
  *
  * In the context of the CAP theorem of distributed computing, the recovery store needs to behave as a CP system -
  * ie it needs to be able to tolerate network Partitions and yet continue to provide Strong Consistency.
- * Redis can provide the strong consistency guarantee if the RedisRaft module is used and if Redis runs
- * in cluster mode. RedisRaft achieves consistency and partition tolerance by ensuring that:
+ * Redis can provide the strong consistency guarantee if the RedisRaft module is used with Redis running as a
+ * cluster. RedisRaft achieves consistency and partition tolerance by ensuring that:
  *
  * - acknowledged writes are guaranteed to be committed and never lost,
  * - reads will always return the most up-to-date committed write,
@@ -47,6 +47,13 @@ import java.util.Set;
  * The documentation at the RedisRaft github repository includes
  * <a href="https://github.com/RedisLabs/redisraft/blob/master/docs/Deployment.md#deploying-redisraft">
  *     instructions on setting up clusters</a>.
+ *
+ * The performance cost/benefit comparison between a standard redis cluster and redis raft cluster shows that
+ * the complexities of guaranteeing strong consistency adds a 4-fold performance cost.
+ *
+ * This performance cost is just a baseline measure and optimisation work should improve upon it,
+ * for example batching writes, in the manor of hornetq store perhaps using
+ * (<a href="https://redis.io/docs/manual/pipelining/">redis pipelines</a>) or otherwise.
  */
 public class RedisSlots implements BackingSlots, SharedSlots {
     private CloudId cloudId;
