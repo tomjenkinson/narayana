@@ -208,15 +208,22 @@ public class RecoveryCoordinator {
     }
 
     @POST
-    @Path(MIGRATE_PATH_NAME + "/{NodeId}")
-    @Operation(summary = "Migrate recovering LRAs to a new node. Only supported by particular stores")
+    @Path(MIGRATE_PATH_NAME + "/{fromNodeId}/{toNodeId}")
+    @Operation(summary = "Migrate recovering LRAs from another node. Only supported by particular stores")
+    // TODO we should have a method to move the logs in the other direction
+    // this is the default one so that we can migrate logs from a failed node
     public Response migrateLRAs(
-            @Parameter(name = "NodeId",
-                    description = "The target nodeId to migrate the logs maintained by this coordinator to",
+            @Parameter(name = "fromNodeId",
+                    description = "The source nodeId from which to migrate logs from",
                     required = true)
-            @PathParam("NodeId")String targetNodeId) {
+            @PathParam("fromNodeId")String fromNodeId,
 
-        boolean supported = lraService.migrate(targetNodeId);
+            @Parameter(name = "toNodeId",
+                    description = "The target nodeId to which to migrate logs to",
+                    required = true)
+            @PathParam("fromNodeId")String toNodeId) {
+
+        boolean supported = lraService.migrate(fromNodeId, toNodeId);
 
         return Response.status(supported ? OK : NOT_IMPLEMENTED).build();
     }

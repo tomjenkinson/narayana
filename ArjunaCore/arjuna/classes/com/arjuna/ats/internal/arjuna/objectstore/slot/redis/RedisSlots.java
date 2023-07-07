@@ -8,6 +8,9 @@ package com.arjuna.ats.internal.arjuna.objectstore.slot.redis;
 
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
 import com.arjuna.ats.arjuna.logging.tsLogger;
+import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
+import com.arjuna.ats.arjuna.objectstore.StoreManager;
+import com.arjuna.ats.arjuna.state.InputBuffer;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.BackingSlots;
 import com.arjuna.ats.internal.arjuna.objectstore.slot.SlotStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
@@ -171,7 +174,9 @@ public class RedisSlots implements BackingSlots, SharedSlots {
             // (using the curly brace notation) so that they will be stored on the same redis node
             // In this way we can perform multikey operations on a slot
             // see https://redis.io/docs/reference/cluster-spec/ section "Key distribution model" for more info
-            slots[i] = String.format("{%s}:%s:%d", cloudId.failoverGroupId, cloudId.nodeId, i).getBytes(StandardCharsets.UTF_8);
+//            slots[i] = String.format("{%s}:%s:%s:%d", cloudId.failoverGroupId, cloudId.nodeId, new Uid().stringForm(), i)
+//                    .getBytes(StandardCharsets.UTF_8);
+            slots[i] = cloudId.generateUniqueKey(i);
             i += 1;
         }
     }
@@ -188,6 +193,7 @@ public class RedisSlots implements BackingSlots, SharedSlots {
                 }
             }
         } else {
+            // note that the slot number is based ultimately based on uid , typeName and the status of the state
             if (!"OK".equals(jedisCluster.set(slots[slot], data))) {
                 if (tsLogger.logger.isInfoEnabled()) {
                     tsLogger.logger.info("RedisSlots.write(): write failed");
@@ -225,8 +231,8 @@ public class RedisSlots implements BackingSlots, SharedSlots {
     }
 
     @Override
-    public boolean migrate(CloudId to) {
-        return migrate(cloudId, to);
+    public boolean migrate(CloudId from) {
+        return migrate(from, cloudId);
     }
 
     @Override
@@ -248,7 +254,12 @@ public class RedisSlots implements BackingSlots, SharedSlots {
             throw new UnsupportedOperationException("migrating logs is only supported if they belong to the same failover group");
         }
 
+        RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
+
         for (String key : jedisCluster.keys(from.allKeysPattern())) {
+            String data = jedisCluster.get(key);
+
+//            decodeData(data);
             String newKey = key.replace(from.nodeId, to.nodeId);
 
             try {
@@ -256,7 +267,10 @@ public class RedisSlots implements BackingSlots, SharedSlots {
                     if (tsLogger.logger.isInfoEnabled()) {
                         tsLogger.logger.info("RedisSlots.migrate(): rename failed");
                     }
-                }
+                }// else {
+//                    recoveryStore.remove_committed()
+//                    recoveryStore.write_committed()
+//                }
             } catch (JedisException e) {
                 if (tsLogger.logger.isInfoEnabled()) {
                     tsLogger.logger.infof("RedisSlots.migrate(): %s", e.getMessage());
@@ -287,6 +301,14 @@ public class RedisSlots implements BackingSlots, SharedSlots {
         }*/
 
         return true;
+    }
+
+    private void decodeData(String data) {
+/*        OutputBuffer record = new OutputBuffer();
+        key.packInto(record);
+        outputObjectState.packInto(record);
+        byte[] data = record.buffer();    */
+        InputBuffer inputBuffer = new InputBuffer();
     }
 
     private Transaction getTransaction() {

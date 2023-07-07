@@ -425,8 +425,13 @@ public class LRAService {
         return failedLRAs.values().stream().map(LongRunningAction::getLRAData).collect(toList());
     }
 
-    public boolean migrate(String targetNodeId) {
-        return getRM().migrate(targetNodeId);
+    public boolean migrate(String fromNodeId, String toNodeId) {
+        if (getRM().migrate(fromNodeId, toNodeId)) {
+            getAllRecovering(true);
+            return true;
+        }
+
+        return false;
     }
 
     private LRARecoveryModule getRM() {

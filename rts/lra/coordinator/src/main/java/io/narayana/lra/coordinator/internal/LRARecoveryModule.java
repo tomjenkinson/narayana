@@ -282,7 +282,12 @@ public class LRARecoveryModule implements RecoveryModule {
         }
     }
 
-    public synchronized boolean migrate(String targetNodeId) {
+    /**
+     * migrate logs from another node to this one
+     * @param fromNodeId the node id of the node from which we are migrating logs from
+     * @return
+     */
+    public synchronized boolean migrate(String fromNodeId, String toNodeId) {
         SlotStoreEnvironmentBean slotEnv = BeanPopulator.getDefaultInstance(SlotStoreEnvironmentBean.class);
         BackingSlots slotImpl = slotEnv.getBackingSlots();
 
@@ -290,10 +295,11 @@ public class LRARecoveryModule implements RecoveryModule {
             RedisStoreEnvironmentBean redisEnv = BeanPopulator.getDefaultInstance(RedisStoreEnvironmentBean.class);
             String nodeId = BeanPopulator.getDefaultInstance(CoreEnvironmentBean.class).getNodeIdentifier();
             SharedSlots impl = (SharedSlots) slotImpl;
-            CloudId cloudId = new CloudId(nodeId, redisEnv.getFailoverId());
+            CloudId fromId = new CloudId(fromNodeId, redisEnv.getFailoverId());
+            CloudId toId = new CloudId(toNodeId, redisEnv.getFailoverId());
 
             // periodic recovery is blocked since this method and the recovery methods are synchronized
-            return impl.migrate(cloudId);
+            return impl.migrate(fromId, toId);
         }
 
         return false;
