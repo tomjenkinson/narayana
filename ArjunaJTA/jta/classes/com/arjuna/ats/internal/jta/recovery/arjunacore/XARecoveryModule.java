@@ -318,7 +318,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 	 * @return
 	 */
 	@Override
-	public boolean preventShutdown () {
+	public boolean blockShutdown () {
 		// TODO Check if there are orphans, any other conditions?
 		return true;
 	}

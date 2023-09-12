@@ -238,7 +238,7 @@ public class AtomicActionRecoveryModule implements RecoveryModule
      * This is just for illustration. For instance it may be that periodic recovery would have cleaned some of these.
      * @return
      */
-    public boolean preventShutdown() {
+    public boolean blockShutdown() {
         return _transactionUidVector.isEmpty();
     }
 
