@@ -619,17 +619,17 @@ public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean
         this.waitForRecovery = waitForRecovery;
     }
 
-    /**
-     * Define which store types should block clean shutdown
-     * @param typeNamesToBlockShutdown fully qualified type names of record types that must be recovered before shutdown
-     */
-    public void setTypeNamesToBlockShutdown(List<String> typeNamesToBlockShutdown)
-    {
-        this.typeNamesToBlockShutdown = typeNamesToBlockShutdown;
-    }
-
-    public List<String> getTypeNamesToBlockShutdown()
-    {
-        return new ArrayList<>(typeNamesToBlockShutdown);
-    }
+//    /**
+//     * Define which store types should block clean shutdown
+//     * @param typeNamesToBlockShutdown fully qualified type names of record types that must be recovered before shutdown
+//     */
+//    public void setTypeNamesToBlockShutdown(List<String> typeNamesToBlockShutdown)
+//    {
+//        this.typeNamesToBlockShutdown = typeNamesToBlockShutdown;
+//    }
+//
+//    public List<String> getTypeNamesToBlockShutdown()
+//    {
+//        return new ArrayList<>(typeNamesToBlockShutdown);
+//    }
 }
