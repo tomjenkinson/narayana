@@ -42,7 +42,7 @@ import com.arjuna.ats.arjuna.utils.Utility;
 
 public class PeriodicRecovery extends Thread
 {
-    private boolean preventShutdown;
+    private boolean blockShutdown;
     /***** public API *****/
 
     /**
@@ -176,7 +176,7 @@ public class PeriodicRecovery extends Thread
                            // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
                            // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
                            // but please know that these checks are called by external processes at any time and so that would need to be blocked while this shutdown process continues and appropriately handled
-                           if (!preventShutdown) {
+                           if (!blockShutdown) {
 //                           if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
                                // the store does not contain any records we're interested in,
                                // so move directly to Mode.TERMINATED
@@ -789,7 +789,7 @@ public class PeriodicRecovery extends Thread
     {
         // n.b. we only get here if status is SCANNING
 
-        preventShutdown = false;
+        blockShutdown = false;
 
         if (tsLogger.logger.isDebugEnabled()) {
             tsLogger.logger.debug("Periodic recovery first pass at "+_theTimestamper.format(new Date()));
@@ -859,7 +859,7 @@ public class PeriodicRecovery extends Thread
             ClassLoader cl = switchClassLoader(m);
             try {
             m.periodicWorkSecondPass();
-            preventShutdown = preventShutdown || m.preventShutdown();
+            blockShutdown = blockShutdown || m.blockShutdown();
             } finally {
                 restoreClassLoader(cl);
             }
