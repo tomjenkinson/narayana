@@ -312,6 +312,17 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 		return "XARecoveryModule:" + _recoveryManagerClass;
 	}
 
+
+	/**
+	 * Just as an example, needs more work
+	 * @return
+	 */
+	@Override
+	public boolean preventShutdown () {
+		// TODO Check if there are orphans, any other conditions?
+		return true;
+	}
+
 	/**
 	 * @param xid The transaction to commit/rollback.
 	 *

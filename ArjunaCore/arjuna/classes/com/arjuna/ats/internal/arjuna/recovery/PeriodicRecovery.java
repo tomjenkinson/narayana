@@ -42,7 +42,8 @@ import com.arjuna.ats.arjuna.utils.Utility;
 
 public class PeriodicRecovery extends Thread
 {
-   /***** public API *****/
+    private boolean preventShutdown;
+    /***** public API *****/
 
     /**
      *  state values indicating whether or not some thread is currently scanning. used to define values of field
@@ -160,7 +161,7 @@ public class PeriodicRecovery extends Thread
                }
                // see if shutdown should delay until certain types have recovered
                if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
-                   List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
+//                   List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
 
                    // disable the transaction system but keep recovery running
                    TxControl.disable();
@@ -169,17 +170,24 @@ public class PeriodicRecovery extends Thread
 
                    while (true) {
                        try {
-                           if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
+                           // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
+                           // maybe it can be checked we are not in the middle of scanning rather than simply wait?
+                           _stateLock.wait();
+                           // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
+                           // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
+                           // but please know that these checks are called by external processes at any time and so that would need to be blocked while this shutdown process continues and appropriately handled
+                           if (!preventShutdown) {
+//                           if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
                                // the store does not contain any records we're interested in,
                                // so move directly to Mode.TERMINATED
                                break;
                            }
                            _stateLock.wait(); // for next cycle to finish
-                       } catch (ObjectStoreException | IOException e) {
-                           tsLogger.logger.fatalf("Store error during shutdown %s", e);
-                           // graceful shutdown with an empty store was requested, but we were unable to read the store
-                           // so cause the VM to terminate abruptly so that standard crash recovery can take over
-                           throw new FatalError("Store error during shutdown", e);
+//                       } catch (ObjectStoreException | IOException e) {
+//                           tsLogger.logger.fatalf("Store error during shutdown %s", e);
+//                           // graceful shutdown with an empty store was requested, but we were unable to read the store
+//                           // so cause the VM to terminate abruptly so that standard crash recovery can take over
+//                           throw new FatalError("Store error during shutdown", e);
                        } catch (InterruptedException e) {
                            // just ignore and retest condition
                        }
@@ -223,29 +231,29 @@ public class PeriodicRecovery extends Thread
        }
    }
 
-   // check whether there are any records in the store matching any of the given types
-    private boolean storeContainsAnyOf(List<String> types) throws ObjectStoreException, IOException {
-        for (String typeName : types) {
-            ObjectStoreIterator iterator = new ObjectStoreIterator(StoreManager.getRecoveryStore(), typeName);
-            Uid u = iterator.iterate();
-
-            if (!Uid.nullUid().equals(u)) {
-                return true; // contains a record of type typeName
-            }
-        }
-
-        return false;
-    }
-
-    private boolean hasOrphans() {
-        // TODO check the XARecoveryModule for orphans
-        return false;
-    }
-
-    private boolean hasSubordinates() {
-        // TODO can we avoid supporting subordinates
-        return false;
-    }
+//   // check whether there are any records in the store matching any of the given types
+//    private boolean storeContainsAnyOf(List<String> types) throws ObjectStoreException, IOException {
+//        for (String typeName : types) {
+//            ObjectStoreIterator iterator = new ObjectStoreIterator(StoreManager.getRecoveryStore(), typeName);
+//            Uid u = iterator.iterate();
+//
+//            if (!Uid.nullUid().equals(u)) {
+//                return true; // contains a record of type typeName
+//            }
+//        }
+//
+//        return false;
+//    }
+//
+//    private boolean hasOrphans() {
+//        // TODO check the XARecoveryModule for orphans
+//        return false;
+//    }
+//
+//    private boolean hasSubordinates() {
+//        // TODO can we avoid supporting subordinates
+//        return false;
+//    }
 
     /**
      * make all scanning operations suspend.
@@ -781,6 +789,8 @@ public class PeriodicRecovery extends Thread
     {
         // n.b. we only get here if status is SCANNING
 
+        preventShutdown = false;
+
         if (tsLogger.logger.isDebugEnabled()) {
             tsLogger.logger.debug("Periodic recovery first pass at "+_theTimestamper.format(new Date()));
         }
@@ -849,6 +859,7 @@ public class PeriodicRecovery extends Thread
             ClassLoader cl = switchClassLoader(m);
             try {
             m.periodicWorkSecondPass();
+            preventShutdown = preventShutdown || m.preventShutdown();
             } finally {
                 restoreClassLoader(cl);
             }

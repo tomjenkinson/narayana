@@ -37,4 +37,8 @@ public interface RecoveryModule
      */
 
     public void periodicWorkSecondPass ();
+
+    public default boolean preventShutdown() {
+        return false;
+    }
 }

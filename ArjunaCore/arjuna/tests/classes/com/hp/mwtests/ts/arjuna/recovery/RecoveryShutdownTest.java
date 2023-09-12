@@ -26,7 +26,7 @@ public class RecoveryShutdownTest {
     public static void beforeClass() {
         // register the CrashRecord type with the recovery system
         RecordTypeManager.manager().add(new TestRecordMap());
-        List<String> types = new ArrayList<>();
+//        List<String> types = new ArrayList<>();
         RecoveryEnvironmentBean recoveryConfig = recoveryPropertyManager.getRecoveryEnvironmentBean();
         String[] modules = {
                 // the modules to test
@@ -39,13 +39,13 @@ public class RecoveryShutdownTest {
 //                "com.arjuna.ats.internal.jta.recovery.jts.XARecoveryModule"
         };
 
-        types.add(new AtomicAction().type()); // AtomicActionRecoveryModule
+//        types.add(new AtomicAction().type()); // AtomicActionRecoveryModule
 
         recoveryConfig.setRecoveryBackoffPeriod(1); // in between passes
         recoveryConfig.setPeriodicRecoveryPeriod(20); // 20 seconds
 
         recoveryConfig.setRecoveryModuleClassNames(Arrays.asList(modules)); // the test set of modules
-        recoveryConfig.setTypeNamesToBlockShutdown(types); // tell the system which record types to stall shutdown for
+//        recoveryConfig.setTypeNamesToBlockShutdown(types); // tell the system which record types to stall shutdown for
         recoveryConfig.setWaitForFinalRecovery(true); // don't sign off until the store is empty
 
         // obtain a new RecoveryManager with the above config:

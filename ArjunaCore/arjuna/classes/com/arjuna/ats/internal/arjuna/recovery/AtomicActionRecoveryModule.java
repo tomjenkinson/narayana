@@ -237,6 +237,14 @@ public class AtomicActionRecoveryModule implements RecoveryModule
         }
    }
 
+    /**
+     * This is just for illustration. For instance it may be that periodic recovery would have cleaned some of these.
+     * @return
+     */
+    public boolean preventShutdown() {
+        return _transactionUidVector.isEmpty();
+    }
+
    // 'type' within the Object Store for AtomicActions.
    private String _transactionType = new AtomicAction().type() ;
 
