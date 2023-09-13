@@ -20,6 +20,7 @@ import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.recovery.RecoverAtomicAction;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import com.arjuna.ats.arjuna.recovery.ShutdownBlockingRecoveryModule;
 import com.arjuna.ats.arjuna.recovery.TransactionStatusConnectionManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
@@ -30,7 +31,7 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
  * It is responsible for recovering failed AtomicAction transactions.
 */
 
-public class AtomicActionRecoveryModule implements RecoveryModule
+public class AtomicActionRecoveryModule implements ShutdownBlockingRecoveryModule
 {
    public AtomicActionRecoveryModule()
    {
@@ -241,7 +242,8 @@ public class AtomicActionRecoveryModule implements RecoveryModule
      * This is just for illustration. For instance it may be that periodic recovery would have cleaned some of these.
      * @return
      */
-    public boolean blockShutdown() {
+    @Override
+    public boolean shouldBlockShutdown() {
         return _transactionUidVector.isEmpty();
     }
 

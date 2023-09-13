@@ -13,19 +13,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.List;
 
-import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
 import com.arjuna.ats.arjuna.coordinator.TxControl;
-import com.arjuna.ats.arjuna.exceptions.FatalError;
-import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
-import com.arjuna.ats.arjuna.objectstore.ObjectStoreIterator;
-import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import com.arjuna.ats.arjuna.recovery.ShutdownBlockingRecoveryModule;
 import com.arjuna.ats.arjuna.utils.Utility;
 
 /**
@@ -859,7 +854,9 @@ public class PeriodicRecovery extends Thread
             ClassLoader cl = switchClassLoader(m);
             try {
             m.periodicWorkSecondPass();
-            blockShutdown = blockShutdown || m.blockShutdown();
+            if (m instanceof ShutdownBlockingRecoveryModule) {
+                blockShutdown = blockShutdown || ((ShutdownBlockingRecoveryModule) m).shouldBlockShutdown();
+            }
             } finally {
                 restoreClassLoader(cl);
             }
