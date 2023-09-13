@@ -34,8 +34,4 @@ public interface RecoveryModule
      */
 
     public void periodicWorkSecondPass ();
-
-    public default boolean blockShutdown() {
-        return false;
-    }
 }
