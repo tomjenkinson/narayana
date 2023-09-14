@@ -20,7 +20,7 @@ import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
-import com.arjuna.ats.arjuna.recovery.ShutdownBlockingRecoveryModule;
+import com.arjuna.ats.arjuna.recovery.SuspendBlockingRecoveryModule;
 import com.arjuna.ats.arjuna.utils.Utility;
 
 /**
@@ -37,7 +37,7 @@ import com.arjuna.ats.arjuna.utils.Utility;
 
 public class PeriodicRecovery extends Thread
 {
-    private boolean blockShutdown;
+    private boolean blockSuspension;
     /***** public API *****/
 
     /**
@@ -154,40 +154,6 @@ public class PeriodicRecovery extends Thread
                if (tsLogger.logger.isDebugEnabled()) {
                    tsLogger.logger.debug("PeriodicRecovery: Mode <== TERMINATED");
                }
-               // see if shutdown should delay until certain types have recovered
-               if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
-//                   List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
-
-                   // disable the transaction system but keep recovery running
-                   TxControl.disable();
-                   // wait for in flight transactions to complete
-                   TransactionReaper.terminate(true);
-
-                   while (true) {
-                       try {
-                           // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
-                           // maybe it can be checked we are not in the middle of scanning rather than simply wait?
-                           _stateLock.wait();
-                           // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
-                           // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
-                           // but please know that these checks are called by external processes at any time and so that would need to be blocked while this shutdown process continues and appropriately handled
-                           if (!blockShutdown) {
-//                           if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
-                               // the store does not contain any records we're interested in,
-                               // so move directly to Mode.TERMINATED
-                               break;
-                           }
-                           _stateLock.wait(); // for next cycle to finish
-//                       } catch (ObjectStoreException | IOException e) {
-//                           tsLogger.logger.fatalf("Store error during shutdown %s", e);
-//                           // graceful shutdown with an empty store was requested, but we were unable to read the store
-//                           // so cause the VM to terminate abruptly so that standard crash recovery can take over
-//                           throw new FatalError("Store error during shutdown", e);
-                       } catch (InterruptedException e) {
-                           // just ignore and retest condition
-                       }
-                   }
-               }
                setMode(Mode.TERMINATED);
                _stateLock.notifyAll();
            }
@@ -265,6 +231,40 @@ public class PeriodicRecovery extends Thread
    {
        synchronized (_stateLock)
        {
+           // see if suspension should delay until certain types have recovered
+           if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
+               // List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
+
+               // disable the transaction system but keep recovery running
+               TxControl.disable();
+               // wait for in flight transactions to complete
+               TransactionReaper.terminate(true);
+
+               while (true) {
+                   try {
+                       // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
+                       // maybe it can be checked we are not in the middle of scanning rather than simply wait?
+                       _stateLock.wait();
+                       // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
+                       // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
+                       // but please know that these checks are called by external processes at any time and so that would need to be blocked while this suspension process continues and appropriately handled
+                       if (!blockSuspension) {
+                           // if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
+                           // the store does not contain any records we're interested in,
+                           // so move directly to Mode.TERMINATED
+                           break;
+                       }
+                       _stateLock.wait(); // for next cycle to finish
+                             // } catch (ObjectStoreException | IOException e) {
+                             // tsLogger.logger.fatalf("Store error during suspension %s", e);
+                             // graceful suspension with an empty store was requested, but we were unable to read the store
+                             // so cause the VM to terminate abruptly so that standard crash recovery can take over
+                             // throw new FatalError("Store error during suspension", e);
+                   } catch (InterruptedException e) {
+                       // just ignore and retest condition
+                   }
+               }
+           }
            // only switch and kick everyone if we are currently ENABLED
            Mode currentMode = getMode();
 
@@ -275,7 +275,7 @@ public class PeriodicRecovery extends Thread
                setMode(Mode.SUSPENDED);
                _stateLock.notifyAll();
            }
-           if (!async) {
+           if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
@@ -784,7 +784,7 @@ public class PeriodicRecovery extends Thread
     {
         // n.b. we only get here if status is SCANNING
 
-        blockShutdown = false;
+        blockSuspension = false;
 
         if (tsLogger.logger.isDebugEnabled()) {
             tsLogger.logger.debug("Periodic recovery first pass at "+_theTimestamper.format(new Date()));
@@ -854,8 +854,8 @@ public class PeriodicRecovery extends Thread
             ClassLoader cl = switchClassLoader(m);
             try {
             m.periodicWorkSecondPass();
-            if (m instanceof ShutdownBlockingRecoveryModule) {
-                blockShutdown = blockShutdown || ((ShutdownBlockingRecoveryModule) m).shouldBlockShutdown();
+            if (m instanceof SuspendBlockingRecoveryModule) {
+                blockSuspension = blockSuspension || ((SuspendBlockingRecoveryModule) m).shouldBlockShutdown();
             }
             } finally {
                 restoreClassLoader(cl);
