@@ -241,11 +241,14 @@ public class PeriodicRecovery extends Thread
                // TODO Need some way to check the reaper is terminated
 
 
+               while (getStatus() == Status.SCANNING) {
+                   // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
+                   // maybe it can be checked we are not in the middle of scanning rather than simply wait?
+                   _stateLock.wait();
+               }
+               
                while (true) {
                    try {
-                       // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
-                       // maybe it can be checked we are not in the middle of scanning rather than simply wait?
-                       _stateLock.wait();
                        // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
                        // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
                        // but please know that these checks are called by external processes at any time and so that would need to be blocked while this suspension process continues and appropriately handled
