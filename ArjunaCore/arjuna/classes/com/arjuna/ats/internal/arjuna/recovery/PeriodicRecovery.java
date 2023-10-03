@@ -229,7 +229,7 @@ public class PeriodicRecovery extends Thread
        synchronized (_stateLock)
        {
            // see if suspension should delay until certain types have recovered
-           if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
+           if (RecoveryManager.manager().isWaitForFinalRecovery()) {
                // List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
 
                // disable the transaction system but keep recovery running
@@ -272,7 +272,8 @@ public class PeriodicRecovery extends Thread
                setMode(Mode.SUSPENDED);
                _stateLock.notifyAll();
            }
-           if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery() && !async) {
+           // It is not expected that another scan could have started as the block about should have set it to suspended
+           if (!RecoveryManager.manager().isWaitForFinalRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
