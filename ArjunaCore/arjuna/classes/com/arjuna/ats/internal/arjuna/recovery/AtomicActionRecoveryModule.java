@@ -19,8 +19,7 @@ import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.recovery.RecoverAtomicAction;
-import com.arjuna.ats.arjuna.recovery.RecoveryModule;
-import com.arjuna.ats.arjuna.recovery.ShutdownBlockingRecoveryModule;
+import com.arjuna.ats.arjuna.recovery.SuspendBlockingRecoveryModule;
 import com.arjuna.ats.arjuna.recovery.TransactionStatusConnectionManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
@@ -31,7 +30,7 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
  * It is responsible for recovering failed AtomicAction transactions.
 */
 
-public class AtomicActionRecoveryModule implements ShutdownBlockingRecoveryModule
+public class AtomicActionRecoveryModule implements SuspendBlockingRecoveryModule
 {
    public AtomicActionRecoveryModule()
    {
