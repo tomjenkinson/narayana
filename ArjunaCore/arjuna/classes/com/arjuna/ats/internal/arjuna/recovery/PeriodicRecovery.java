@@ -258,7 +258,7 @@ public class PeriodicRecovery extends Thread
                        if (!blockSuspension) {
                            // if (!storeContainsAnyOf(types) && !hasOrphans() && !hasSubordinates()) {
                            // the store does not contain any records we're interested in,
-                           // so move directly to Mode.TERMINATED
+                           // so move directly to Mode.SUSPENDED
                            break;
                        }
                        _stateLock.wait(); // for next cycle to finish
