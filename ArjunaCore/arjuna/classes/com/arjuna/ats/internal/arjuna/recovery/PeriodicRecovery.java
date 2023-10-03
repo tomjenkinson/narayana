@@ -232,10 +232,14 @@ public class PeriodicRecovery extends Thread
            if (RecoveryManager.manager().isWaitForFinalRecovery()) {
                // List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
 
-               // disable the transaction system but keep recovery running
-               TxControl.disable();
-               // wait for in flight transactions to complete
-               TransactionReaper.terminate(true);
+               // Need to make sure that we wait for TxControl to have been disabled
+               while (TxControl.isEnabled()) {
+                   // This should be done with better handling
+                    Thread.currentThread().sleep(1000);
+               }
+
+               // TODO Need some way to check the reaper is terminated
+
 
                while (true) {
                    try {
