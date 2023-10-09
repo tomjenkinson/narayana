@@ -45,7 +45,6 @@ public class RecoveryShutdownTest {
         recoveryConfig.setPeriodicRecoveryPeriod(20); // 20 seconds
 
         recoveryConfig.setRecoveryModuleClassNames(Arrays.asList(modules)); // the test set of modules
-//        recoveryConfig.setTypeNamesToBlockShutdown(types); // tell the system which record types to stall shutdown for
         recoveryConfig.setWaitForFinalRecovery(true); // don't sign off until the store is empty
 
         // obtain a new RecoveryManager with the above config:

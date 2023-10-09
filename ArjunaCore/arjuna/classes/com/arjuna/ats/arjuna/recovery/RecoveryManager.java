@@ -373,8 +373,8 @@ public class RecoveryManager
 
     /**
      * @return true if the recovery manager should wait for the object store to recover
-     * certain types {@see getTypeNamesToBlockShutdown} before finally
-     * shutting down. Note that this may necessitate the disabling of further transaction creation.
+     * RecoveryModules that are instances of SuspendBlockingRecoveryModule before finally
+     * shutting down. Note that this necessitates the disabling of further transaction creation.
      */
     public boolean isWaitForFinalRecovery()
     {

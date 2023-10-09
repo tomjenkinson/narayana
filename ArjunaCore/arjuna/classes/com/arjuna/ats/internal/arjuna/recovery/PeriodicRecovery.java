@@ -228,10 +228,8 @@ public class PeriodicRecovery extends Thread
    {
        synchronized (_stateLock)
        {
-           // see if suspension should delay until certain types have recovered
+           // see if suspension should delay until RecoveryModules that are instances of SuspendBlockingRecoveryModule have completed recovery
            if (RecoveryManager.manager().isWaitForFinalRecovery()) {
-               // List<String> types = recoveryPropertyManager.getRecoveryEnvironmentBean().getTypeNamesToBlockShutdown();
-
                // Need to make sure that we wait for TxControl to have been disabled
                while (TxControl.isEnabled()) {
                    // This should be done with better handling
