@@ -54,7 +54,6 @@ public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean
 
     @FullPropertyName(name = "com.arjuna.ats.internal.arjuna.recovery.listener.timeoutsocket")
     private volatile boolean timeoutSocket = false;
-    private volatile List<String> typeNamesToBlockShutdown = new ArrayList<String>();
 
     /**
      * Returns the interval between recovery scans, in seconds.
@@ -599,18 +598,4 @@ public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean
     {
         this.timeoutSocket = timeoutSocket;
     }
-
-//    /**
-//     * Define which store types should block clean shutdown
-//     * @param typeNamesToBlockShutdown fully qualified type names of record types that must be recovered before shutdown
-//     */
-//    public void setTypeNamesToBlockShutdown(List<String> typeNamesToBlockShutdown)
-//    {
-//        this.typeNamesToBlockShutdown = typeNamesToBlockShutdown;
-//    }
-//
-//    public List<String> getTypeNamesToBlockShutdown()
-//    {
-//        return new ArrayList<>(typeNamesToBlockShutdown);
-//    }
 }
