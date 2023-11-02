@@ -12,9 +12,12 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
+import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import com.arjuna.ats.arjuna.recovery.SuspendBlockingRecoveryModule;
 import com.arjuna.ats.arjuna.utils.Utility;
 
 /**
@@ -31,7 +34,8 @@ import com.arjuna.ats.arjuna.utils.Utility;
 
 public class PeriodicRecovery extends Thread
 {
-   /***** public API *****/
+    private boolean blockSuspension;
+    /***** public API *****/
 
     /**
      *  state values indicating whether or not some thread is currently scanning. used to define values of field
@@ -200,6 +204,37 @@ public class PeriodicRecovery extends Thread
    {
        synchronized (_stateLock)
        {
+           // see if suspension should delay until RecoveryModules that are instances of SuspendBlockingRecoveryModule have completed recovery
+           if (RecoveryManager.manager().isWaitForFinalRecovery()) {
+               // Need to make sure that we wait for TxControl to have been disabled
+               while (TxControl.isEnabled()) {
+                   // This should be done with better handling
+                    Thread.currentThread().sleep(1000);
+               }
+
+               // TODO Need some way to check the reaper is terminated
+
+
+               while (getStatus() == Status.SCANNING) {
+                   // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
+                   // maybe it can be checked we are not in the middle of scanning rather than simply wait?
+                   _stateLock.wait();
+               }
+               
+               while (true) {
+                   try {
+                       // preventShutdown is reset in doWorkInternal to false and after scanning completes check if there were any reasons to preventShutdown
+                       // I don't know the best place to make this comment but checking for subordinates could be a new recovery module wrapping something like https://github.com/jbosstm/narayana/blob/86182416bea64368ecdfc7e78767f798b15c14db/ArjunaJTS/jtax/classes/com/arjuna/ats/internal/jta/transaction/jts/jca/XATerminatorImple.java#L438C4-L438C4
+                       // but please know that these checks are called by external processes at any time and so that would need to be blocked while this suspension process continues and appropriately handled
+                       if (!blockSuspension) {
+                           break;
+                       }
+                       _stateLock.wait(); // for next cycle to finish
+                   } catch (InterruptedException e) {
+                       // just ignore and retest condition
+                   }
+               }
+           }
            // only switch and kick everyone if we are currently ENABLED
            Mode currentMode = getMode();
 
@@ -210,7 +245,8 @@ public class PeriodicRecovery extends Thread
                setMode(Mode.SUSPENDED);
                _stateLock.notifyAll();
            }
-           if (!async) {
+           // It is not expected that another scan could have started as the block about should have set it to suspended
+           if (!RecoveryManager.manager().isWaitForFinalRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
@@ -719,6 +755,8 @@ public class PeriodicRecovery extends Thread
     {
         // n.b. we only get here if status is SCANNING
 
+        blockSuspension = false;
+
         if (tsLogger.logger.isDebugEnabled()) {
             tsLogger.logger.debug("Periodic recovery first pass at "+_theTimestamper.format(new Date()));
         }
@@ -787,6 +825,9 @@ public class PeriodicRecovery extends Thread
             ClassLoader cl = switchClassLoader(m);
             try {
             m.periodicWorkSecondPass();
+            if (m instanceof SuspendBlockingRecoveryModule) {
+                blockSuspension = blockSuspension || ((SuspendBlockingRecoveryModule) m).shouldBlockShutdown();
+            }
             } finally {
                 restoreClassLoader(cl);
             }
