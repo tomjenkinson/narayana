@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- * 
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2002,
- *
- * Arjuna Technologies Limited,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: ACCoordinator.java,v 1.7 2005/06/09 09:41:27 nmcl Exp $
- */
+
+
 
 package com.arjuna.mwlabs.wscf.model.twophase.arjunacore;
 
@@ -249,34 +225,47 @@ public class ATCoordinator extends TwoPhaseCoordinator
 		return _theId;
 	}
 
-	public synchronized void participantRolledBack (String participantId)
+	public void participantRolledBack (String participantId)
 			throws InvalidParticipantException, WrongStateException,
 			SystemException
 	{
-		if (participantId == null)
-			throw new SystemException(
-                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+		synchronizationLock.lock();
 
-		if (status() == ActionStatus.RUNNING)
-			changeParticipantStatus(participantId, ROLLEDBACK);
-		else
-			throw new WrongStateException();
+		try {
+			if (participantId == null)
+				throw new SystemException(
+						wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+
+			if (status() == ActionStatus.RUNNING)
+				changeParticipantStatus(participantId, ROLLEDBACK);
+			else
+				throw new WrongStateException();
+		} finally {
+			synchronizationLock.unlock();
+		}
+
 	}
 
-	public synchronized void participantReadOnly (String participantId)
+	public void participantReadOnly (String participantId)
 			throws InvalidParticipantException, SystemException
 	{
-		if (participantId == null)
-			throw new SystemException(
-                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+		synchronizationLock.lock();
 
-		if (status() == ActionStatus.RUNNING)
-		{
-			changeParticipantStatus(participantId, READONLY);
+		try {
+			if (participantId == null)
+				throw new SystemException(
+						wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+
+			if (status() == ActionStatus.RUNNING)
+			{
+				changeParticipantStatus(participantId, READONLY);
+			}
+			else
+				throw new SystemException(
+						wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_3());
+		} finally {
+			synchronizationLock.unlock();
 		}
-		else
-			throw new SystemException(
-                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_3());
 	}
 
     @Override

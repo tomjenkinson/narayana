@@ -1,28 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2007, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (c) 2002, 2003, Arjuna Technologies Limited.
- *
- * $Id: DummyListenerService.java,v 1.2 2004/06/24 13:52:53 nmcl Exp $
- */
+
+
 
 package com.jboss.transaction.wstf.proxy;
 
@@ -36,12 +17,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.jboss.jbossts.xts.environment.WSCEnvironmentBean;
 import org.jboss.jbossts.xts.environment.XTSPropertyManager;

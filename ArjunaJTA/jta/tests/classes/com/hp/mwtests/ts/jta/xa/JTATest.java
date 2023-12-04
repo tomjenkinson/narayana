@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2001, 2002,
- *
- * Hewlett-Packard Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: JTATest.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.hp.mwtests.ts.jta.xa;
 
@@ -35,11 +11,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
+import jakarta.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
@@ -60,11 +36,11 @@ public class JTATest {
 
     @Test
     public void testDuplicateXAREndCalled() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
 
         AtomicBoolean endCalled = new AtomicBoolean(false);
 
@@ -136,11 +112,11 @@ public class JTATest {
 
     @Test
     public void testDuplicateXAREndCalledFailure() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
         XAException rmFail = new XAException(XAException.XAER_RMFAIL);
         XAException rbRollback = new XAException(XAException.XA_RBROLLBACK);
 
@@ -238,18 +214,18 @@ public class JTATest {
             }
         };
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
 
         assertTrue(theTransaction.enlistResource(theResource));
 
         try {
             tm.commit();
             fail();
-        } catch (javax.transaction.HeuristicMixedException e) {
+        } catch (jakarta.transaction.HeuristicMixedException e) {
             // Expected
         }
     }
@@ -257,12 +233,12 @@ public class JTATest {
 	@Test
 	public void test() throws Exception {
 
-		javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+		jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
 				.transactionManager();
 
 		tm.begin();
 
-		javax.transaction.Transaction theTransaction = tm.getTransaction();
+		jakarta.transaction.Transaction theTransaction = tm.getTransaction();
 
 		assertTrue(theTransaction.enlistResource(new XARMERRXAResource(false)));
 		XARMERRXAResource rollbackCalled = new XARMERRXAResource(true);
@@ -287,12 +263,12 @@ public class JTATest {
 	@Test
     public void testRollbackRTE() throws SecurityException, IllegalStateException, HeuristicMixedException, HeuristicRollbackException, SystemException, NotSupportedException, RollbackException {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
             .transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
 
         assertTrue(theTransaction.enlistResource(new SimpleXAResource() {
             @Override
@@ -327,12 +303,12 @@ public class JTATest {
 	@Test
 	public void testHeuristicRollbackSuppressedException() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
                 .transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
 
         assertTrue(theTransaction.enlistResource(new XAResource() {
 

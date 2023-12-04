@@ -1,6 +1,10 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.txbridge.outbound;
 
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.jboss.ws.api.configuration.AbstractClientFeature;
 

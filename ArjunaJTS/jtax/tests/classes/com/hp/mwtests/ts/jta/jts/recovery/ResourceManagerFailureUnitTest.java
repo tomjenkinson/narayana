@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jta.jts.recovery;
 
 import java.util.ArrayList;
@@ -6,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 

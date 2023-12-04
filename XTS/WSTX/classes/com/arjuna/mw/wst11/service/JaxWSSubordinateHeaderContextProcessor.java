@@ -1,9 +1,13 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.mw.wst11.service;
 
 import com.arjuna.mw.wstx.logging.wstxLogger;
 
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.soap.SOAPMessage;
 
 /**
  * specialised version which creates and interposes a subordinate AT transaction when

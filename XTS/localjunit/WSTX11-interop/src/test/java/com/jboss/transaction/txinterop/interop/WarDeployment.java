@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2011, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.jboss.transaction.txinterop.interop;
 
@@ -49,6 +33,7 @@ import com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPort
 import com.jboss.transaction.txinterop.webservices.bainterop.server.BAInitiatorInitialisation;
 import com.jboss.transaction.txinterop.webservices.handlers.CoordinationContextHandler;
 import com.jboss.transaction.txinterop.webservices.soapfault.client.SoapFaultClient;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
 import java.net.UnknownHostException;
 import java.net.Inet6Address;
@@ -60,6 +45,9 @@ import java.net.InetAddress;
  */
 public class WarDeployment {
     public static WebArchive getDeployment(){
+
+        String versionDom4j = System.getProperty("version.org.dom4j");
+
         return ShrinkWrap.create(WebArchive.class, "interop11.war")
                 .addPackage(InteropTestCase.class.getPackage())
                 .addPackage(InteropWaitState.class.getPackage())
@@ -84,6 +72,7 @@ public class WarDeployment {
                 .addPackage(SoapFaultClient.class.getPackage())
                 .addPackage(SoapFaultPortType.class.getPackage())
                 .addPackage(ParticipantCompletionReadOnlyRules.class.getPackage())
+                .addAsLibraries(Maven.resolver().resolve("org.dom4j:dom4j:" + versionDom4j).withoutTransitivity().asFile())
                 .addAsResource("interop11/participanthandlers.xml", "com/jboss/transaction/txinterop/webservices/atinterop/sei/participanthandlers.xml")
                 .addAsResource("interop11/participanthandlers.xml", "com/jboss/transaction/txinterop/webservices/bainterop/sei/participanthandlers.xml")
                 .addAsWebInfResource("interop11/wsdl/interopat.wsdl", "classes/com/jboss/transaction/txinterop/webservices/atinterop/generated/wsdl/interopat.wsdl")
@@ -103,8 +92,8 @@ public class WarDeployment {
                 .addAsWebResource("web/invalidParameters.html", "invalidParameters.html")
                 .addAsWebResource("web/results.jsp", "results.jsp")
                 .addAsWebInfResource("web.xml")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsManifestResource(new StringAsset("Dependencies: org.jboss.jts,org.jboss.ws.api,javax.xml.ws.api,org.jboss.xts,org.dom4j,org.jboss.ws.jaxws-client services export,org.jboss.ws.cxf.jbossws-cxf-client services export,com.sun.xml.bind services export\n"), "MANIFEST.MF");
+                .addAsWebInfResource(new StringAsset("<beans bean-discovery-mode=\"all\"></beans>"), "beans.xml")
+                .addAsManifestResource(new StringAsset("Dependencies: org.jboss.jts,org.jboss.ws.api,jakarta.xml.ws.api,org.jboss.xts,org.jboss.ws.jaxws-client services export,org.jboss.ws.cxf.jbossws-cxf-client services export,com.sun.xml.bind services export\n"), "MANIFEST.MF");
     }
 
     static String getLocalHost() {

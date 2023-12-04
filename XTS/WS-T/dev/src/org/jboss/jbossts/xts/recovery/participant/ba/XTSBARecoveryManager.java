@@ -1,6 +1,11 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.xts.recovery.participant.ba;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.webservices.logging.WSTLogger;
 
 import java.util.NoSuchElementException;
 
@@ -23,12 +28,18 @@ public abstract class XTSBARecoveryManager {
      */
     public static XTSBARecoveryManager getRecoveryManager()
     {
-        int i = 0;
-
-        while (theRecoveryManager == null && i++ < 2) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+        // use a lock to get the recovery manager to avoid a race with the code that sets it
+        if (theRecoveryManager == null) {
+            synchronized (lock) {
+                // theRecoveryManager must eventually be set to a non-null value
+                while (theRecoveryManager == null) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        // reset the interrupted status
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
         }
 
@@ -42,10 +53,19 @@ public abstract class XTSBARecoveryManager {
      */
     public static XTSBARecoveryManager setRecoveryManager(XTSBARecoveryManager recoveryManager)
     {
-        XTSBARecoveryManager old = theRecoveryManager;
-        theRecoveryManager = recoveryManager;
+        if (recoveryManager == null) {
+            // Warning, if recoveryManager is null then getRecoveryManager() will hang
+            WSTLogger.logger.warnf("%s recoveryManager is being set to null, this may cause a hang",
+                    XTSBARecoveryManager.class);
+        }
 
-        return old;
+        synchronized (lock) {
+            XTSBARecoveryManager old = theRecoveryManager;
+            theRecoveryManager = recoveryManager;
+            lock.notifyAll();
+
+            return old;
+        }
     }
 
     /*****************************************************************************************/
@@ -165,5 +185,6 @@ public abstract class XTSBARecoveryManager {
      * the singleton instance of the recovery manager
      */
 
-    protected static XTSBARecoveryManager theRecoveryManager = null;
+    protected static volatile XTSBARecoveryManager theRecoveryManager = null;
+    protected final static Object lock = new Object();
 }

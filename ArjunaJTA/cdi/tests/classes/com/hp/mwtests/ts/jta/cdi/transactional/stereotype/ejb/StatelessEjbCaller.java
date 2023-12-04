@@ -1,15 +1,13 @@
 /*
- *
- * Copyright The Narayana Authors
- *
- * SPDX-License-Identifier: LGPL-2.1-only
- *
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.hp.mwtests.ts.jta.cdi.transactional.stereotype.ejb;
 
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 @Stateless
 public class StatelessEjbCaller {

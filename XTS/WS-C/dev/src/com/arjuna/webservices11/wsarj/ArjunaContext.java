@@ -1,8 +1,12 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.webservices11.wsarj;
 
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 
-import javax.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext;
 
 /**
  * The arjuna context.

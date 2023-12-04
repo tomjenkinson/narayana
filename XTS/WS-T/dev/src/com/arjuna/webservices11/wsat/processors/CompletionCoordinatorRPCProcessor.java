@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.webservices11.wsat.processors;
 
 import com.arjuna.webservices.SoapFault;

@@ -1,36 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2018, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.arjuna.webservices11.wscoor.sei;
 
 import com.arjuna.webservices.logging.WSCLogger;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 import com.arjuna.wsc11.AsynchronousRegistrationMapper;
-import javax.jws.*;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.soap.Addressing;
-import javax.annotation.Resource;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.jws.*;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.handler.MessageContext;
 import org.jboss.ws.api.addressing.MAP;
 
 /**

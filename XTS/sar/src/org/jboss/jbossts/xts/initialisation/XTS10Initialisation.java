@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.xts.initialisation;
 
 import com.arjuna.services.framework.startup.Sequencer;

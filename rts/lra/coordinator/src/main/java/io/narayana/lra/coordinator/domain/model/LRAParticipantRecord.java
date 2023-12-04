@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2017, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package io.narayana.lra.coordinator.domain.model;
 
 import com.arjuna.ats.arjuna.common.Uid;
@@ -33,21 +17,21 @@ import io.narayana.lra.LRAConstants;
 import io.narayana.lra.LRAData;
 import io.narayana.lra.coordinator.domain.service.LRAService;
 import io.narayana.lra.logging.LRALogger;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.eclipse.microprofile.lra.annotation.ParticipantStatus;
 import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.AsyncInvoker;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -64,8 +48,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static io.narayana.lra.LRAConstants.AFTER;
+import static io.narayana.lra.LRAConstants.NARAYANA_LRA_PARTICIPANT_DATA_HEADER_NAME;
 import static io.narayana.lra.LRAConstants.PARTICIPANT_TIMEOUT;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT_HEADER;
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_PARENT_CONTEXT_HEADER;
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_RECOVERY_HEADER;
@@ -88,6 +73,7 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
 
     private String responseData;
     private String compensatorData;
+    private String previousCompensatorData;
     private LRAService lraService;
     private ParticipantStatus status;
     private boolean accepted;
@@ -345,6 +331,7 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
                         .header(LRA_HTTP_CONTEXT_HEADER, lraId.toASCIIString())
                         .header(LRA_HTTP_PARENT_CONTEXT_HEADER, parentId) // make the context available to participants
                         .header(LRA_HTTP_RECOVERY_HEADER, recoveryURI.toASCIIString())
+                        .header(NARAYANA_LRA_PARTICIPANT_DATA_HEADER_NAME, compensatorData)
                         .async()
                         .put(Entity.text(""))
                         .get(PARTICIPANT_TIMEOUT, TimeUnit.SECONDS);
@@ -447,7 +434,8 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
             client = ClientBuilder.newClient();
             Invocation.Builder builder = client.target(target)
                 .request()
-                .header(LRA_HTTP_RECOVERY_HEADER, recoveryURI.toASCIIString());
+                .header(LRA_HTTP_RECOVERY_HEADER, recoveryURI.toASCIIString())
+                .header(NARAYANA_LRA_PARTICIPANT_DATA_HEADER_NAME, compensatorData);
 
             if (target.equals(afterURI)) {
                 builder.header(LRA.LRA_HTTP_ENDED_CONTEXT_HEADER, lra.getId().toASCIIString());
@@ -608,6 +596,7 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
                         .header(LRA_HTTP_CONTEXT_HEADER, lraId.toASCIIString())
                         .header(LRA_HTTP_RECOVERY_HEADER, recoveryURI.toASCIIString())
                         .header(LRA_HTTP_PARENT_CONTEXT_HEADER, parentId)
+                        .header(NARAYANA_LRA_PARTICIPANT_DATA_HEADER_NAME, compensatorData)
                         .async()
                         .get()
                         .get(PARTICIPANT_TIMEOUT, TimeUnit.SECONDS); // if the attempt times out the catch block below will return a heuristic
@@ -680,7 +669,7 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
         return -1;
     }
 
-    private Future<Response> getAsyncResponse(WebTarget target, String method, AsyncInvoker asyncInvoker, String compensatorData) {
+    private Future<Response> getAsyncResponse(WebTarget target, String method, AsyncInvoker asyncInvoker, String cData) {
         String queryString = target.getUri().getQuery();
 
         if (queryString != null) {
@@ -692,13 +681,13 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
 
                     if (qp[0].equals(LRAConstants.HTTP_METHOD_NAME)) {
                         switch (qp[1]) {
-                            case "javax.ws.rs.GET":
+                            case "jakarta.ws.rs.GET":
                                 return asyncInvoker.get();
-                            case "javax.ws.rs.PUT":
-                                return asyncInvoker.put(Entity.entity(compensatorData, MediaType.TEXT_PLAIN));
-                            case "javax.ws.rs.POST":
-                                return asyncInvoker.post(Entity.entity(compensatorData, MediaType.TEXT_PLAIN));
-                            case "javax.ws.rs.DELETE":
+                            case "jakarta.ws.rs.PUT":
+                                return asyncInvoker.put(Entity.entity(cData, MediaType.TEXT_PLAIN));
+                            case "jakarta.ws.rs.POST":
+                                return asyncInvoker.post(Entity.entity(cData, MediaType.TEXT_PLAIN));
+                            case "jakarta.ws.rs.DELETE":
                                 return asyncInvoker.delete();
                             default:
                                 break;
@@ -709,13 +698,13 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
         }
 
         switch (method) {
-            case "javax.ws.rs.GET":
+            case "jakarta.ws.rs.GET":
                 return asyncInvoker.get();
-            case "javax.ws.rs.PUT":
+            case "jakarta.ws.rs.PUT":
                 return asyncInvoker.put(Entity.entity(compensatorData, MediaType.TEXT_PLAIN));
-            case "javax.ws.rs.POST":
+            case "jakarta.ws.rs.POST":
                 return asyncInvoker.post(Entity.entity(compensatorData, MediaType.TEXT_PLAIN));
-            case "javax.ws.rs.DELETE":
+            case "jakarta.ws.rs.DELETE":
                 return asyncInvoker.delete();
             default:
                 return asyncInvoker.get();
@@ -790,6 +779,7 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
                     .header(LRA_HTTP_CONTEXT_HEADER, lraId)
                     .header(LRA_HTTP_RECOVERY_HEADER, recoveryURI)
                     .header(LRA_HTTP_PARENT_CONTEXT_HEADER, parentId)
+                    .header(NARAYANA_LRA_PARTICIPANT_DATA_HEADER_NAME, compensatorData)
                     .async()
                     .delete()
                     .get(PARTICIPANT_TIMEOUT, TimeUnit.SECONDS);
@@ -1036,6 +1026,17 @@ public class LRAParticipantRecord extends AbstractRecord implements Comparable<A
         String path = lraId.getPath();
 
         return path.substring(path.lastIndexOf('/') + 1);
+    }
+
+    public void setCompensatorData(String compensatorData) {
+        String previous = this.compensatorData;
+
+        this.previousCompensatorData = this.compensatorData;
+        this.compensatorData = compensatorData;
+    }
+
+    public String getPreviousCompensatorData() {
+        return previousCompensatorData;
     }
 
     private void trace_progress(String reason) {

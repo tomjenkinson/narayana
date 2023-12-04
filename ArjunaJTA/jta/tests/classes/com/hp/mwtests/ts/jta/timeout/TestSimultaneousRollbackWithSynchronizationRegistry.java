@@ -1,13 +1,17 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jta.timeout;
 
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

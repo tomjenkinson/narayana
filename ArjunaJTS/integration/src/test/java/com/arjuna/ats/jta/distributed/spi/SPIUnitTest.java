@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2015, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.arjuna.ats.jta.distributed.spi;
 
 import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
@@ -30,7 +14,6 @@ import com.arjuna.ats.jta.distributed.JndiProvider;
 import com.arjuna.ats.jta.utils.JNDIManager;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.arjuna.orbportability.internal.utils.PostInitLoader;
-import org.jboss.tm.TransactionManagerLocator;
 import org.jboss.tm.listener.EventType;
 import org.jboss.tm.listener.TransactionListenerRegistry;
 import org.jboss.tm.listener.TransactionListenerRegistryLocator;
@@ -41,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.naming.InitialContext;
-import javax.transaction.*;
+import jakarta.transaction.*;
 import java.util.*;
 import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
@@ -114,7 +97,7 @@ public class SPIUnitTest {
 
     @After
     public void cleanThread() {
-        TransactionManager tm = TransactionManagerLocator.locateTransactionManager();
+        TransactionManager tm = getTransactionManager();
 
         try {
             Transaction txn = tm.getTransaction();
@@ -128,7 +111,7 @@ public class SPIUnitTest {
 
     @Test
     public void testListener() {
-        TransactionManager tm = TransactionManagerLocator.locateTransactionManager();
+        TransactionManager tm = getTransactionManager();
         Transaction prevTxn = null;
 
         // transaction-to-thread listeners were deactivated by default in JBTM-3166

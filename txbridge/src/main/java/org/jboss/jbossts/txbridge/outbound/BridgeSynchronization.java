@@ -1,33 +1,15 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * (C) 2009 @author JBoss Inc
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package org.jboss.jbossts.txbridge.outbound;
 
 import org.jboss.jbossts.txbridge.utils.txbridgeLogger;
 import org.jboss.jbossts.xts.bridge.at.BridgeWrapper;
 
-import javax.transaction.Synchronization;
-import javax.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.Status;
 
 import com.arjuna.ats.jta.utils.JTAHelper;
 
@@ -67,7 +49,7 @@ public class BridgeSynchronization implements Synchronization
     /**
      * This method is called by the transaction manager after the transaction is committed or rolled back.
      *
-     * @param status the javax.transaction.Status representing the tx outcome.
+     * @param status the jakarta.transaction.Status representing the tx outcome.
      */
     public void afterCompletion(int status)
     {

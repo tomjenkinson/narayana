@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates,
- * and individual contributors as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2010,
- * @author JBoss, by Red Hat.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.hp.mwtests.ts.jta.jts.basic;
 
 import static org.junit.Assert.assertEquals;
@@ -26,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.transaction.Synchronization;
-import javax.transaction.TransactionSynchronizationRegistry;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,7 +60,7 @@ public class TransactionSynchronizationRegistryTest {
     @Test
     public void testTSR() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         TransactionSynchronizationRegistry tsr = new TransactionSynchronizationRegistryImple();
 
@@ -117,7 +102,7 @@ public class TransactionSynchronizationRegistryTest {
     @Test
     public void testTSRUseAfterCompletion() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         final CompletionCountLock ccl = new CompletionCountLock(2);
         tm.begin();

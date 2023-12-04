@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.qa.extension;
 
 import org.jboss.arquillian.container.spi.ServerKillProcessor;

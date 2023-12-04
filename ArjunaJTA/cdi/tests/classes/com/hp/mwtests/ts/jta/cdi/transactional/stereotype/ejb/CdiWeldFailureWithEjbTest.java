@@ -1,10 +1,8 @@
 /*
- *
- * Copyright The Narayana Authors
- *
- * SPDX-License-Identifier: LGPL-2.1-only
- *
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.hp.mwtests.ts.jta.cdi.transactional.stereotype.ejb;
 
@@ -17,8 +15,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-import javax.transaction.Status;
+import jakarta.inject.Inject;
+import jakarta.transaction.Status;
 
 /**
  * When using Weld then Narayana switches to use Weld API to access the list of the {@code @Transactional} annotations.

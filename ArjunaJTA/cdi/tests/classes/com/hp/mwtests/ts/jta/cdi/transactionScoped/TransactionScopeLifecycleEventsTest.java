@@ -1,51 +1,35 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2019, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.hp.mwtests.ts.jta.cdi.transactionScoped;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.BeforeDestroyed;
-import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.context.Destroyed;
-import javax.enterprise.context.Initialized;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.BeforeDestroyed;
+import jakarta.enterprise.context.ContextNotActiveException;
+import jakarta.enterprise.context.Destroyed;
+import jakarta.enterprise.context.Initialized;
 
-import javax.enterprise.context.spi.Context;
+import jakarta.enterprise.context.spi.Context;
 
-import javax.enterprise.event.Observes;
+import jakarta.enterprise.event.Observes;
 
-import javax.enterprise.event.TransactionPhase;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.event.TransactionPhase;
+import jakarta.enterprise.inject.spi.BeanManager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.Transactional;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionScoped;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.Status;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionScoped;
+import jakarta.transaction.UserTransaction;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 
@@ -201,7 +185,7 @@ public class TransactionScopeLifecycleEventsTest {
         assertEquals("Expected rollback", Status.STATUS_ROLLEDBACK, finalStatus);
     }
 
-    public static class TestSync implements javax.transaction.Synchronization {
+    public static class TestSync implements jakarta.transaction.Synchronization {
         @Override
         public void beforeCompletion() {
             if (log.isDebugEnabled()) {

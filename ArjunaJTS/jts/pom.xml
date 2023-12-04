@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
-	LLC, and others contributors as indicated by the @authors tag. All rights 
-	reserved. See the copyright.txt in the distribution for a full listing of 
-	individual contributors. This copyrighted material is made available to anyone 
-	wishing to use, modify, copy, or redistribute it subject to the terms and 
-	conditions of the GNU Lesser General Public License, v. 2.1. This program 
-	is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
-	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-	PURPOSE. See the GNU Lesser General Public License for more details. You 
-	should have received a copy of the GNU Lesser General Public License, v.2.1 
-	along with this distribution; if not, write to the Free Software Foundation, 
-	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana.jts</groupId>
     <artifactId>narayana-jts-all</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jts</artifactId>
@@ -26,87 +18,84 @@
   <properties>
     <!-- This module builds a jar holding a set of Sun orb's IDL stubs -->
     <classesDirectoryWithIdlj>${project.build.directory}/jts-idlj</classesDirectoryWithIdlj>
-    <classesDirectoryWithibmorb>${project.build.directory}/jts-ibmorb</classesDirectoryWithibmorb>
     <idlj.boot.args></idlj.boot.args>
-    <openjdk-orb.jar>${settings.localRepository}/org/jboss/openjdk-orb/openjdk-orb/${version.org.jboss.openjdk-orb}/openjdk-orb-${version.org.jboss.openjdk-orb}.jar</openjdk-orb.jar>
     <surefireArgLine></surefireArgLine>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom-test</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
       <artifactId>common</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
       <artifactId>arjuna</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jts</groupId>
       <artifactId>orbportability</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging-processor</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging-processor}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
       <artifactId>common</artifactId>
-      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
       <artifactId>txoj</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
       <artifactId>test-utils</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${version.com.h2database}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -118,19 +107,16 @@
     <dependency>
       <groupId>org.jboss.byteman</groupId>
       <artifactId>byteman-submit</artifactId>
-      <version>${version.org.jboss.byteman}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.byteman</groupId>
       <artifactId>byteman-install</artifactId>
-      <version>${version.org.jboss.byteman}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.byteman</groupId>
       <artifactId>byteman-bmunit</artifactId>
-      <version>${version.org.jboss.byteman}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -193,6 +179,29 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-test-sources</id>
+            <goals>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>jbossts-properties.xml</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <sourceDirectory>classes</sourceDirectory>
     <testSourceDirectory>tests/classes</testSourceDirectory>
@@ -215,19 +224,16 @@
         <dependency>
           <groupId>org.jboss.narayana.jts</groupId>
           <artifactId>idlj-idl-openjdk</artifactId>
-          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.jboss.narayana.jts</groupId>
           <artifactId>idlj-idl-openjdk</artifactId>
-          <version>${project.version}</version>
           <classifier>tests</classifier>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.openjdk-orb</groupId>
           <artifactId>openjdk-orb</artifactId>
-          <version>${version.org.jboss.openjdk-orb}</version>
         </dependency>
       </dependencies>
 
@@ -241,11 +247,6 @@
                 <goals>
                   <goal>compile</goal>
                 </goals>
-                <configuration>
-                  <excludes>
-                    <exclude>**/ibmorb/**</exclude>
-                  </excludes>
-                </configuration>
               </execution>
               <execution>
                 <id>idlj-testCompile</id>
@@ -256,7 +257,6 @@
                   <testExcludes>
                     <!-- TODO make sure all supported ORBs have "RecoveryCreator" tests -->
                     <exclude>**/GenericRecoveryCreatorUnitTest.java</exclude>
-                    <exclude>**/ibmorb/**</exclude>
                   </testExcludes>
                 </configuration>
               </execution>
@@ -286,14 +286,9 @@
                     <exclude>**/GridTest.java</exclude>
                     <exclude>**/remote/**</exclude>
                     <exclude>**/DefaultTimeout.java</exclude>
-                    <exclude>**/ibmorb/**</exclude>
                   </excludes>
                   <argLine>@{surefireArgLine} -Djdk.attach.allowAttachSelf=true ${idlj.boot.args}</argLine>
                   <reportsDirectory>${project.build.directory}/idlj-openjdk-surefire-reports</reportsDirectory>
-                  <classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:ibmorb-idl</classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:ibmorb-idl:test-jar</classpathDependencyExcludes>
-                  </classpathDependencyExcludes>
                   <systemPropertyVariables combine.children="append">
                     <OrbPortabilityEnvironmentBean.orbImpleClassName>com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4</OrbPortabilityEnvironmentBean.orbImpleClassName>
                     <OrbPortabilityEnvironmentBean.poaImpleClassName>com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4</OrbPortabilityEnvironmentBean.poaImpleClassName>
@@ -307,108 +302,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>jts-ibmorb</id>
-      <activation>
-        <property>
-          <name>ibmorb-enabled</name>
-        </property>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>ibmorb-idl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>ibmorb-idl</artifactId>
-          <version>${project.version}</version>
-          <type>test-jar</type>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>ibmorb-compile</id>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <excludes>
-                    <exclude>**/javaidl/**</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>ibmorb-testCompile</id>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-                <configuration>
-                  <testExcludes>
-                    <exclude>**/GenericRecoveryCreatorUnitTest.java</exclude>
-                    <exclude>**/javaidl/**</exclude>
-                  </testExcludes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>surefire-ibmorb</id>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <systemProperties combine.children="append"></systemProperties>
-                  <excludes>
-                    <!-- exclude tests that load the byteman agent (BMUnitRunner) -->
-                    <exclude>**/RecoveredServerTransactionUnitTest.java</exclude>
-                    <exclude>**/RecoveredTransactionUnitTest.java</exclude>
-
-                    <!-- not sure why these are excluded -->
-                    <exclude>**/common/**</exclude>
-                    <exclude>**/exceptions/**</exclude>
-                    <exclude>**/orbspecific/resources/**</exclude>
-                    <exclude>**/resources/**</exclude>
-                    <exclude>**/utils/ResourceTrace.java</exclude>
-                    <exclude>**/utils/Util.java</exclude>
-                    <exclude>**/TransactionTest2.java</exclude>
-                    <exclude>**/CheckedTransactions.java</exclude>
-                    <exclude>**/GridTest.java</exclude>
-                    <exclude>**/remote/**</exclude>
-                    <exclude>**/DefaultTimeout.java</exclude>
-
-                    <exclude>**/javaidl/**</exclude>
-                  </excludes>
-                  <reportsDirectory>${project.build.directory}/ibmorb-surefire-reports</reportsDirectory>
-                  <classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:idlj-idl-openjdk</classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:idlj-idl-openjdk:tests</classpathDependencyExcludes>
-                  </classpathDependencyExcludes>
-                  <systemPropertyVariables combine.children="append">
-                    <OrbPortabilityEnvironmentBean.orbImpleClassName>com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1</OrbPortabilityEnvironmentBean.orbImpleClassName>
-                    <OrbPortabilityEnvironmentBean.poaImpleClassName>com.arjuna.orbportability.internal.orbspecific.ibmorb.oa.implementations.ibmorb_7_1</OrbPortabilityEnvironmentBean.poaImpleClassName>
-                    <OrbPortabilityEnvironmentBean.orbDataClassName>com.arjuna.orbportability.internal.orbspecific.versions.ibmorb_7_1</OrbPortabilityEnvironmentBean.orbDataClassName>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>release</id>
       <build>

@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.xts.servicetests.service;
 
 import org.jboss.jbossts.xts.servicetests.service.participant.*;
@@ -17,7 +21,7 @@ import com.arjuna.mw.wst.TxContext;
 import com.arjuna.mw.wst11.*;
 import com.arjuna.wst.SystemException;
 
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceException;
 import javax.xml.namespace.QName;
 
 /**

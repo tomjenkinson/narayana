@@ -1,6 +1,10 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wst11;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 /**
  */

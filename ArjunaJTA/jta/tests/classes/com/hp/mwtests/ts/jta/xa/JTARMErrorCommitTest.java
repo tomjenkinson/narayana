@@ -1,8 +1,12 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jta.xa;
 
 import org.junit.Test;
 
-import javax.transaction.RollbackException;
+import jakarta.transaction.RollbackException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
@@ -20,12 +24,12 @@ public class JTARMErrorCommitTest {
     @Test
     public void test() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+        jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
                 .transactionManager();
 
         tm.begin();
 
-        javax.transaction.Transaction theTransaction = tm.getTransaction();
+        jakarta.transaction.Transaction theTransaction = tm.getTransaction();
         assertTrue(theTransaction.enlistResource(new SimpleXAResource(1, true)));
         assertTrue(theTransaction.enlistResource(new SimpleXAResource(2, false)));
 

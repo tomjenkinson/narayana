@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.narayana.rest.integration;
 
 import org.jboss.jbossts.star.logging.RESTATLogger;
@@ -7,11 +11,11 @@ import org.jboss.jbossts.star.util.TxSupport;
 import org.jboss.logging.Logger;
 import org.jboss.narayana.rest.integration.api.VolatileParticipant;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
 
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>

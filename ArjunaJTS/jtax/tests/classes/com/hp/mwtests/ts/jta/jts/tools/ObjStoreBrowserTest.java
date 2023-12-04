@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jta.jts.tools;
 
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
@@ -28,7 +32,7 @@ import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicMixedException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;

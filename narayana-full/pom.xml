@@ -1,101 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!-- JBoss, Home of Professional Open Source Copyright 2009, Red Hat Middleware 
-		LLC, and individual contributors as indicated by the @author tags. See the 
-		copyright.txt in the distribution for a full listing of individual contributors. 
-		This copyrighted material is made available to anyone wishing to use, modify, 
-		copy, or redistribute it subject to the terms and conditions of the GNU Lesser 
-		General Public License, v. 2.1. This program is distributed in the hope that 
-		it will be useful, but WITHOUT A WARRANTY; without even the implied warranty 
-		of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-		General Public License for more details. You should have received a copy 
-		of the GNU Lesser General Public License, v.2.1 along with this distribution; 
-		if not, write to the Free Software Foundation, Inc., 51 Franklin Street, 
-		Fifth Floor, Boston, MA 02110-1301, USA. (C) 2009, @author JBoss Inc. (jonathan.halliday@redhat.com) -->
+  <!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
+
   <parent>
     <groupId>org.jboss.narayana</groupId>
     <artifactId>narayana-all</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>narayana-full</artifactId>
   <packaging>pom</packaging>
   <name>Narayana: narayana-full</name>
   <description>Narayana: narayana-full</description>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom-test</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
       <artifactId>arjunacore-services</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
       <artifactId>narayana-jta</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.narayana.jta</groupId>
-      <artifactId>narayana-jta-jakarta</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jts</groupId>
       <artifactId>narayana-jts-integration</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>restat-web</artifactId>
-      <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>restat-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>jbossxts</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.narayana.xts</groupId>
-      <artifactId>jbossxts</artifactId>
-      <version>${project.version}</version>
-      <classifier>api</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.narayana.xts</groupId>
-      <artifactId>jbossxts-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>ws-c11</artifactId>
-      <version>${project.version}</version>
       <classifier>war</classifier>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>ws-t11</artifactId>
-      <version>${project.version}</version>
       <classifier>client</classifier>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>ws-t11</artifactId>
-      <version>${project.version}</version>
       <classifier>coordinator</classifier>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>ws-t11</artifactId>
-      <version>${project.version}</version>
       <classifier>participant</classifier>
       <type>war</type>
     </dependency>
@@ -103,66 +89,41 @@
     <dependency>
       <groupId>org.jboss.narayana.xts</groupId>
       <artifactId>xts-test-servlet</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
       <artifactId>jbosstxbridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.narayana</groupId>
-      <artifactId>jbosstxbridge-jakarta</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- javadoc dependencies -->
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
       <artifactId>jms</artifactId>
-      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_2.0_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec}</version>
+      <groupId>jakarta.jms</groupId>
+      <artifactId>jakarta.jms-api</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <version>${version.javax.enterprise}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>${version.javax.annotation}</version>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
-      <version>${version.org.apache.ant}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.ws</groupId>
       <artifactId>jbossws-api</artifactId>
-      <version>${version.org.jboss.ws}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.integration</groupId>
-      <artifactId>jboss-corba-ots-spi</artifactId>
-      <version>${version.org.jboss.integration}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-core</artifactId>
-      <version>${version.org.jboss.resteasy}</version>
       <scope>provided</scope>
       <!-- filter out unwanted jars -->
       <exclusions>
@@ -170,35 +131,27 @@
           <groupId>commons-httpclient</groupId>
           <artifactId>commons-httpclient</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <version>${version.commons-httpclient}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
-      <version>${version.org.jboss.resteasy}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.smallrye.reactive</groupId>
       <artifactId>smallrye-reactive-converter-api</artifactId>
-      <version>${version.smallrye-converter-api}</version>
       <scope>provided</scope>
     </dependency>
     <!-- Ensure these are in the distribution -->
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>artemis-journal</artifactId>
-      <version>${version.org.apache.activemq}</version>
       <exclusions>
         <exclusion>
           <groupId>io.netty</groupId>
@@ -209,27 +162,14 @@
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging-processor</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging-processor}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.transaction</groupId>
-      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.transaction}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.ironjacamar</groupId>
-      <artifactId>ironjacamar-spec-api</artifactId>
-      <version>${version.org.jboss.ironjacamar}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-transaction-spi</artifactId>
-      <version>${version.org.jboss.jboss-transaction-spi}</version>
       <exclusions>
         <exclusion>
           <groupId>org.jboss.logging</groupId>
@@ -240,25 +180,33 @@
     <dependency>
       <groupId>org.jboss.narayana.stm</groupId>
       <artifactId>stm</artifactId>
-      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.xml.bind</groupId>
-      <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version>
+      <groupId>jakarta.json</groupId>
+      <artifactId>jakarta.json-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.xml.ws</groupId>
-      <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec}</version>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>idlj-idl-openjdk</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.ws</groupId>
       <artifactId>jaxws-ri</artifactId>
-      <version>${version.jaxws-ri}</version>
       <type>pom</type>
       <scope>provided</scope>
       <exclusions>
@@ -343,33 +291,11 @@
       </dependencies>
     </profile>
     <profile>
-      <id>jts-ibmorb</id>
-      <activation>
-        <property>
-          <name>ibmorb-enabled</name>
-        </property>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>narayana-jts-ibmorb</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>ibmorb-idl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
       <id>release</id>
       <dependencies>
         <dependency>
           <groupId>io.mashona</groupId>
           <artifactId>mashona-logwriting</artifactId>
-          <version>${version.io.mashona}</version>
           <scope>compile</scope>
         </dependency>
       </dependencies>
@@ -430,8 +356,21 @@
                     <additionalJOption>${jvm.args.modular}</additionalJOption>
                   </additionalJOptions>
                   <dependencySourceExcludes>
-                    <dependencySourceExclude>javax.enterprise:cdi-api</dependencySourceExclude>
-                    <dependencySourceExclude>org.jboss.spec.javax.xml.bind:jboss-jaxb-api_2.3_spec</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.annotation:jakarta.annotation-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.json:jakarta.json-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.servlet:jakarta.servlet-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.interceptor:jakarta.interceptor-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.ejb:jakarta.ejb-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.inject:jakarta.inject-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.xml.bind:jakarta.xml.bind-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.xml.soap:jakarta.xml.soap-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.xml.ws:jakarta.xml.ws-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.ws.rs:jakarta.ws.rs-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.jms:jakarta.jms-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.enterprise:jakarta.enterprise.cdi-api</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.enterprise:jakarta.enterprise.lang-model</dependencySourceExclude>
+                    <dependencySourceExclude>jakarta.el:jakarta.el-api</dependencySourceExclude>
+                    <dependencySourceExclude>org.apache.activemq:artemis-journal</dependencySourceExclude>
                   </dependencySourceExcludes>
                 </configuration>
               </execution>
@@ -468,9 +407,8 @@
           <systemPath>${orson.jar.location}/orson-0.5.0.jar</systemPath>
         </dependency>
         <dependency>
-          <groupId>jfree</groupId>
+          <groupId>org.jfree</groupId>
           <artifactId>jfreechart</artifactId>
-          <version>${version.jfree}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>

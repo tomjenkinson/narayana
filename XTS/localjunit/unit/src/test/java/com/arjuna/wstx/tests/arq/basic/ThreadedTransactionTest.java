@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wstx.tests.arq.basic;
 
 import org.jboss.arquillian.container.test.api.Deployment;

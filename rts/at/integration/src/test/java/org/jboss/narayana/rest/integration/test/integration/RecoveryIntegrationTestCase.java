@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.narayana.rest.integration.test.integration;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -17,11 +21,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonString;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonString;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.Response;
 import java.io.File;
 
 /**

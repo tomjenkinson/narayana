@@ -1,9 +1,13 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.star.client;
 
 import org.jboss.jbossts.star.client.extended.txstatusext.TransactionManagerElement;
 import org.jboss.jbossts.star.client.extended.txstatusext.TransactionStatisticsElement;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 

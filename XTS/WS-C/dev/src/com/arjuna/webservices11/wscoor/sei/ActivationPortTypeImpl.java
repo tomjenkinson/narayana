@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.webservices11.wscoor.sei;
 
 import com.arjuna.webservices11.wscoor.processors.ActivationCoordinatorProcessor;
@@ -7,14 +11,14 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.ActivationPortType;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CreateCoordinationContextType;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CreateCoordinationContextResponseType;
 
-import javax.annotation.Resource;
-import javax.jws.*;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.Action;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.Addressing;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.jws.*;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2009,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package org.jboss.jbossts.xts.servicetests.service.subordinate;
 
@@ -27,13 +12,13 @@ import org.jboss.jbossts.xts.servicetests.generated.CommandsType;
 import org.jboss.jbossts.xts.servicetests.generated.XTSServiceTestPortType;
 import org.jboss.jbossts.xts.servicetests.service.XTSServiceTestInterpreter;
 
-import javax.jws.*;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.jws.*;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 

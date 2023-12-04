@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.narayana.compensations.internal;
 
 import org.jboss.narayana.compensations.api.CompensationHandler;

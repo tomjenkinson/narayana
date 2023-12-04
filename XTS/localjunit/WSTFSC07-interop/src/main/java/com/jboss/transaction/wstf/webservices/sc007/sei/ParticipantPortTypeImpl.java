@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2007, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.jboss.transaction.wstf.webservices.sc007.sei;
 
 import com.jboss.transaction.wstf.webservices.sc007.processors.ParticipantProcessor;
@@ -28,15 +13,15 @@ import org.jboss.ws.api.addressing.MAP;
 import com.arjuna.webservices11.SoapFault11;
 import com.arjuna.wsc11.messaging.MessageId;
 
-import javax.jws.*;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.handler.MessageContext;
-import javax.annotation.Resource;
+import jakarta.jws.*;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.annotation.Resource;
 
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 import org.xmlsoap.schemas.soap.envelope.Fault;

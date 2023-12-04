@@ -1,43 +1,19 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2002,
- *
- * Hewlett-Packard Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: TransactionImple.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate;
 
 import java.io.IOException;
 
-import javax.transaction.HeuristicCommitException;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
+import jakarta.transaction.HeuristicCommitException;
+import jakarta.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.SystemException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
@@ -80,10 +56,10 @@ public class TransactionImple extends
 	 * back directly, should fail.
 	 */
 
-	public void commit () throws javax.transaction.RollbackException,
-			javax.transaction.HeuristicMixedException,
-			javax.transaction.HeuristicRollbackException,
-			java.lang.SecurityException, javax.transaction.SystemException,
+	public void commit () throws jakarta.transaction.RollbackException,
+			jakarta.transaction.HeuristicMixedException,
+			jakarta.transaction.HeuristicRollbackException,
+			java.lang.SecurityException, jakarta.transaction.SystemException,
 			java.lang.IllegalStateException
 	{
 		throw new IllegalStateException( jtaLogger.i18NLogger.get_transaction_arjunacore_subordinate_invalidstate() );
@@ -95,7 +71,7 @@ public class TransactionImple extends
 	 */
 
 	public void rollback () throws java.lang.IllegalStateException,
-			java.lang.SecurityException, javax.transaction.SystemException
+			java.lang.SecurityException, jakarta.transaction.SystemException
 	{
 		throw new InvalidTerminationStateException( jtaLogger.i18NLogger.get_transaction_arjunacore_subordinate_invalidstate() );
 	}
@@ -133,7 +109,7 @@ public class TransactionImple extends
 
 	public boolean doCommit () throws IllegalStateException,
 			HeuristicMixedException, HeuristicRollbackException,
-			javax.transaction.SystemException
+			jakarta.transaction.SystemException
 	{
 		try
 		{
@@ -247,7 +223,7 @@ public class TransactionImple extends
 	}
 
 	public void doOnePhaseCommit () throws IllegalStateException,
-			javax.transaction.HeuristicMixedException, javax.transaction.SystemException, RollbackException
+			jakarta.transaction.HeuristicMixedException, jakarta.transaction.SystemException, RollbackException
 	{
 		try
 		{
@@ -266,7 +242,7 @@ public class TransactionImple extends
 				break;
 			case ActionStatus.H_COMMIT:
 				TransactionImple.removeTransaction(this);
-				throw new javax.transaction.HeuristicMixedException(jtaLogger.i18NLogger.get_onephase_heuristic_commit_failure(super._theTransaction));
+				throw new jakarta.transaction.HeuristicMixedException(jtaLogger.i18NLogger.get_onephase_heuristic_commit_failure(super._theTransaction));
 			case ActionStatus.ABORTED:
 	                 case ActionStatus.ABORTING:
 	                 case ActionStatus.H_ROLLBACK:
@@ -279,7 +255,7 @@ public class TransactionImple extends
 			case ActionStatus.H_HAZARD:
 			case ActionStatus.H_MIXED:
 			default:
-				throw new javax.transaction.HeuristicMixedException();
+				throw new jakarta.transaction.HeuristicMixedException();
 			}
 		}
 		catch (ClassCastException ex)
@@ -292,7 +268,7 @@ public class TransactionImple extends
 		}
 	}
 	
-	public boolean doBeforeCompletion () throws javax.transaction.SystemException
+	public boolean doBeforeCompletion () throws jakarta.transaction.SystemException
 	{
 	    try
 	    {
@@ -323,10 +299,10 @@ public class TransactionImple extends
 	}
 
 	protected void commitAndDisassociate ()
-			throws javax.transaction.RollbackException,
-			javax.transaction.HeuristicMixedException,
-			javax.transaction.HeuristicRollbackException,
-			java.lang.SecurityException, javax.transaction.SystemException,
+			throws jakarta.transaction.RollbackException,
+			jakarta.transaction.HeuristicMixedException,
+			jakarta.transaction.HeuristicRollbackException,
+			java.lang.SecurityException, jakarta.transaction.SystemException,
 			java.lang.IllegalStateException
 	{
 		throw new InvalidTerminationStateException();
@@ -334,7 +310,7 @@ public class TransactionImple extends
 
 	protected void rollbackAndDisassociate ()
 			throws java.lang.IllegalStateException,
-			java.lang.SecurityException, javax.transaction.SystemException
+			java.lang.SecurityException, jakarta.transaction.SystemException
 	{
 		throw new InvalidTerminationStateException();
 	}

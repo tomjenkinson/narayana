@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- * 
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2005,
- *
- * Arjuna Technologies Ltd,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: WSTLogger.java,v 1.1.2.1 2005/11/22 10:35:00 kconner Exp $
- */
+
+
 
 package com.arjuna.webservices.logging;
 
@@ -37,7 +13,7 @@ import org.jboss.logging.Logger;
 import org.jboss.ws.api.addressing.MAP;
 import org.oasis_open.docs.ws_tx.wsat._2006._06.Notification;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 public class WSTLogger
 {
@@ -72,7 +48,7 @@ public class WSTLogger
         if (inboundMap != null) {
             StringBuilder referenceParameters = new StringBuilder();
             if (inboundMap.getReferenceParameters() != null) {
-                inboundMap.getReferenceParameters().stream().filter(t -> t instanceof javax.xml.bind.JAXBElement)
+                inboundMap.getReferenceParameters().stream().filter(t -> t instanceof jakarta.xml.bind.JAXBElement)
                         .forEach(t -> {
                             JAXBElement jaxb = (JAXBElement) t;
                             referenceParameters.append("(name:").append(jaxb.getName()).append(",value:").append(jaxb.getValue()).append(");");

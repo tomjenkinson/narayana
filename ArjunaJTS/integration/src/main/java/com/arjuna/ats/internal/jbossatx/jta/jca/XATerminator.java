@@ -1,43 +1,19 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2005,
- *
- * Arjuna Technologies Ltd.
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id$
- */
+
+
 
 package com.arjuna.ats.internal.jbossatx.jta.jca;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkCompletedException;
-import javax.resource.spi.work.WorkException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
+import jakarta.resource.spi.work.Work;
+import jakarta.resource.spi.work.WorkCompletedException;
+import jakarta.resource.spi.work.WorkException;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.Status;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 

@@ -1,26 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * (C) 2007, 2009 @author JBoss Inc
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package org.jboss.jbossts.txbridge.inbound;
 
 import com.arjuna.ats.jta.xa.XATxConverter;
@@ -72,7 +54,7 @@ public class InboundBridgeManager
      */
     public static InboundBridge getInboundBridge()
             throws XAException, WrongStateException, UnknownTransactionException,
-            com.arjuna.wst.SystemException, javax.transaction.SystemException, AlreadyRegisteredException
+            com.arjuna.wst.SystemException, jakarta.transaction.SystemException, AlreadyRegisteredException
     {
         txbridgeLogger.logger.trace("InboundBridgeManager.getInboundBridge()");
 
@@ -134,7 +116,7 @@ public class InboundBridgeManager
      */
     private static synchronized void createMapping(String externalTxId, int timeout)
             throws XAException, WrongStateException, UnknownTransactionException,
-            com.arjuna.wst.SystemException, javax.transaction.SystemException, AlreadyRegisteredException
+            com.arjuna.wst.SystemException, jakarta.transaction.SystemException, AlreadyRegisteredException
     {
         txbridgeLogger.logger.trace("InboundBridgeManager.createMapping(externalTxId="+externalTxId+")");
 

@@ -1,100 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
-	LLC, and others contributors as indicated by the @authors tag. All rights 
-	reserved. See the copyright.txt in the distribution for a full listing of 
-	individual contributors. This copyrighted material is made available to anyone 
-	wishing to use, modify, copy, or redistribute it subject to the terms and 
-	conditions of the GNU Lesser General Public License, v. 2.1. This program 
-	is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
-	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-	PURPOSE. See the GNU Lesser General Public License for more details. You 
-	should have received a copy of the GNU Lesser General Public License, v.2.1 
-	along with this distribution; if not, write to the Free Software Foundation, 
-	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana</groupId>
     <artifactId>narayana-all</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>qa</artifactId>
   <packaging>jar</packaging>
   <name>Narayana: qa</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom-test</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging}</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.transaction</groupId>
-      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-      <version>1.0.0.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
-    </dependency>
-    <dependency>
-      <groupId>jboss.profiler.jvmti</groupId>
-      <artifactId>jboss-profiler-jvmti</artifactId>
-      <version>1.0.0.CR5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>${version.org.apache.ant}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <version>${version.javax.javaee-api}</version>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-journal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-transaction-spi</artifactId>
-      <version>${version.org.jboss.jboss-transaction-spi}</version>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.openjdk-orb</groupId>
+      <artifactId>openjdk-orb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.openjdk-orb</groupId>
+      <artifactId>openjdk-orb</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>jboss.profiler.jvmti</groupId>
+      <artifactId>jboss-profiler-jvmti</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.ant</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ant-contrib</groupId>
+      <artifactId>ant-contrib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.messaging.mq</groupId>
+      <artifactId>fscontext</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
+
+    <!-- Narayana Dependencies -->
     <dependency>
       <groupId>org.jboss.narayana.jts</groupId>
       <artifactId>narayana-jts-idlj</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>narayana-jts-integration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>jts</artifactId>
+      <classifier>test-sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>idlj-idl-openjdk</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>idlj-idl-openjdk</artifactId>
+      <classifier>test-sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jts</groupId>
+      <artifactId>idlj-idl-openjdk</artifactId>
+      <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>test-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>common</artifactId>
+      <classifier>test-sources</classifier>
+    </dependency>
+
+    <!-- JDBC Drivers -->
+
+    <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc8</artifactId>
-      <version>${version.com.oracle}</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>${version.postgresql}</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>${version.mysql}</version>
     </dependency>
     <dependency>
       <groupId>com.ibm.db2</groupId>
       <artifactId>jcc</artifactId>
-      <version>${version.com.ibm}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.openjdk-orb</groupId>
-      <artifactId>openjdk-orb</artifactId>
-      <version>${version.org.jboss.openjdk-orb}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.openjdk-orb</groupId>
-      <artifactId>openjdk-orb</artifactId>
-      <version>${version.org.jboss.openjdk-orb}</version>
-      <classifier>sources</classifier>
     </dependency>
   </dependencies>
 
@@ -152,18 +196,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
 
         <configuration>
-          <excludeGroupIds>org.jboss.spec.javax.transaction,
-            junit,
-            jboss.profiler.jvmti,
-            org.apache.ant,
-            javax,
-            org.jboss.narayana,
-            com.oracle.database.jdbc,
-            org.postgresql,
-            mysql,
-            com.ibm.db2</excludeGroupIds>
-          <excludeArtifactIds>jboss-transaction-spi</excludeArtifactIds>
-          <outputDirectory>./ext</outputDirectory>
           <overWriteReleases>false</overWriteReleases>
           <overWriteSnapshots>false</overWriteSnapshots>
           <overWriteIfNewer>true</overWriteIfNewer>
@@ -171,22 +203,48 @@
           <stripVersion>true</stripVersion>
         </configuration>
 
-        <!--
-          Drivers of the used databases are downloaded directly from Maven repositories.
-          The consumer of these drivers is the ant script "run-tests.xml", which is also
-          the main script to run all tests in the QA module. The main reason to use DBs in
-          the QA module is to test Narayana with different kinds of Object Stores
-         -->
         <executions>
+          <!--
+            Drivers of the used databases are downloaded directly from Maven repositories.
+            The consumer of these drivers is the ant script "run-tests.xml", which is also
+            the main script to run all tests in the QA module. The main reason to use DBs in
+            the QA module is to test Narayana with different kinds of Object Stores
+         -->
           <execution>
+            <id>JDBCDrivers</id>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
             <phase>install</phase>
             <configuration>
               <excludeGroupIds>*</excludeGroupIds>
-              <outputDirectory>${project.build.directory}/../dbdrivers</outputDirectory>
+              <outputDirectory>${project.basedir}/dbdrivers</outputDirectory>
               <includeArtifactIds>ojdbc8, postgresql, mysql-connector-java, jcc</includeArtifactIds>
+            </configuration>
+          </execution>
+          <execution>
+            <id>Dependencies</id>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <phase>install</phase>
+            <configuration>
+              <excludeArtifactIds>ojdbc8, postgresql, mysql-connector-java, jcc</excludeArtifactIds>
+              <outputDirectory>${project.basedir}/ext</outputDirectory>
+            </configuration>
+          </execution>
+          <!-- Transitive dependencies are also copied as ant needs to have these jars in its classpath -->
+          <!-- This execution can be removed ONLY if ant is replaced with maven -->
+          <execution>
+            <id>TransitiveDependencies</id>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <phase>install</phase>
+            <configuration>
+              <excludeTransitive>false</excludeTransitive>
+              <includeGroupIds>org.slf4j, jakarta.transaction, org.hamcrest, org.apache.activemq, io.netty, org.jacoco, org.jboss.narayana.jts</includeGroupIds>
+              <outputDirectory>${project.basedir}/ext</outputDirectory>
             </configuration>
           </execution>
         </executions>

@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2021, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package io.narayana.lra.coordinator.domain.model;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
@@ -46,25 +30,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -326,6 +310,16 @@ public class LRATest {
         }
     }
 
+    @ApplicationPath("/")
+    public static class LRACoordinator extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            HashSet<Class<?>> classes = new HashSet<>();
+            classes.add(Coordinator.class);
+            return classes;
+        }
+    }
+
     @BeforeClass
     public static void start() {
         System.setProperty("lra.coordinator.url", TestPortProvider.generateURL('/' + COORDINATOR_PATH_NAME));
@@ -345,7 +339,7 @@ public class LRATest {
 
         client = ClientBuilder.newClient();
         coordinatorPath = TestPortProvider.generateURL('/' + COORDINATOR_PATH_NAME);
-        server.deploy(Coordinator.class);
+        server.deploy(LRACoordinator.class);
         server.deployOldStyle(LRAParticipant.class);
 
         service = LRARecoveryModule.getService();
@@ -399,6 +393,28 @@ public class LRATest {
         assertEquals(completions + 1, completeCount.get());
         LRAStatus status = getStatus(new URI(lraId));
         assertTrue("LRA should have closed", status == null || status == LRAStatus.Closed);
+    }
+
+    /**
+     * Run a loop of LRAs so that a debugger can watch memory
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testForLeaks() throws URISyntaxException {
+        int txnCount = 10;
+        // verify that the participant complete request is issued when a method annotated with @LRA returns
+        int completions = completeCount.get();
+
+        // start some LRAs
+        for (int i = 0; i < txnCount; i++) {
+            String lraId = client.target(TestPortProvider.generateURL("/base/test/start-end")).request().get(String.class);
+            LRAStatus status = getStatus(new URI(lraId));
+            assertTrue("LRA should have closed", status == null || status == LRAStatus.Closed);
+        }
+
+        // Remark: there should be no memory leaks in LRAService
+
+        assertEquals(completions + txnCount, completeCount.get());
     }
 
     /**

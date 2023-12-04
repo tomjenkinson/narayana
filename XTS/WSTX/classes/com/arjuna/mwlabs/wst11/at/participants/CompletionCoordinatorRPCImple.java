@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.mwlabs.wst11.at.participants;
 
 import com.arjuna.mw.wsas.activity.ActivityHierarchy;
@@ -9,7 +13,7 @@ import com.arjuna.wst.TransactionRolledBackException;
 import com.arjuna.wst.UnknownTransactionException;
 import com.arjuna.wst11.CompletionCoordinatorParticipant;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 /**
  * Created by IntelliJ IDEA.

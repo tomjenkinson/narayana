@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.mwlabs.wst11.at.remote;
 
 import com.arjuna.mw.wst11.TransactionManager;
@@ -18,8 +22,8 @@ import com.arjuna.wst11.messaging.engines.ParticipantEngine;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 /**
  * This is the interface that the core exposes in order to allow different types

@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2002,
- *
- * Hewlett-Packard Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: BaseTransaction.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.arjuna.ats.internal.jta.transaction.arjunacore;
 
@@ -40,8 +16,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.NotSupportedException;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.coordinator.TxControl;
@@ -51,8 +27,8 @@ import com.arjuna.ats.jta.logging.jtaLogger;
 public class BaseTransaction
 {
 
-	public void begin() throws javax.transaction.NotSupportedException,
-			javax.transaction.SystemException
+	public void begin() throws jakarta.transaction.NotSupportedException,
+			jakarta.transaction.SystemException
 	{
 		if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("BaseTransaction.begin");
@@ -78,7 +54,7 @@ public class BaseTransaction
 		    }
 		    catch (Exception e2)
 		    {
-		        javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+		        jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(
 		                e2.toString());
 		        systemException.initCause(e2);
 		        throw systemException;
@@ -108,11 +84,11 @@ public class BaseTransaction
 	 * a differentiation.
 	 */
 
-	public void commit() throws javax.transaction.RollbackException,
-			javax.transaction.HeuristicMixedException,
-			javax.transaction.HeuristicRollbackException,
+	public void commit() throws jakarta.transaction.RollbackException,
+			jakarta.transaction.HeuristicMixedException,
+			jakarta.transaction.HeuristicRollbackException,
 			java.lang.SecurityException, java.lang.IllegalStateException,
-			javax.transaction.SystemException
+			jakarta.transaction.SystemException
 	{
 		if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("BaseTransaction.commit");
@@ -129,7 +105,7 @@ public class BaseTransaction
 	}
 
 	public void rollback() throws java.lang.IllegalStateException,
-			java.lang.SecurityException, javax.transaction.SystemException
+			java.lang.SecurityException, jakarta.transaction.SystemException
 	{
 		if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("BaseTransaction.rollback");
@@ -146,7 +122,7 @@ public class BaseTransaction
 	}
 
 	public void setRollbackOnly() throws java.lang.IllegalStateException,
-			javax.transaction.SystemException
+			jakarta.transaction.SystemException
 	{
 		if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("BaseTransaction.setRollbackOnly");
@@ -161,18 +137,18 @@ public class BaseTransaction
 		theTransaction.setRollbackOnly();
 	}
 
-	public int getStatus() throws javax.transaction.SystemException
+	public int getStatus() throws jakarta.transaction.SystemException
 	{
 		TransactionImple theTransaction = TransactionImple.getTransaction();
 
 		if (theTransaction == null)
-			return javax.transaction.Status.STATUS_NO_TRANSACTION;
+			return jakarta.transaction.Status.STATUS_NO_TRANSACTION;
 		else
 			return theTransaction.getStatus();
 	}
 
 	public void setTransactionTimeout(int seconds)
-			throws javax.transaction.SystemException
+			throws jakarta.transaction.SystemException
 	{
 		if (seconds > 0)
 		{
@@ -184,7 +160,7 @@ public class BaseTransaction
 		}
 	}
 
-	public int getTimeout() throws javax.transaction.SystemException
+	public int getTimeout() throws jakarta.transaction.SystemException
 	{
 		Integer value = _timeouts.get();
 
@@ -206,7 +182,7 @@ public class BaseTransaction
 			return "Transaction: " + theTransaction;
 	}
 
-	public TransactionImple createSubordinate () throws javax.transaction.NotSupportedException, javax.transaction.SystemException
+	public TransactionImple createSubordinate () throws jakarta.transaction.NotSupportedException, jakarta.transaction.SystemException
 	{
 		if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("BaseTransaction.createSubordinate");
@@ -224,7 +200,7 @@ public class BaseTransaction
 		}
 		catch (Exception e2)
 		{
-            javax.transaction.SystemException systemException = new javax.transaction.SystemException(e2.toString());
+            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e2.toString());
             systemException.initCause(e2);
             throw systemException;
 		}
@@ -252,7 +228,7 @@ public class BaseTransaction
 	 */
 
 	final void checkTransactionState() throws IllegalStateException,
-			javax.transaction.SystemException
+			jakarta.transaction.SystemException
 	{
 		// ok, no transaction currently associated with thread.
 
@@ -262,7 +238,7 @@ public class BaseTransaction
 			return;
 		else
 		{
-			if ((theTransaction.getStatus() != javax.transaction.Status.STATUS_NO_TRANSACTION)
+			if ((theTransaction.getStatus() != jakarta.transaction.Status.STATUS_NO_TRANSACTION)
 					&& !_supportSubtransactions)
 			{
 				throw new IllegalStateException(
@@ -284,11 +260,11 @@ public class BaseTransaction
 
 		return wrap(new Callable<Void>() {
 			public Void call() throws InvalidTransactionException,
-					javax.transaction.RollbackException,
-					javax.transaction.HeuristicMixedException,
-					javax.transaction.HeuristicRollbackException,
+					jakarta.transaction.RollbackException,
+					jakarta.transaction.HeuristicMixedException,
+					jakarta.transaction.HeuristicRollbackException,
 					java.lang.SecurityException,
-					javax.transaction.SystemException,
+					jakarta.transaction.SystemException,
 					java.lang.IllegalStateException {
 				if (AtomicAction.suspend() != null) {
 					System.err

@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates,
- * and individual contributors as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2011,
- * @author JBoss, by Red Hat.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package org.jboss.jbossts.qa.DefaultTimeout;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
@@ -25,9 +10,9 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
-import javax.transaction.RollbackException;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.RollbackException;
 
 /**
  * Test default timeout causes rollback by the reaper.

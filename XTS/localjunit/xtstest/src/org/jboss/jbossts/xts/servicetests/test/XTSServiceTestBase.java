@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.xts.servicetests.test;
 
 import org.jboss.jbossts.xts.servicetests.service.XTSServiceTestInterpreter;

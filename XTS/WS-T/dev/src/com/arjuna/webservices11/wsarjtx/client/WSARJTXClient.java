@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.webservices11.wsarjtx.client;
 
 import com.arjuna.schemas.ws._2005._10.wsarjtx.*;
@@ -7,9 +11,9 @@ import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 import org.jboss.ws.api.addressing.MAP;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import java.util.Map;
 import org.w3c.dom.Element;
 

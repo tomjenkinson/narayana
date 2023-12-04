@@ -1,32 +1,18 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package org.jboss.narayana.compensations.internal;
 
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.Extension;
+
+import org.jboss.narayana.compensations.api.CompensatableAction;
 
 
 /**
@@ -43,22 +29,26 @@ public class CompensationsCDIExtension implements Extension {
     public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {
 
         //Current API
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationManagerImpl.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorMandatory.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorNever.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorNotSupported.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorRequired.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorRequiresNew.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorSupports.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(TxCompensateInterceptor.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(TxConfirmInterceptor.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(TxLoggedInterceptor.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CancelOnFailureInterceptor.class));
-        bbd.addAnnotatedType(bm.createAnnotatedType(CompensatableActionProducer.class));
+        addAnnotatedType(bbd, bm, CompensationManagerImpl.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorMandatory.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorNever.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorNotSupported.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorRequired.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorRequiresNew.class);
+        addAnnotatedType(bbd, bm, CompensationInterceptorSupports.class);
+        addAnnotatedType(bbd, bm, TxCompensateInterceptor.class);
+        addAnnotatedType(bbd, bm, TxConfirmInterceptor.class);
+        addAnnotatedType(bbd, bm, TxLoggedInterceptor.class);
+        addAnnotatedType(bbd, bm, CancelOnFailureInterceptor.class);
+        addAnnotatedType(bbd, bm, CompensatableActionImpl.class);
     }
 
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
 
         event.addContext(new CompensationContext());
+    }
+
+    private static void addAnnotatedType(final BeforeBeanDiscovery bbd, final BeanManager bm, final Class<?> type) {
+        bbd.addAnnotatedType(bm.createAnnotatedType(type), type.getName() + "-tx-compensations");
     }
 }

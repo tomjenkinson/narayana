@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.qa.CrashRecovery05Clients1;
 
 import org.jboss.jbossts.qa.CrashRecovery05.BeforeCrashService;

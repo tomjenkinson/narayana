@@ -1,10 +1,14 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.narayana.rest.bridge.inbound.test.common;
 
-import javax.transaction.SystemException;
-import javax.transaction.Transactional;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>

@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 
 package org.jboss.jbossts.xts.servicetests.generated;
 
@@ -5,9 +9,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebEndpoint;
-import javax.xml.ws.WebServiceClient;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebEndpoint;
+import jakarta.xml.ws.WebServiceClient;
 
 
 /**

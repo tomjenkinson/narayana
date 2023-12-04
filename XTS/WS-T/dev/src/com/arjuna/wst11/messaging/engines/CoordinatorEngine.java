@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wst11.messaging.engines;
 
 import com.arjuna.webservices.SoapFault;
@@ -18,7 +22,7 @@ import com.arjuna.wsc11.messaging.MessageId;
 import org.oasis_open.docs.ws_tx.wsat._2006._06.Notification;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import java.util.TimerTask;
 
 /**

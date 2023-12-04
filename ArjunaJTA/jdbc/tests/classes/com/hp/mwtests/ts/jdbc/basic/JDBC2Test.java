@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 1998, 1999, 2000,
- *
- * Arjuna Solutions Limited,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: JDBC2Test.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.hp.mwtests.ts.jdbc.basic;
 
@@ -43,12 +19,12 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import javax.sql.XADataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
+import jakarta.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.SystemException;
 
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
 import org.h2.Driver;
@@ -81,7 +57,7 @@ public class JDBC2Test
             }
         }
 
-        javax.transaction.TransactionManager tx = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jakarta.transaction.TransactionManager tx = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tx.begin();
 
@@ -162,7 +138,7 @@ public class JDBC2Test
                 stmt.executeUpdate("CREATE TABLE test_table (a INTEGER,b INTEGER)");
                 stmt.executeUpdate("CREATE TABLE test_table2 (a INTEGER,b INTEGER)");
 
-        javax.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
+        jakarta.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
         try
         {
@@ -400,7 +376,7 @@ public class JDBC2Test
     @Test
     public void testCloseUsed() throws Exception {
         conn.close();
-        javax.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
+        jakarta.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
         assertTrue(conn.isClosed());
 

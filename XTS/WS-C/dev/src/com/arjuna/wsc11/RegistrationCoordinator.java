@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wsc11;
 
 import com.arjuna.webservices.SoapFault;
@@ -11,10 +15,10 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.RegisterType;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.RegistrationPortType;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.soap.Detail;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.jboss.jbossts.xts.environment.WSCEnvironmentBean;

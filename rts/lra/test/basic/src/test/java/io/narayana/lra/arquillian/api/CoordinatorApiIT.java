@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2021, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package io.narayana.lra.arquillian.api;
 
@@ -36,12 +20,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -579,7 +563,8 @@ public class CoordinatorApiIT extends TestBase {
                 .path(encodedLraId)
                 .request()
                 .header(LRA_API_VERSION_HEADER_NAME, version)
-                .put(Entity.text("http://compensator.url:8080"))) {
+                // the request body should correspond to a valid compensator or be empty
+                .put(Entity.text(""))) {
             Assert.assertEquals("Expected joining LRA succeeded, PUT/200 is expected.",
                     Status.OK.getStatusCode(), response.getStatus());
             Assert.assertEquals("Expected API header to be returned with the version provided in request",
@@ -720,7 +705,8 @@ public class CoordinatorApiIT extends TestBase {
                 .path(notExistingLRAid)
                 .request()
                 .header(LRA_API_VERSION_HEADER_NAME, version)
-                .put(Entity.text("http://localhost:8080"))) {
+                // the request body should correspond to a valid compensator or be empty
+                .put(Entity.text(""))) {
             Assert.assertEquals("Expected the join failing on unknown LRA id, PUT/404 is expected.",
                     Status.NOT_FOUND.getStatusCode(), response.getStatus());
             Assert.assertEquals("Expected API header to be returned with the version provided in request",
@@ -743,7 +729,7 @@ public class CoordinatorApiIT extends TestBase {
                 .path(encodedLraId)
                 .request()
                 .header(LRA_API_VERSION_HEADER_NAME, version)
-                .put(Entity.text("this-is-not-an-url::::"))) {
+                .put(Entity.text("this-is-not-a-valid-url::::"))) {
             Assert.assertEquals("Expected the join failing on wrong compensator data format, PUT/412 is expected.",
                     Status.PRECONDITION_FAILED.getStatusCode(), response.getStatus());
             Assert.assertEquals("Expected API header to be returned with the version provided in request",
@@ -786,7 +772,7 @@ public class CoordinatorApiIT extends TestBase {
     public void leaveLRA() throws UnsupportedEncodingException {
         URI lraId = lraClient.startLRA(testRule.getMethodName());
         lrasToAfterFinish.add(lraId);
-        URI recoveryUri = lraClient.joinLRA(lraId, 0L, URI.create("http://localhost:8080"), "");
+        URI recoveryUri = lraClient.joinLRA(lraId, 0L, URI.create("http://localhost:8080"), new StringBuilder());
 
         String encodedLRAId = URLEncoder.encode(lraId.toString(), StandardCharsets.UTF_8.name());
         try (Response response = client.target(coordinatorUrl)

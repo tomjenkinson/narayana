@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wstx.tests.common;
 
 import java.net.MalformedURLException;
@@ -6,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.handler.Handler;
 
 import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
 import com.arjuna.mw.wst11.client.WSTXFeature;

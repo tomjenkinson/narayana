@@ -1,22 +1,8 @@
 /*
- * Copyright 2013, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2013
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.hp.mwtests.ts.jta.commitmarkable;
 
 import static org.junit.Assert.assertFalse;
@@ -60,7 +46,7 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends
 	public void testFailAfterPrepare() throws Exception {
 		final DataSource dataSource = new JdbcDataSource();
 		((JdbcDataSource) dataSource)
-				.setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+				.setURL("jdbc:h2:mem:JBTMDB;DB_CLOSE_DELAY=-1");
 
 		// Test code
 		Utils.createTables(dataSource.getConnection());
@@ -102,7 +88,7 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends
 			public void run() {
 
 				try {
-					javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+					jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
 							.transactionManager();
 
 					tm.begin();

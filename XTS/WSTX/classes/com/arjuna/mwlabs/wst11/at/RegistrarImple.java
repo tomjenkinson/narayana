@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.mwlabs.wst11.at;
 
 import com.arjuna.ats.arjuna.common.Uid;
@@ -27,8 +31,8 @@ import com.arjuna.wst11.stub.Volatile2PCStub;
 import com.arjuna.wsc11.RegistrarMapper;
 import com.arjuna.wsc11.Registrar;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RegistrarImple implements Registrar

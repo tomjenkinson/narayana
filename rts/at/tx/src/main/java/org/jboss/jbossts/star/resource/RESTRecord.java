@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2010
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package org.jboss.jbossts.star.resource;
 
 import java.net.HttpURLConnection;
@@ -150,8 +135,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
     private void check_suspend(Fault f) {
         if (fault.equals(f))
         {
-            try
-            {
+            try {
                 log.infof("%s: for 10 seconds", f);
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -212,8 +196,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
         if (prepareURI == null || txId == null)
             return TwoPhaseOutcome.PREPARE_READONLY;
 
-        try
-        {
+        try {
             String body = new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK}, this.prepareURI, "PUT",
                     TxMediaType.TX_STATUS_MEDIA_TYPE, TxSupport.toStatusContent(TxStatus.TransactionPrepared.name()));
 
@@ -308,8 +291,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
         String commitUri = (nextState == TxStatus.TransactionCommittedOnePhase && this.commitOnePhaseURI != null)
             ? this.commitOnePhaseURI : this.commitURI;
 
-        try
-        {
+        try {
             if (log.isTraceEnabled())
                 log.tracef("committing %s", commitUri);
 
@@ -374,8 +356,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
                     return false;
                 }
 
-                try
-                {
+                try {
                     TxSupport.getStatus(new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK},
                             uri, "PUT", TxMediaType.TX_STATUS_MEDIA_TYPE,
                             TxSupport.toStatusContent(nextState.name())));
@@ -407,8 +388,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
      * @return true if the participant did move
      */
     private boolean hasParticipantMoved() {
-        try
-        {
+        try {
             if (log.isTraceEnabled())
                 log.tracef("seeing if participant has moved: %s  recoveryURI: %s", coordinatorID, recoveryURI);
 
@@ -476,8 +456,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
     }
 
     public boolean save_state(OutputObjectState os, int t) {
-        try
-        {
+        try {
             os.packString(txId);
             os.packBoolean(prepared);
             os.packString(participantURI);
@@ -501,8 +480,7 @@ public class RESTRecord extends AbstractRecord implements Comparable {
     }
 
     public boolean restore_state(InputObjectState os, int t) {
-        try
-        {
+        try {
             txId = os.unpackString();
             prepared = os.unpackBoolean();
             participantURI = os.unpackString();

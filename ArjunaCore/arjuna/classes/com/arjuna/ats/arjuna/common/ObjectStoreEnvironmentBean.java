@@ -1,22 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2009,
- * @author JBoss, a division of Red Hat.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
 package com.arjuna.ats.arjuna.common;
 
@@ -30,6 +14,8 @@ import com.arjuna.ats.internal.arjuna.objectstore.HashedStore;
 import com.arjuna.ats.internal.arjuna.objectstore.ShadowNoFileLockStore;
 import com.arjuna.common.internal.util.propertyservice.FullPropertyName;
 import com.arjuna.common.internal.util.propertyservice.PropertyPrefix;
+
+import javax.sql.DataSource;
 
 /**
  * A JavaBean containing configuration properties for the objectstore and various implementations thereof.
@@ -77,6 +63,8 @@ public class ObjectStoreEnvironmentBean implements ObjectStoreEnvironmentBeanMBe
     private volatile boolean androidDirCheck = false;
     
 	private volatile String jdbcAccess;
+
+	private DataSource jdbcStoreDataSource;
 
 	private volatile String tablePrefix;
 
@@ -703,6 +691,28 @@ public class ObjectStoreEnvironmentBean implements ObjectStoreEnvironmentBeanMBe
 	 */
 	public void setJdbcAccess(String connectionDetails) {
 		jdbcAccess = connectionDetails;
+	}
+
+	/**
+	 * Set a DataSource to be used for the JDBCStore.
+	 *
+	 * This property takes precedence over the property {@link ObjectStoreEnvironmentBean#jdbcAccess}
+	 *
+	 * To avoid automatic schema modifications set the following config properties to
+	 * false, false and null respectively:
+	 *
+	 * {@link ObjectStoreEnvironmentBean#setCreateTable(boolean)},
+	 * {@link ObjectStoreEnvironmentBean#setDropTable(boolean)},
+	 * {@link ObjectStoreEnvironmentBean#setTablePrefix(String)}.
+	 *
+	 * @param jdbcStoreDataSource A configured instance of javax.sql.DataSource
+	 */
+	public void setJdbcDataSource(DataSource jdbcStoreDataSource) {
+		this.jdbcStoreDataSource = jdbcStoreDataSource;
+	}
+
+	public DataSource getJdbcDataSource() {
+		return jdbcStoreDataSource;
 	}
 
 	/**

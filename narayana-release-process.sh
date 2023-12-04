@@ -47,15 +47,32 @@ if [[ $ENVOK == n* ]]
 then
   exit
 fi
+read -p "By default you will need the ability to upload to a server for hosting the website and downloads. Do you have this (if you have access but don't want to upload, answer n* and then the next question)?" RSYNCOK
+if [[ $RSYNCOK != n* ]]
+then
+  RSYNC_ENABLED="true"
+else
+  read -p "Do you want to continue without uploading the website?" NORSYNC
+  if [[ $NORSYNC == n* ]]
+  then
+    exit
+  fi
+  RSYNC_ENABLED="false"
+fi
 read -p "Have you configured ~/.m2/settings.xml with repository 'jboss-releases-repository' and correct username/password?" M2OK
 if [[ $M2OK == n* ]]
 then
   exit
 fi
-read -p "You will need: docker.io account with permission to push under https://hub.docker.com/u/jbosstm/. Do you have these? y/n: " ENVOK
-if [[ $ENVOK == n* ]]
+read -p "To upload an lra-coordinator image to quay.io you will need a quay.io account with permission to push to jbosstm. Do you have this (if you have access but don't want to upload, answer n* and then the next question)?: " QUAYIOOK
+if [[ $QUAYIOOK == n* ]]
 then
-  exit
+  read -p "Do you want to continue without uploading lra-coordinator image?" NOQUAYIO
+  if [[ $NOQUAYIO == n* ]]
+  then
+    exit
+  fi
+  QUAYIOOK=n
 fi
 read -p "Until ./scripts/release/update_jira.py -k JBTM -t 5.next -n $CURRENT is fixed you will need to go to https://issues.jboss.org/projects/JBTM?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=released-unreleased, rename (Actions -> Edit) 5.next to $CURRENT, create a new 5.next version, Actions -> Release on the new $CURRENT. Have you done this? y/n " JIRAOK
 if [[ $JIRAOK == n* ]]
@@ -63,9 +80,14 @@ then
   exit
 fi
 
-# Do this early to prevent later interactive need
-docker login docker.io
-[ $? -ne 0 ] && echo "Login to docker.io was not succesful" && exit
+if [[ $QUAYIOOK != n* ]]
+then
+  # Do this early to prevent later interactive need
+  echo "logging in to quay.io ..."
+  # log in to quay.io
+  podman login quay.io
+  [ $? -ne 0 ] && echo "Login to quay.io was not succesful" && exit
+fi
 
 #if [ -z "$WFLYISSUE" ]
 #then
@@ -189,7 +211,7 @@ then
   exit
 fi
 git archive -o ../../narayana-full-$CURRENT-src.zip $CURRENT
-ant -f build-release-pkgs.xml -Drsync.host=${RSYNC_HOST} -Dawestruct.executable="awestruct" all
+ant -f build-release-pkgs.xml -Drsync.host=${RSYNC_HOST} -Drsync.enabled=${RSYNC_ENABLED} -Dawestruct.executable="awestruct" all
 if [[ $? != 0 ]]
 then
   echo 1>&2 COULD NOT BUILD Narayana RELEASE PKGS
@@ -206,7 +228,9 @@ then
   exit
 fi
 
-echo "building, tagging and pushing podman images to quay.io ..."
+if [[ $QUAYIOOK != n* ]]
+then
+  echo "building, tagging and pushing podman images to quay.io ..."
 #read -p "Have you logged in (podman login quay.io), if not you will be prompted (y/n): " ok
 #if [[ $ok == y* ]]; then
   # build the lra-coordinator image
@@ -214,9 +238,7 @@ echo "building, tagging and pushing podman images to quay.io ..."
   # tag it and push it
   podman tag lra-coordinator quay.io/jbosstm/lra-coordinator:${CURRENT}
   podman tag lra-coordinator quay.io/jbosstm/lra-coordinator:latest
-  echo "loging in to quay.io ..."
-  # log in to quay.io
-  podman login quay.io
+
   # push the image
   podman push quay.io/jbosstm/lra-coordinator:${CURRENT}
   podman push quay.io/jbosstm/lra-coordinator:latest
@@ -224,6 +246,7 @@ echo "building, tagging and pushing podman images to quay.io ..."
 #else
 #  echo "alternatively run the above commands manually"
 #fi
+fi
 
 # not sure why we need to look at CI at this point so commenting it out
 # xdg-open http://narayanaci1.eng.hst.ams2.redhat.com/ &

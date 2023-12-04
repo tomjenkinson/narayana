@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana.rts</groupId>
     <artifactId>lra-test</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>lra-test-basic</artifactId>
@@ -14,7 +18,6 @@
   <properties>
     <!-- This configuration allows WildFly to be ran with various extra subsystems, including an OpenAPI subsystem -->
     <config.to.replace>standalone-microprofile.xml</config.to.replace>
-    <lra.coordinator.jar.path>${project.basedir}/../../coordinator-quarkus/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
     <skip.wildfly.plugin>false</skip.wildfly.plugin>
   </properties>
 
@@ -22,40 +25,42 @@
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>narayana-lra</artifactId>
-      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-test-arquillian-extension</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.json</groupId>
       <artifactId>jakarta.json-api</artifactId>
-      <version>${version.jakarta.json-api}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${version.fasterxml.jackson}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.glassfish</groupId>
-      <artifactId>javax.json</artifactId>
-      <version>${version.glassfish.json}</version>
+      <artifactId>jakarta.json</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
-      <version>${version.org.jboss.resteasy}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson2-provider</artifactId>
+    </dependency>
+    <!--     jboss-threads version 2.x needed for Junit4 -->
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads</artifactId>
+      <version>2.4.0.Final</version>
+    </dependency>
   </dependencies>
 
 </project>

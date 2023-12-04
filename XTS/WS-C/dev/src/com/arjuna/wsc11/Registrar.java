@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wsc11;
 
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
@@ -6,7 +10,7 @@ import com.arjuna.wsc.InvalidProtocolException;
 import com.arjuna.wsc.InvalidStateException;
 import com.arjuna.wsc.NoActivityException;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 public interface Registrar
 {

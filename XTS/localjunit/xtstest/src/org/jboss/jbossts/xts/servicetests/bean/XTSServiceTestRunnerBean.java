@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2009,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package org.jboss.jbossts.xts.servicetests.bean;
 
@@ -26,8 +11,8 @@ import org.jboss.jbossts.xts.servicetests.test.XTSServiceTest;
 import org.jboss.jbossts.xts.servicetests.service.recovery.TestATRecoveryModule;
 import org.jboss.jbossts.xts.servicetests.service.recovery.TestBARecoveryModule;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * A service bean used to run XTS service tests at JBoss startup. A specific test is configurerd by setting an
@@ -48,6 +33,7 @@ public class XTSServiceTestRunnerBean
         try {
             start();
         } catch (Exception e) {
+            log.warn("TEST IS INVALID DUE TO START PROBLEM", e);
             // ignore
         }
     }
@@ -61,6 +47,7 @@ public class XTSServiceTestRunnerBean
         try {
             stop();
         } catch (Exception e) {
+            log.warn("TEST IS INVALID DUE TO STOP PROBLEM", e);
             // ignore
         }
     }
@@ -97,13 +84,16 @@ public class XTSServiceTestRunnerBean
             }
 
             try {
-                testInstance = (XTSServiceTest)testClass.newInstance();
+                testInstance = (XTSServiceTest)testClass.newInstance(); // assumes there is a no-arg constructor
             } catch (InstantiationException ie) {
                 log.warn("XTSServiceTestRunner : cannot instantiate test class " + testName, ie);
                 throw new Exception("XTSServiceTestRunner : cannot instantiate test class " + testName, ie);
             } catch (IllegalAccessException iae) {
                 log.warn("XTSServiceTestRunner : cannot access constructor for test class " + testName, iae);
                 throw new Exception("XTSServiceTestRunner : cannot access constructor for test class " + testName, iae);
+            } catch (Throwable e) {
+                log.warn("XTSServiceTestRunner : cannot construct new instance for test class " + testName, e);
+                throw new Exception("XTSServiceTestRunner : cannot construct new instance for test class " + testName, e);
             }
 
             // since we are running in the AS startup thread we need a separate thread for the test

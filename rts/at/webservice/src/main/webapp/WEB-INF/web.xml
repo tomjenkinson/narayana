@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+  -->
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
@@ -13,7 +18,7 @@
             org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
         </servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
       		<param-value>org.jboss.jbossts.star.service.TMApplication</param-value>
         </init-param>
     </servlet>

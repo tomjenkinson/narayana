@@ -1,41 +1,25 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2013-2018, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.arjuna.ats.jta.cdi;
 
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
-import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.PassivationCapable;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionScoped;
-import javax.transaction.TransactionSynchronizationRegistry;
+import jakarta.enterprise.context.ContextNotActiveException;
+import jakarta.enterprise.context.spi.Context;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.PassivationCapable;
+import jakarta.transaction.Status;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionScoped;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;

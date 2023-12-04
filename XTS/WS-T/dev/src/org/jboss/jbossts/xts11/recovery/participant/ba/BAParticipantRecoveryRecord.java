@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.xts11.recovery.participant.ba;
 
 import com.arjuna.ats.arjuna.state.OutputObjectState;
@@ -10,7 +14,7 @@ import com.arjuna.wst.BusinessAgreementWithCoordinatorCompletionParticipant;
 import com.arjuna.wst11.messaging.engines.ParticipantCompletionParticipantEngine;
 import com.arjuna.wst11.messaging.engines.CoordinatorCompletionParticipantEngine;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;

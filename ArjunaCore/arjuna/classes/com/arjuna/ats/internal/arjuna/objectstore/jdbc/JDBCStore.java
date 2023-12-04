@@ -1,34 +1,7 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2000, 2001,
- *
- * Arjuna Solutions Limited,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: JDBCStore.java 2342 2006-03-30 13:06:17Z  $
- */
-
 package com.arjuna.ats.internal.arjuna.objectstore.jdbc;
 
 import java.io.IOException;
@@ -49,6 +22,9 @@ import com.arjuna.ats.arjuna.state.InputBuffer;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputBuffer;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
+import com.arjuna.ats.internal.arjuna.objectstore.jdbc.accessors.DirectDataSourceJDBCAccess;
+
+import javax.sql.DataSource;
 
 /**
  * An object store implementation which uses a JDBC database for maintaining
@@ -64,8 +40,8 @@ public class JDBCStore implements ObjectStoreAPI {
     protected String tableName;
     protected final ObjectStoreEnvironmentBean jdbcStoreEnvironmentBean;
     private String _storeName;
-    private static Map<String, JDBCImple_driver> imples = new HashMap<String, JDBCImple_driver>();
-    private static Map<String, String> storeNames = new HashMap<String, String>();
+    private static final Map<String, JDBCImple_driver> imples = new HashMap<String, JDBCImple_driver>();
+    private static final Map<String, String> storeNames = new HashMap<String, String>();
 
     @Override
     public void start() {
@@ -184,15 +160,16 @@ public class JDBCStore implements ObjectStoreAPI {
      * @param jdbcStoreEnvironmentBean
      *            The environment bean containing the configuration
      * @throws ObjectStoreException
-     *             In case the store environment bean was not correctly
-     *             configured
+     *            In case the store environment bean was not correctly
+     *            configured
      */
     public JDBCStore(ObjectStoreEnvironmentBean jdbcStoreEnvironmentBean) throws ObjectStoreException {
         this.jdbcStoreEnvironmentBean = jdbcStoreEnvironmentBean;
+        DataSource ds = jdbcStoreEnvironmentBean.getJdbcDataSource();
         String connectionDetails = jdbcStoreEnvironmentBean.getJdbcAccess();
         String key;
 
-        if (connectionDetails == null) {
+        if (ds == null && connectionDetails == null) {
             throw new ObjectStoreException(tsLogger.i18NLogger.get_objectstore_JDBCStore_5());
         }
         String impleTableName = DEFAULT_TABLE_NAME;
@@ -201,65 +178,81 @@ public class JDBCStore implements ObjectStoreAPI {
             impleTableName = tablePrefix + impleTableName;
         }
         tableName = impleTableName;
-        key = connectionDetails + tableName;
-
+        key = ds == null ? connectionDetails + tableName : ds + tableName;
         _theImple = imples.get(key);
         _storeName = storeNames.get(key);
+
         if (_theImple == null) {
-            try {
+            initImple(ds, connectionDetails, key);
+        }
+    }
+
+    private void initImple(DataSource dataSource, String connectionDetails, String key) throws ObjectStoreException {
+        try {
+            JDBCAccess jdbcAccess;
+
+            if (dataSource != null) {
+                // dataSource takes priority over connectionDetails
+                jdbcAccess = new DirectDataSourceJDBCAccess(dataSource);
+                jdbcAccess.initialise(null);
+            } else if (connectionDetails != null) {
                 StringTokenizer stringTokenizer = new StringTokenizer(connectionDetails, ";");
-                JDBCAccess jdbcAccess = (JDBCAccess) Class.forName(stringTokenizer.nextToken()).newInstance();
+                jdbcAccess = (JDBCAccess) Class.forName(stringTokenizer.nextToken()).newInstance();
                 jdbcAccess.initialise(stringTokenizer);
-
-                _storeName = jdbcAccess.getClass().getName() + ":" + tableName;
-
-                Connection connection = jdbcAccess.getConnection();
-                String name;
-                int major;
-                int minor;
-                try {
-                    DatabaseMetaData md = connection.getMetaData();
-                    name = md.getDriverName();
-                    major = md.getDriverMajorVersion();
-                    minor = md.getDriverMinorVersion();
-                } finally {
-                    connection.close();
-                }
-
-                /*
-                 * Check for spaces in the name - our implementation classes are
-                 * always just the first part of such names.
-                 */
-
-                int index = name.indexOf(' ');
-
-                if (index != -1)
-                    name = name.substring(0, index);
-
-                name = name.replaceAll("-", "_");
-
-                name = name.toLowerCase();
-
-                final String packagePrefix = JDBCStore.class.getName().substring(0, JDBCStore.class.getName().lastIndexOf('.')) + ".drivers.";
-                Class jdbcImpleClass = null;
-                try {
-                    jdbcImpleClass = Class.forName(packagePrefix + name + "_" + major + "_" + minor + "_driver");
-                } catch (final ClassNotFoundException cnfe) {
-                    try {
-                        jdbcImpleClass = Class.forName(packagePrefix + name + "_" + major + "_driver");
-                    } catch (final ClassNotFoundException cnfe2) {
-                        jdbcImpleClass = Class.forName(packagePrefix + name + "_driver");
-                    }
-                }
-                _theImple = (com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver) jdbcImpleClass.newInstance();
-
-                _theImple.initialise(jdbcAccess, tableName, jdbcStoreEnvironmentBean);
-                imples.put(key, _theImple);
-                storeNames.put(key, _storeName);
-            } catch (Exception e) {
-                tsLogger.i18NLogger.fatal_objectstore_JDBCStore_2(_storeName, e);
-                throw new ObjectStoreException(e);
+            } else {
+                throw new ObjectStoreException("Invalid store configuration");
             }
+
+            _storeName = jdbcAccess.getClass().getName() + ":" + tableName;
+
+            Connection connection = jdbcAccess.getConnection();
+            String name;
+            int major;
+            int minor;
+
+            try {
+                DatabaseMetaData md = connection.getMetaData();
+                name = md.getDriverName();
+                major = md.getDriverMajorVersion();
+                minor = md.getDriverMinorVersion();
+            } finally {
+                connection.close();
+            }
+
+            /*
+             * Check for spaces in the name - our implementation classes are
+             * always just the first part of such names.
+             */
+
+            int index = name.indexOf(' ');
+
+            if (index != -1)
+                name = name.substring(0, index);
+
+            name = name.replaceAll("-", "_");
+
+            name = name.toLowerCase();
+
+            final String packagePrefix = JDBCStore.class.getName().substring(0, JDBCStore.class.getName().lastIndexOf('.')) + ".drivers.";
+            Class jdbcImpleClass;
+            try {
+                jdbcImpleClass = Class.forName(packagePrefix + name + "_" + major + "_" + minor + "_driver");
+            } catch (final ClassNotFoundException cnfe) {
+                try {
+                    jdbcImpleClass = Class.forName(packagePrefix + name + "_" + major + "_driver");
+                } catch (final ClassNotFoundException cnfe2) {
+                    jdbcImpleClass = Class.forName(packagePrefix + name + "_driver");
+                }
+            }
+
+            _theImple = (com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver) jdbcImpleClass.newInstance();
+
+            _theImple.initialise(jdbcAccess, tableName, jdbcStoreEnvironmentBean);
+            imples.put(key, _theImple);
+            storeNames.put(key, _storeName);
+        } catch (Exception e) {
+            tsLogger.i18NLogger.fatal_objectstore_JDBCStore_2(_storeName, e);
+            throw new ObjectStoreException(e);
         }
     }
 }

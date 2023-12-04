@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,28 +11,26 @@
 
   <groupId>org.jboss.narayana.vertx</groupId>
   <artifactId>echo-test</artifactId>
-  <version>5.12.8.Final-SNAPSHOT</version>
+  <version>7.0.1.Final-SNAPSHOT</version>
 
   <properties>
     <narayana.version>${project.version}</narayana.version>
     <vertx.version>3.5.4</vertx.version>
   </properties>
 
+
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${vertx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.stm</groupId>
       <artifactId>stm</artifactId>
-      <version>${narayana.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>3.1.4.GA</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

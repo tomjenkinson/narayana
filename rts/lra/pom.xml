@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2017 Red Hat, Inc. and/or its affiliates.
-  ~
-  ~ Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
-  -->
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana.rts</groupId>
     <artifactId>rest-tx</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -22,7 +21,6 @@
     <module>service-base</module>
     <module>client</module>
     <module>coordinator</module>
-    <module>coordinator-quarkus</module>
     <module>coordinator-war</module>
     <module>proxy</module>
     <module>test</module>
@@ -41,57 +39,29 @@
     <sortpom.skip>false</sortpom.skip>
 
     <test.logs.to.file>false</test.logs.to.file>
-
-    <version.cdi-api>2.0</version.cdi-api>
-
-    <version.jboss-interceptors>1.0.1.Final</version.jboss-interceptors>
-    <version.jboss-modules>1.10.2.Final</version.jboss-modules>
-    <version.microprofile.fault-tolerance>2.1.1</version.microprofile.fault-tolerance>
-
-    <version.microprofile.lra>1.0</version.microprofile.lra>
-    <version.org.jboss.servlet.api>1.0.0.Final</version.org.jboss.servlet.api>
-    <version.org.jboss.shrinkwrap>1.2.6</version.org.jboss.shrinkwrap>
-    <version.org.jboss.shrinkwrap.resolvers>3.1.4</version.org.jboss.shrinkwrap.resolvers>
-
-    <version.org.jboss.weld.se>3.1.1.Final</version.org.jboss.weld.se>
-    <version.servlet-api>2.5</version.servlet-api>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-bom</artifactId>
-        <version>${version.org.jboss.arquillian.core}</version>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom-test</artifactId>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <dependencies>
     <!-- for testing -->
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
-      <version>${version.hamcrest}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>${version.hamcrest}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-impl-base</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -123,7 +93,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${version.maven-failsafe-plugin}</version>
         <configuration>
           <redirectTestOutputToFile>${test.logs.to.file}</redirectTestOutputToFile>
           <skipITs>${skipITs}</skipITs>

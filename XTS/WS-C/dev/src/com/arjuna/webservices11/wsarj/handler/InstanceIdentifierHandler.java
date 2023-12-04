@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- * 
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.arjuna.webservices11.wsarj.handler;
 
 import com.arjuna.webservices.logging.WSCLogger;
@@ -26,14 +11,14 @@ import com.arjuna.webservices11.wsarj.ArjunaContext;
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.soap.SOAPEnvelope;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPHeaderElement;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -66,7 +51,7 @@ public class InstanceIdentifierHandler implements SOAPHandler<SOAPMessageContext
      * @return Always return true
      * @throws RuntimeException               Causes the JAX-WS runtime to cease
      *                                        handler processing and generate a fault.
-     * @throws javax.xml.ws.ProtocolException Causes the JAX-WS runtime to switch to
+     * @throws jakarta.xml.ws.ProtocolException Causes the JAX-WS runtime to switch to
      *                                        fault message processing.
      */
     public boolean handleMessage(SOAPMessageContext context) throws ProtocolException
@@ -172,7 +157,7 @@ public class InstanceIdentifierHandler implements SOAPHandler<SOAPMessageContext
      *
      * @param context the message context
      */
-    public void close(javax.xml.ws.handler.MessageContext context)
+    public void close(jakarta.xml.ws.handler.MessageContext context)
     {
     }
 

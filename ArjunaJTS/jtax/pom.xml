@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
-	LLC, and others contributors as indicated by the @authors tag. All rights 
-	reserved. See the copyright.txt in the distribution for a full listing of 
-	individual contributors. This copyrighted material is made available to anyone 
-	wishing to use, modify, copy, or redistribute it subject to the terms and 
-	conditions of the GNU Lesser General Public License, v. 2.1. This program 
-	is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
-	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-	PURPOSE. See the GNU Lesser General Public License for more details. You 
-	should have received a copy of the GNU Lesser General Public License, v.2.1 
-	along with this distribution; if not, write to the Free Software Foundation, 
-	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana.jts</groupId>
     <artifactId>narayana-jts-all</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jtax</artifactId>
@@ -27,36 +19,42 @@
   <properties>
     <idlj.boot.args></idlj.boot.args>
     <modular.jdk.args>--upgrade-module-path ${project.build.directory}/upgrademodulepath</modular.jdk.args>
-    <openjdk-orb.jar>${settings.localRepository}/org/jboss/openjdk-orb/openjdk-orb/${version.org.jboss.openjdk-orb}/openjdk-orb-${version.org.jboss.openjdk-orb}.jar</openjdk-orb.jar>
-
     <surefireArgLine></surefireArgLine>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom-test</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
       <artifactId>jta</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jts</groupId>
       <artifactId>jts</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jts</groupId>
       <artifactId>orbportability</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.transaction</groupId>
-      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.transaction}</version>
+      <groupId>jakarta.resource</groupId>
+      <artifactId>jakarta.resource-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-transaction-spi</artifactId>
-      <version>${version.org.jboss.jboss-transaction-spi}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -67,67 +65,51 @@
     </dependency>
 
     <dependency>
-      <!-- JCA API -->
-      <groupId>org.jboss.ironjacamar</groupId>
-      <artifactId>ironjacamar-spec-api</artifactId>
-      <version>${version.org.jboss.ironjacamar}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging-processor</artifactId>
-      <version>${version.org.jboss.logging.jboss-logging-processor}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
       <artifactId>jta</artifactId>
-      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana</groupId>
       <artifactId>common</artifactId>
-      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${version.org.slf4j}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${version.com.h2database}</version>
       <scope>test</scope>
     </dependency>
 
@@ -175,19 +157,16 @@
         <dependency>
           <groupId>org.jboss.narayana.jts</groupId>
           <artifactId>idlj-idl-openjdk</artifactId>
-          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.jboss.narayana.jts</groupId>
           <artifactId>idlj-idl-openjdk</artifactId>
-          <version>${project.version}</version>
           <classifier>tests</classifier>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.openjdk-orb</groupId>
           <artifactId>openjdk-orb</artifactId>
-          <version>${version.org.jboss.openjdk-orb}</version>
         </dependency>
       </dependencies>
 
@@ -220,10 +199,6 @@
                     <exclude>**/implicit/**</exclude>
                   </excludes>
                   <reportsDirectory>${project.build.directory}/idlj-openjdk-surefire-reports</reportsDirectory>
-                  <classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:ibmorb-idl</classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:ibmorb-idl:test-jar</classpathDependencyExcludes>
-                  </classpathDependencyExcludes>
                   <systemPropertyVariables combine.children="append">
                     <OrbPortabilityEnvironmentBean.orbImpleClassName>com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4</OrbPortabilityEnvironmentBean.orbImpleClassName>
                     <OrbPortabilityEnvironmentBean.poaImpleClassName>com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4</OrbPortabilityEnvironmentBean.poaImpleClassName>
@@ -237,73 +212,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>jts-ibmorb</id>
-      <activation>
-        <property>
-          <name>ibmorb-enabled</name>
-        </property>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>ibmorb-idl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.narayana.jts</groupId>
-          <artifactId>ibmorb-idl</artifactId>
-          <version>${project.version}</version>
-          <type>test-jar</type>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>surefire-ibmorb</id>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <skip>false</skip>
-                  <systemProperties combine.children="append">
-                    <property>
-                      <name>java.util.logging.config.file</name>
-                      <value>${basedir}/src/test/resources/logging.properties</value>
-                    </property>
-                  </systemProperties>
-                  <excludes>
-                    <exclude>**/common/**</exclude>
-                    <exclude>**/ExampleXAResource.java</exclude>
-                    <exclude>**/JTSTestCase.java</exclude>
-                    <exclude>**/LastOnePhaseResource.java</exclude>
-                    <exclude>**/implicit/**</exclude>
-                  </excludes>
-                  <reportsDirectory>${project.build.directory}/ibmorb-surefire-reports</reportsDirectory>
-                  <classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:idlj-idl-openjdk</classpathDependencyExcludes>
-                    <classpathDependencyExcludes>org.jboss.narayana.jts:idlj-idl-openjdk:tests</classpathDependencyExcludes>
-                  </classpathDependencyExcludes>
-                  <systemPropertyVariables combine.children="append">
-                    <OrbPortabilityEnvironmentBean.orbImpleClassName>com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1</OrbPortabilityEnvironmentBean.orbImpleClassName>
-                    <OrbPortabilityEnvironmentBean.poaImpleClassName>com.arjuna.orbportability.internal.orbspecific.ibmorb.oa.implementations.ibmorb_7_1</OrbPortabilityEnvironmentBean.poaImpleClassName>
-                    <OrbPortabilityEnvironmentBean.orbDataClassName>com.arjuna.orbportability.internal.orbspecific.versions.ibmorb_7_1</OrbPortabilityEnvironmentBean.orbDataClassName>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>release</id>
       <build>

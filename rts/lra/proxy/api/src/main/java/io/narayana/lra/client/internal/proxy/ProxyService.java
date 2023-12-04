@@ -1,38 +1,21 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2017, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package io.narayana.lra.client.internal.proxy;
 
 import io.narayana.lra.client.NarayanaLRAClient;
-import org.eclipse.microprofile.lra.annotation.ParticipantStatus;
 import io.narayana.lra.proxy.logging.LRAProxyLogger;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import org.eclipse.microprofile.lra.annotation.ParticipantStatus;
 
-import javax.annotation.PostConstruct;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -49,8 +32,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static io.narayana.lra.client.internal.proxy.ParticipantProxyResource.LRA_PROXY_PATH;
+import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 
 @ApplicationScoped
 public class ProxyService {
@@ -179,9 +162,10 @@ public class ProxyService {
             Optional<String> compensatorData = serializeParticipant(participant);
             URI participantUri = uriBuilder.build(lra, pId);
             long timeLimitInSeconds = Duration.of(timeLimit, unit).getSeconds();
+            StringBuilder sb = new StringBuilder(compensatorData.orElse(""));
 
-            URI participantRecoveryUrl
-                    = narayanaLRAClient.joinLRA(lraId, timeLimitInSeconds, participantUri, compensatorData.orElse(null));
+            URI participantRecoveryUrl = narayanaLRAClient.joinLRA(lraId, timeLimitInSeconds, participantUri, sb);
+
             return participantRecoveryUrl;
         } catch (Exception e) {
             throw new WebApplicationException(e, Response.status(0)

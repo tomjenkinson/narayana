@@ -1,13 +1,17 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.narayana.compensations.internal;
 
 import org.jboss.weld.bean.builtin.BeanManagerProxy;
 import org.jboss.weld.manager.BeanManagerImpl;
 import org.jboss.weld.manager.BeanManagerLookupService;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.CDI;
 
 public class BeanManagerUtil {
 

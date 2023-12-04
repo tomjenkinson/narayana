@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package io.narayana.lra.coordinator.domain.model.objectstore;
 
 import io.narayana.lra.LRAData;
@@ -15,12 +19,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.Application;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,6 +54,16 @@ public class TestBase {
         }
     }
 
+    @ApplicationPath("/")
+    public static class LRACoordinator extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            HashSet<Class<?>> classes = new HashSet<>();
+            classes.add(Coordinator.class);
+            return classes;
+        }
+    }
+
     @BeforeClass
     static void start() {
         System.setProperty("lra.coordinator.url", TestPortProvider.generateURL('/' + COORDINATOR_PATH_NAME));
@@ -64,7 +78,7 @@ public class TestBase {
         client = ClientBuilder.newClient();
 
         server = new UndertowJaxrsServer().start();
-        server.deploy(Coordinator.class);
+        server.deploy(LRACoordinator.class);
         server.deploy(TestBase.LRAInfo.class);
     }
 

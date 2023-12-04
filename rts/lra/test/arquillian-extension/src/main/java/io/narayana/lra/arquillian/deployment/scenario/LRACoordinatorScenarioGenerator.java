@@ -1,7 +1,8 @@
 /*
- * Copyright Red Hat
- * SPDX-License-Identifier: LGPL-2.1-only
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package io.narayana.lra.arquillian.deployment.scenario;
 

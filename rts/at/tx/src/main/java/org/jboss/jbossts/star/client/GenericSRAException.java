@@ -1,6 +1,10 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package org.jboss.jbossts.star.client;
 
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.WebApplicationException;
 import java.net.URL;
 
 public class GenericSRAException extends WebApplicationException {

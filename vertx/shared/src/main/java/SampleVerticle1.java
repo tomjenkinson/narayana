@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.AtomicAction;
 import io.vertx.core.AbstractVerticle;

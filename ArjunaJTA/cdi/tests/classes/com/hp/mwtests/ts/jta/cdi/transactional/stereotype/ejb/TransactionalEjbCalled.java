@@ -1,18 +1,16 @@
 /*
- *
- * Copyright The Narayana Authors
- *
- * SPDX-License-Identifier: LGPL-2.1-only
- *
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 
 package com.hp.mwtests.ts.jta.cdi.transactional.stereotype.ejb;
 
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.transaction.TransactionManager;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Stateless;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 
 @Stateless
 public class TransactionalEjbCalled {

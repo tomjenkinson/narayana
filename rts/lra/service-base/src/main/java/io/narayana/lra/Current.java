@@ -1,30 +1,13 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2017, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package io.narayana.lra;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.UriBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.narayana.lra.LRAConstants.PARENT_LRA_PARAM_NAME;
 import static io.narayana.lra.LRAConstants.QUERY_FIELD_SEPARATOR;
@@ -45,6 +29,33 @@ import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT
 // for use by NarayanaLRAClient and ServerLRAFilter
 public class Current {
     private static final ThreadLocal<Current> lraContexts = new ThreadLocal<>();
+
+    /**
+     * Use this cache to prevent from {@link ThreadLocal} spilling. This cache is incremented when the request filter
+     * method is invoked and decremented when the response filter method is invoked. In this sense, if the response
+     * filter method runs on different thread (meaning it doesn't clear the right {@link ThreadLocal}) we still remove
+     * it from the cache.
+     */
+    private static final Map<URI, Integer> activeLRACache = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("ConstantConditions")
+    public static void addActiveLRACache(URI lraId) {
+        if (lraId != null && activeLRACache.containsKey(lraId)) {
+            activeLRACache.compute(lraId, (k, v) -> v + 1);
+        } else {
+            activeLRACache.put(lraId, 1);
+        }
+    }
+
+    public static void removeActiveLRACache(URI lraId) {
+        if (lraId != null && activeLRACache.containsKey(lraId)) {
+            activeLRACache.compute(lraId, (k, v) -> v - 1);
+
+            if (activeLRACache.get(lraId) == 0) {
+                activeLRACache.remove(lraId);
+            }
+        }
+    }
 
     private final Stack<URI> stack;
     private Map<String, Object> state;
@@ -151,8 +162,16 @@ public class Current {
 
     public static URI peek() {
         Current current = lraContexts.get();
+        URI peek = current != null ? current.stack.peek() : null;
 
-        return current != null ? current.stack.peek() : null;
+        if (peek != null && !activeLRACache.containsKey(peek)) {
+            // we cleaned the Current on different thread, so we need to clear the context
+            // that was set by previous request filter and wasn't cleaned by the response filter
+            Current.popAll();
+            return null;
+        }
+
+        return peek;
     }
 
     public static URI pop() {
@@ -272,35 +291,6 @@ public class Current {
     public static void updateLRAContext(URI lraId, MultivaluedMap<String, String> headers) {
         headers.putSingle(LRA_HTTP_CONTEXT_HEADER, lraId.toString());
         push(lraId);
-    }
-
-    /**
-     * If there is an LRA context on the calling thread then make it available as
-     * a header on outgoing JAX-RS invocations
-     *
-     * @param context the context for the JAX-RS request
-     */
-    public static void updateLRAContext(ClientRequestContext context) {
-        MultivaluedMap<String, Object> headers = context.getHeaders();
-
-        if (headers.containsKey(LRA_HTTP_CONTEXT_HEADER)) {
-            // LRA context is explicitly set
-            return;
-        }
-
-        URI lraId = Current.peek();
-
-        if (lraId != null) {
-            headers.putSingle(LRA_HTTP_CONTEXT_HEADER, lraId);
-        } else {
-            Object lraContext = context.getProperty(LRA_HTTP_CONTEXT_HEADER);
-
-            if (lraContext != null) {
-                headers.putSingle(LRA_HTTP_CONTEXT_HEADER, lraContext);
-            } else {
-                headers.remove(LRA_HTTP_CONTEXT_HEADER);
-            }
-        }
     }
 
     public static void popAll() {

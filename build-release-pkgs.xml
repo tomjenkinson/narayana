@@ -1,23 +1,8 @@
 <!--
-  JBoss, Home of Professional Open Source
-  Copyright 2009, Red Hat Middleware LLC, and individual contributors
-  as indicated by the @author tags.
-  See the copyright.txt in the distribution for a
-  full listing of individual contributors.
-  This copyrighted material is made available to anyone wishing to use,
-  modify, copy, or redistribute it subject to the terms and conditions
-  of the GNU Lesser General Public License, v. 2.1.
-  This program is distributed in the hope that it will be useful, but WITHOUT A
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-  PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
-  You should have received a copy of the GNU Lesser General Public License,
-  v.2.1 along with this distribution; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-  MA  02110-1301, USA.
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
 
-  (C) 2007-2009,
-  @author JBoss Inc. (jonathan.halliday@redhat.com)
--->
 <!--
     build-release-pkgs.xml: Utility script for building Narayana release artifacts.
     Probably only useful for Narayana dev team. Everyone else should only need the
@@ -31,7 +16,7 @@
     usage:
 
       Tag the Narayana release on GitHub.
-        or you can do a snapshot release direct from master, see properties below.
+        or you can do a snapshot release direct from main, see properties below.
 
       Check the version of WildFly referenced in pom.xml is sane.
         In general, use the oldest WildFly release the Narayana release is intended to support.
@@ -66,7 +51,7 @@
   <!-- where to get the source -->
   <property name="gitbase" value="git@github.com:jbosstm"/>
   <!-- The tag as it appears under svnbase -->
-  <property name="tag" value="5.12.8.Final-SNAPSHOT"/>
+  <property name="tag" value="7.0.1.Final-SNAPSHOT"/>
   <!-- a working directory for the process. Can contain output from previous releases if you like to keep them archived locally. -->
   <property name="workdir" location="${user.home}/tmp/narayana/${tag}"/>
   <!-- the location the Narayana web site downloads are copied to -->
@@ -124,6 +109,10 @@
       </fileset>
     </copy>
     <copy file="${workdir}/sources/narayana/narayana-full/target/narayana-full-${tag}-javadoc.jar" todir="${workdir}/downloads/api"/>
+    <antcall target="rsync.downloads"/>
+  </target>
+
+  <target name="rsync.downloads" if="${rsync.enabled}">
     <exec executable="bash" dir="${workdir}" failonerror="true">
       <arg value="-c"/>
       <arg value="rsync --chmod=ugo=rwX --partial --progress --rsh=ssh -r downloads/* jbosstm@{rsync.host}:${downloads.dir}/${tag}" />
@@ -143,16 +132,9 @@
     </exec>
     
     <!-- Update web page content -->
-    <antcall target="web-downloads">
-      <param name="config-dir" value="${workdir}/narayana.io/_config/"/>
-    </antcall>
-    <antcall target="web-docs">
-      <param name="docs-dir" value="${workdir}/narayana.io/docs/"/>
-    </antcall>
-    <antcall target="web-api">
-      <param name="docs-dir" value="${workdir}/narayana.io/docs/"/>
-      <param name="config-dir" value="${workdir}/narayana.io/_config/"/>
-    </antcall>
+    <antcall target="web-downloads"/>
+    <antcall target="web-docs"/>
+    <antcall target="web-api"/>
     
     <!-- Commit web page changes -->
     <exec executable="git" dir="${workdir}/narayana.io/">
@@ -170,26 +152,18 @@
       <arg value="develop"/>
     </exec>
 
-    <!-- Build web page and push to jboss.org -->
-    <exec executable="bash" dir="${workdir}/narayana.io/">
-      <arg value="-c"/>
-      <arg value="${awestruct.executable} -P production"/>
-    </exec>
-    <exec executable="bash" dir="${workdir}/narayana.io/" failonerror="true">
-      <arg value="-c"/>
-      <arg value="rsync --partial --progress --rsh=ssh --delete-after -r _site/* jbosstm@{rsync.host}:www_htdocs/jbosstm/" />
-    </exec>
-  </target>
+    <!-- We no longer build automatically web pages, nor push automatically to the file server to jboss.org -->
+    <!-- To manually update the website follow the instructions in README (https://github.com/jbosstm/narayana.io/blob/develop/README.md) -->
   
   <target name="web-docs" depends="docs.check" if="docs.exist" description="Update documentations on Narayana web page">
-    <delete dir="${docs-dir}product"/>
-    <delete dir="${docs-dir}project"/>
-    <mkdir dir="${docs-dir}product"/>
-    <mkdir dir="${docs-dir}project"/>
-    <copy todir="${docs-dir}product">
+    <delete dir="${workdir}/narayana.io/docs/product"/>
+    <delete dir="${workdir}/narayana.io/docs/project"/>
+    <mkdir dir="${workdir}/narayana.io/docs/product"/>
+    <mkdir dir="${workdir}/narayana.io/docs/project"/>
+    <copy todir="${workdir}/narayana.io/docs/product">
       <fileset dir="${workdir}/sources/documentation/product/target/docbook/publish/en-US/html_single"/>
     </copy>
-    <copy todir="${docs-dir}project">
+    <copy todir="${workdir}/narayana.io/docs/project">
       <fileset dir="${workdir}/sources/documentation/project/target/docbook/publish/en-US/html_single"/>
     </copy>
   </target>
@@ -200,9 +174,9 @@
     </tstamp>
     
     <!-- Create new current Narayana release configuration -->
-    <delete dir="${config-dir}current_narayana_release.yml"/>
-    <touch file="${config-dir}current_narayana_release.yml"/>
-    <echo file="${config-dir}current_narayana_release.yml">version: ${tag}
+    <delete file="${workdir}/narayana.io/_config/current_narayana_release.yml"/>
+    <touch file="${workdir}/narayana.io/_config/current_narayana_release.yml"/>
+    <echo file="${workdir}/narayana.io/_config/current_narayana_release.yml">version: ${tag}
 date: ${date}
 binary: http://www.jboss.org/jbosstm/downloads/${tag}/binary/narayana-full-${tag}-bin.zip
 source: http://www.jboss.org/jbosstm/downloads/${tag}/src/narayana-full-${tag}-src.zip
@@ -211,17 +185,17 @@ source: http://www.jboss.org/jbosstm/downloads/${tag}/src/narayana-full-${tag}-s
   
   <target name="web-api" depends="api.check" if="api.exist" description="Update javadocs on Narayana web page">
     <!-- Update javadoc htmls on the page -->
-    <delete dir="${docs-dir}/api/"/>
-    <delete dir="${docs-dir}/jatmibroker-xatmi-api/"/>
-    <delete dir="${docs-dir}/jatmibroker-nbf-api/"/>
-    <unzip src="${workdir}/sources/narayana/narayana-full/target/narayana-full-${tag}-javadoc.jar" dest="${docs-dir}/api"/>
+    <delete dir="${workdir}/narayana.io/docs/api/"/>
+    <delete dir="${workdir}/narayana.io/docs/jatmibroker-xatmi-api/"/>
+    <delete dir="${workdir}/narayana.io/docs/jatmibroker-nbf-api/"/>
+    <unzip src="${workdir}/downloads/api/narayana-full-${tag}-javadoc.jar" dest="${workdir}/narayana.io/docs/api"/>
 
     <!-- Update javadocs download url -->
-    <exec executable="sed" dir="${config-dir}" outputproperty="first-api-line">
+    <exec executable="sed" dir="${workdir}/narayana.io/_config/" outputproperty="first-api-line">
       <arg value="q"/>
       <arg value="current_narayana_api.yml"/>
     </exec>
-    <echo file="${config-dir}current_narayana_api.yml">${first-api-line}
+    <echo file="${workdir}/narayana.io/_config/current_narayana_api.yml">${first-api-line}
 download: http://www.jboss.org/jbosstm/downloads/${tag}/api/narayana-full-${tag}-javadoc.jar</echo>
   </target>
   
@@ -239,7 +213,7 @@ download: http://www.jboss.org/jbosstm/downloads/${tag}/api/narayana-full-${tag}
   
   <target name="api.check" description="Check if javadocs were built">
     <condition property="api.exist">
-      <available file="${workdir}/sources/narayana/narayana-full/target/narayana-full-${tag}-javadoc.jar"/>
+      <available file="${workdir}/downloads/api/narayana-full-${tag}-javadoc.jar"/>
     </condition>
   </target>
 

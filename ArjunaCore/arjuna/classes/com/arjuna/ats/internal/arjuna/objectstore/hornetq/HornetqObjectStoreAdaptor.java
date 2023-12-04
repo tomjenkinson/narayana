@@ -1,22 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates,
- * and individual contributors as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2010,
- * @author JBoss, by Red Hat.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
 package com.arjuna.ats.internal.arjuna.objectstore.hornetq;
 
@@ -93,7 +77,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public void start()
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.start()");
+            tsLogger.logger.trace("JournalStore.start()");
         }
 
         try {
@@ -107,7 +91,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public void stop()
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.stop()");
+            tsLogger.logger.trace("JournalStore.stop()");
         }
 
         try {
@@ -164,7 +148,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public InputObjectState read_committed(Uid u, String typeName) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.read_committed("+u+", "+typeName+")");
+            tsLogger.logger.trace("JournalStore.read_committed("+u+", "+typeName+")");
         }
 
         typeName = ensureTypenamePrefix(typeName);
@@ -184,7 +168,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public boolean remove_committed(Uid u, String typeName) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.remove_committed("+u+", "+typeName+")");
+            tsLogger.logger.trace("JournalStore.remove_committed("+u+", "+typeName+")");
         }
 
         typeName = ensureTypenamePrefix(typeName);
@@ -245,7 +229,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public int currentState(Uid u, String typeName) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.currentState("+u+", "+typeName+")");
+            tsLogger.logger.trace("JournalStore.currentState("+u+", "+typeName+")");
         }
 
         typeName = ensureTypenamePrefix(typeName);
@@ -286,7 +270,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public boolean write_committed(Uid u, String typeName, OutputObjectState buff) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.write_committed("+u+", "+typeName+")");
+            tsLogger.logger.trace("JournalStore.write_committed("+u+", "+typeName+")");
         }
 
         typeName = ensureTypenamePrefix(typeName);
@@ -298,7 +282,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public boolean allObjUids(String typeName, InputObjectState foundInstances) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.allObjUids("+typeName+")");
+            tsLogger.logger.trace("JournalStore.allObjUids("+typeName+")");
         }
 
         typeName = ensureTypenamePrefix(typeName);
@@ -319,7 +303,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public boolean allObjUids(String typeName, InputObjectState foundInstances, int matchState) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.allObjUids("+typeName+", "+matchState+")");
+            tsLogger.logger.trace("JournalStore.allObjUids("+typeName+", "+matchState+")");
         }
 
         boolean result = true;
@@ -365,7 +349,7 @@ public class HornetqObjectStoreAdaptor implements ObjectStoreAPI
     public boolean allTypes(InputObjectState foundTypes) throws ObjectStoreException
     {
         if(tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("HornetqObjectStore.allTypes()");
+            tsLogger.logger.trace("JournalStore.allTypes()");
         }
 
         boolean result = true;

@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a full listing
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2001, 2002,
- *
- * Hewlett-Packard Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: TransactionManagerImple.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.arjuna.ats.internal.jta.transaction.jts;
 
@@ -35,8 +11,8 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.Name;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.Transaction;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.Transaction;
 
 import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
 import org.omg.CosTransactions.Control;
@@ -49,7 +25,7 @@ import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.jts.OTSManager;
 
 /**
- * An implementation of javax.transaction.TransactionManager.
+ * An implementation of jakarta.transaction.TransactionManager.
  *
  * @author Mark Little (mark_little@hp.com)
  * @version $Id: TransactionManagerImple.java 2342 2006-03-30 13:06:17Z  $
@@ -57,7 +33,7 @@ import com.arjuna.ats.jts.OTSManager;
  */
 
 public class TransactionManagerImple extends BaseTransaction implements
-		javax.transaction.TransactionManager, javax.naming.spi.ObjectFactory
+		jakarta.transaction.TransactionManager, javax.naming.spi.ObjectFactory
 {
 
 	public TransactionManagerImple ()
@@ -65,7 +41,7 @@ public class TransactionManagerImple extends BaseTransaction implements
 	}
 
 	public Transaction getTransaction ()
-			throws javax.transaction.SystemException
+			throws jakarta.transaction.SystemException
 	{
 		try
 		{
@@ -85,14 +61,14 @@ public class TransactionManagerImple extends BaseTransaction implements
 					return null;
 				}
 			} catch (InvalidSlot e1) {
-	            javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+	            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e.toString());
 	            systemException.initCause(e);
 	            throw systemException;
 			}	
 		}
 		catch (Exception e)
 		{
-            javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e.toString());
             systemException.initCause(e);
 		    throw systemException;
 		}
@@ -102,7 +78,7 @@ public class TransactionManagerImple extends BaseTransaction implements
 	 * @return the suspended transaction.
 	 */
 
-	public Transaction suspend () throws javax.transaction.SystemException
+	public Transaction suspend () throws jakarta.transaction.SystemException
 	{
 		if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionManagerImple.suspend");
@@ -126,14 +102,14 @@ public class TransactionManagerImple extends BaseTransaction implements
 					return null;
 				}
 			} catch (InvalidSlot e1) {
-	            javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+	            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e.toString());
 	            systemException.initCause(e);
 	            throw systemException;
 			}
 		}
 		catch (Exception e)
 		{
-            javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+            jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
         }
@@ -145,7 +121,7 @@ public class TransactionManagerImple extends BaseTransaction implements
 	 */
 
 	public void resume (Transaction which) throws InvalidTransactionException,
-			java.lang.IllegalStateException, javax.transaction.SystemException
+			java.lang.IllegalStateException, jakarta.transaction.SystemException
 	{
 	    if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionManagerImple.resume");
@@ -179,7 +155,7 @@ public class TransactionManagerImple extends BaseTransaction implements
 	        }
 	        catch (org.omg.CORBA.SystemException e2)
 	        {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e2.toString());
+                jakarta.transaction.SystemException systemException = new jakarta.transaction.SystemException(e2.toString());
                 systemException.initCause(e2);
                 throw systemException;
 	        }

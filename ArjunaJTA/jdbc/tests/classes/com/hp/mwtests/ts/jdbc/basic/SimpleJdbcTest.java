@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jdbc.basic;
 
 import java.lang.reflect.InvocationTargetException;
@@ -10,7 +14,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
 import org.junit.Ignore;
 import org.junit.Test;

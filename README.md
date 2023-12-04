@@ -1,7 +1,6 @@
 [![Narayana](https://design.jboss.org/narayana/logo/final/narayana_logo_600px.png)](https://narayana.io/)
 
 [![Version](https://img.shields.io/maven-central/v/org.jboss.narayana/narayana-all?logo=apache-maven&style=for-the-badge)](https://search.maven.org/artifact/org.jboss.narayana/narayana-all)
-[![License](https://img.shields.io/badge/License-LGPL%20v2.1-green.svg?style=for-the-badge)](http://www.gnu.org/licenses/lgpl-2.1)
 
 Narayana
 ========
@@ -14,18 +13,16 @@ Getting help
 ------------
 If you need help with using Narayana, please visit our forums at:
 https://groups.google.com/g/narayana-users
+or ask a question on our zulip channel (https://narayana.zulipchat.com/#).
 
-If you think you have found an error in our code, please raise an issue over on:
-https://issues.jboss.org/browse/JBTM
-
-If you would like to contribute a pull request to help the project out the file [CONTRIBUTING.md](https://github.com/jbosstm/narayana/blob/master/CONTRIBUTING.md) contains some guidance on how to do so.
+If you would like to contribute a pull request to help the project out the file [CONTRIBUTING.md](https://github.com/jbosstm/narayana/blob/main/CONTRIBUTING.md) contains some guidance on how to do so.
 
 If you have a performance optimization that you would like to suggest to us, please read our document over here:
 https://developer.jboss.org/wiki/PerformanceGatesForAcceptingPerformanceFixesInNarayana
 
 Requirements
 ------------
-To build this project you will need a JDK (Java Development Kit) with a minimum version of 11.
+To build this project you will need a JDK (Java Development Kit) with a minimum version of 11 and a Maven with a minimum version specified in the [maven wrapper properties file](.mvn/wrapper/maven-wrapper.properties)
 
 The commands to do this will vary depending upon which operating system you are building on.
 
@@ -75,13 +72,27 @@ NarayanaJTA: `./build.[sh|bat] -am -pl :narayana-jta`
 
 NarayanaJTS (idlj): `./build.[sh|bat] -am -pl :narayana-jts-idlj`
 
-NarayanaJTS (ibmorb): `./build.[sh|bat] -am -pl :narayana-jts-ibmorb -Dibmorb-enabled=true` (requires IBM jdk)
-
 XTS: `./build.[sh|bat] -am -pl :jboss-xts`
 
 STM: `./build.[sh|bat] -am -pl :stm`
 
 LRA: `./build.[sh|bat] -am -f rts/lra`
+
+Narayana (BOM) Bill Of Materials
+-----------------------
+maven BOM dependency used to encapsulate all the dependencies required by Narayana.
+
+    <dependencyManagement>
+     <dependencies>
+       <dependency>
+         <groupId>org.jboss.narayana</groupId>
+         <artifactId>narayana-bom</artifactId>
+         <version>6.0.1.Final-SNAPSHOT</version>
+         <type>pom</type>
+         <scope>import</scope>
+       </dependency>
+     </dependencies>
+   </dependencyManagement>
 
 Testing Narayana
 ---------------
@@ -134,7 +145,7 @@ To get your developer life easier use the checkstyle plugins for your IDE
 * configure plugin to consume the *checkstyle.xml* and being applied to the particular module
 
 The WildFly provides a formatter complying with the checkstyle rules. If interested check the IDE configs
-at project [wildfly-core](https://github.com/wildfly/wildfly-core/tree/master/ide-configs).
+at project [wildfly-core](https://github.com/wildfly/wildfly-core/tree/main/ide-configs).
 
 Now The Gory Details.
 ---------------------

@@ -1,24 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2017, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package io.narayana.lra.coordinator.domain.service;
 
 import com.arjuna.ats.arjuna.common.Uid;
@@ -35,10 +19,10 @@ import io.narayana.lra.coordinator.domain.model.LongRunningAction;
 
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,8 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static jakarta.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 import static java.util.stream.Collectors.toList;
 
 public class LRAService {
@@ -59,7 +43,7 @@ public class LRAService {
     private final Map<URI, LongRunningAction> lras = new ConcurrentHashMap<>();
     private final Map<URI, LongRunningAction> recoveringLRAs = new ConcurrentHashMap<>();
     private final Map<URI, ReentrantLock> locks = new ConcurrentHashMap<>();
-    private final Map<String, String> participants = new ConcurrentHashMap<>();
+    private final Map<LongRunningAction, Map<String, String>> lraParticipants = new ConcurrentHashMap<>();
     private LRARecoveryModule recoveryModule;
 
     public LongRunningAction getTransaction(URI lraId) throws NotFoundException {
@@ -211,7 +195,11 @@ public class LRAService {
     public void remove(URI lraId) {
         lraTrace(lraId, "remove LRA");
 
-        lras.remove(lraId);
+        LongRunningAction lra = lras.remove(lraId);
+
+        if (lra != null) {
+            lraParticipants.remove(lra);
+        }
 
         recoveringLRAs.remove(lraId);
 
@@ -225,18 +213,35 @@ public class LRAService {
     public void updateRecoveryURI(URI lraId, String compensatorUrl, String recoveryURI, boolean persist) {
         assert recoveryURI != null;
         assert compensatorUrl != null;
+        LongRunningAction transaction = getTransaction(lraId);
+        Map<String, String> participants = lraParticipants.get(transaction);
 
-        participants.put(recoveryURI, compensatorUrl);
+        // the <participants> collection should be thread safe against update requests, even though such concurrent
+        // updates are improbable because only LRAService.joinLRA and RecoveryCoordinator.replaceCompensator
+        // do updates but those are sequential operations anyway
+        if (participants == null) {
+            participants = new ConcurrentHashMap<>();
+            participants.put(recoveryURI, compensatorUrl);
+            lraParticipants.put(transaction, participants);
+        } else {
+            participants.replace(recoveryURI, compensatorUrl);
+        }
 
-        if (persist && lraId != null) {
-            LongRunningAction transaction = getTransaction(lraId);
-
+        if (persist) {
             transaction.updateRecoveryURI(compensatorUrl, recoveryURI);
         }
     }
 
     public String getParticipant(String rcvCoordId) {
-        return participants.get(rcvCoordId);
+        for (Map<String, String> compensators : lraParticipants.values()) {
+            String compensator = compensators.get(rcvCoordId);
+
+            if (compensator != null) {
+                return compensator;
+            }
+        }
+
+        return null;
     }
 
     public synchronized LongRunningAction startLRA(String baseUri, URI parentLRA, String clientId, Long timelimit) {
@@ -268,6 +273,10 @@ public class LRAService {
     }
 
     public LRAData endLRA(URI lraId, boolean compensate, boolean fromHierarchy) {
+        return endLRA(lraId, compensate, fromHierarchy, null, null);
+    }
+
+     public LRAData endLRA(URI lraId, boolean compensate, boolean fromHierarchy, String compensator, String userData) {
         lraTrace(lraId, "end LRA");
 
         LongRunningAction transaction = getTransaction(lraId);
@@ -278,7 +287,7 @@ public class LRAService {
                     .entity(errorMsg).build());
         }
 
-        transaction.finishLRA(compensate);
+        transaction.finishLRA(compensate, compensator, userData);
 
         if (BasicAction.Current() != null) {
             if (LRALogger.logger.isInfoEnabled()) {
@@ -321,7 +330,7 @@ public class LRAService {
 
     public synchronized int joinLRA(StringBuilder recoveryUrl, URI lra, long timeLimit,
                                     String compensatorUrl, String linkHeader, String recoveryUrlBase,
-                                    String compensatorData) {
+                                    StringBuilder compensatorData) {
         if (lra ==  null) {
             lraTrace(null, "Error missing LRA header in join request");
         } else {
@@ -362,9 +371,21 @@ public class LRAService {
         LRAParticipantRecord participant;
 
         try {
-            participant = transaction.enlistParticipant(lra,
-                    linkHeader != null ? linkHeader : compensatorUrl, recoveryUrlBase,
-                    timeLimit, compensatorData);
+            if (compensatorData != null) {
+                participant = transaction.enlistParticipant(lra,
+                        linkHeader != null ? linkHeader : compensatorUrl, recoveryUrlBase,
+                        timeLimit, compensatorData.toString());
+                // return any previously registered data
+                compensatorData.setLength(0);
+
+                if (participant.getPreviousCompensatorData() != null) {
+                    compensatorData.append(participant.getPreviousCompensatorData());
+                }
+            } else {
+                participant = transaction.enlistParticipant(lra,
+                        linkHeader != null ? linkHeader : compensatorUrl, recoveryUrlBase,
+                        timeLimit, null);
+            }
         } catch (UnsupportedEncodingException e) {
             return Response.Status.PRECONDITION_FAILED.getStatusCode();
         }
@@ -427,11 +448,11 @@ public class LRAService {
 
     private LRARecoveryModule getRM() {
         // since this method is reentrant we do not need any synchronization
-        if (recoveryModule != null) {
-            return recoveryModule;
+        if (recoveryModule == null) {
+            recoveryModule = LRARecoveryModule.getInstance();
         }
 
-        return LRARecoveryModule.getInstance();
+        return recoveryModule;
     }
 
     private List<LRAData> getDataByStatus(Map<URI, LongRunningAction> lrasToFilter, LRAStatus status) {

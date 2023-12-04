@@ -1,69 +1,28 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2007, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-//
-// Copyright (C) 2001,
-//
-// Hewlett-Packard Company,
-// HP Arjuna Labs.,
-// Newcastle upon Tyne,
-// Tyne and Wear,
-// UK.
-//
-// $Id: Test06.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
+
+
+
 //
 
 package org.jboss.jbossts.qa.JTA01Tests;
 
-/*
- * Copyright (C) 1999-2001 by HP Bluestone Software, Inc. All rights Reserved.
- *
- * HP Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: Test06.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
- */
+
 
 /*
  * Try to get around the differences between Ansi CPP and
  * K&R cpp with concatenation.
  */
 
-/*
- * Copyright (C) 1999-2001 by HP Bluestone Software, Inc. All rights Reserved.
- *
- * HP Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: Test06.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
- */
+
 
 
 import org.jboss.jbossts.qa.Utils.Setup;
 
-import javax.transaction.Status;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.TransactionManager;
 
 public class Test06
 {
@@ -95,7 +54,7 @@ public class Test06
 			int numberOfWorkers = Integer.parseInt(args[args.length - 2]);
 			int numberOfTransactions = Integer.parseInt(args[args.length - 1]);
 
-			javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+			jakarta.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
 			Worker[] workers = new Worker[numberOfWorkers];
 

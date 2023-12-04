@@ -2,18 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <!-- JBoss, Home of Professional Open Source Copyright 2009, Red Hat Middleware
-		LLC, and individual contributors as indicated by the @author tags. See the
-		copyright.txt in the distribution for a full listing of individual contributors.
-		This copyrighted material is made available to anyone wishing to use, modify,
-		copy, or redistribute it subject to the terms and conditions of the GNU Lesser
-		General Public License, v. 2.1. This program is distributed in the hope that
-		it will be useful, but WITHOUT A WARRANTY; without even the implied warranty
-		of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-		General Public License for more details. You should have received a copy
-		of the GNU Lesser General Public License, v.2.1 along with this distribution;
-		if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
-		Fifth Floor, Boston, MA 02110-1301, USA. (C) 2009, @author JBoss Inc. (jonathan.halliday@redhat.com) -->
+  <!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+ -->
 
   <parent>
     <groupId>org.jboss</groupId>
@@ -22,15 +14,16 @@
   </parent>
   <groupId>org.jboss.narayana</groupId>
   <artifactId>narayana-all</artifactId>
-  <version>5.12.8.Final-SNAPSHOT</version>
+  <version>7.0.1.Final-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Narayana: all</name>
   <description>${project.artifactId}</description>
   <url>https://narayana.io</url>
   <licenses>
     <license>
-      <name>LGPL 2.1</name>
-      <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
   <developers>
@@ -118,6 +111,8 @@
     </developer>
   </developers>
   <modules>
+    <module>narayana-bom</module>
+    <module>narayana-bom-test</module>
     <module>tools</module>
     <module>ext</module>
     <module>common</module>
@@ -125,16 +120,11 @@
     <module>ArjunaJTA</module>
     <module>ArjunaJTS</module>
     <module>XTS</module>
-    <module>rts</module>
     <module>txbridge</module>
-    <module>txbridge-jakarta</module>
-    <module>STM</module>
-    <module>txframework</module>
-    <module>txframework-jakarta</module>
     <module>compensations</module>
-    <module>compensations-jakarta</module>
-    <module>osgi</module>
+    <module>STM</module>
     <module>vertx</module>
+    <module>rts</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:jbosstm/narayana.git</connection>
@@ -188,94 +178,37 @@
     <sortpom.skip>false</sortpom.skip>
     <!-- The surefire/failsafe test execution logs goes to a file by default -->
     <testLogToFile>true</testLogToFile>
-    <version.ant-contrib>1.0b3</version.ant-contrib>
-    <version.asm>3.3.1</version.asm>
     <version.com.github.spotbugs.spotbugs-maven-plugin>4.5.3.0</version.com.github.spotbugs.spotbugs-maven-plugin>
-    <version.com.h2database>1.4.195</version.com.h2database>
-    <version.com.ibm>11.5.0.0</version.com.ibm>
-    <version.com.microsoft.sqlserver>mssql2005_sqljdbc_2.0</version.com.microsoft.sqlserver>
-    <version.com.oracle>18.3.0.0</version.com.oracle>
-    <version.com.sun.grizzly>1.9.59</version.com.sun.grizzly>
-    <version.com.sun.jersey>1.9.1</version.com.sun.jersey>
-    <version.com.sybase.jConnect>6.0</version.com.sybase.jConnect>
-    <version.commons-httpclient>3.1-jbossorg-1</version.commons-httpclient>
     <version.compiler.plugin>3.8.0-jboss-2</version.compiler.plugin>
-    <version.dom4j>1.6.1</version.dom4j>
+
     <version.doxia>1.8.1</version.doxia>
-    <version.fasterxml.jackson>2.13.1</version.fasterxml.jackson>
-    <version.glassfish.json>1.1.4</version.glassfish.json>
-    <version.hamcrest>2.2</version.hamcrest>
-    <version.io.mashona>1.0.0.Beta1</version.io.mashona>
     <version.io.narayana.checkstyle-config>1.0.1.Final</version.io.narayana.checkstyle-config>
-    <version.jakarta.json-api>2.0.1</version.jakarta.json-api>
-    <version.javadoc.plugin>3.0.1</version.javadoc.plugin>
-    <version.javax.annotation>1.2</version.javax.annotation>
-    <version.javax.enterprise>2.0</version.javax.enterprise>
-    <version.javax.inject>1</version.javax.inject>
-    <version.javax.javaee-api>8.0.1</version.javax.javaee-api>
-    <version.javax.ws.rs-api>2.0.1.Final</version.javax.ws.rs-api>
-    <version.jaxb>2.3.0</version.jaxb>
-    <version.jaxws-ri>2.3.5</version.jaxws-ri>
-    <version.jfree>1.0.9</version.jfree>
-    <version.jnpserver>5.0.3.GA</version.jnpserver>
-    <version.junit>4.13.1</version.junit>
-    <version.junit.jupiter>5.7.1</version.junit.jupiter>
-    <version.mariadb>1.2.2</version.mariadb>
-    <version.maven-failsafe-plugin>2.22.0</version.maven-failsafe-plugin>
+    <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
+    <version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
+    <version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
     <version.maven.checkstyle-plugin>3.1.2</version.maven.checkstyle-plugin>
-    <version.maven.jandex-plugin>1.0.6</version.maven.jandex-plugin>
-    <version.mysql>8.0.25</version.mysql>
-    <version.org.apache.activemq>2.19.0</version.org.apache.activemq>
-    <version.org.apache.ant>1.10.12</version.org.apache.ant>
-    <version.org.apache.httpcomponents>4.2.1</version.org.apache.httpcomponents>
+    <version.maven.jandex-plugin>3.0.5</version.maven.jandex-plugin>
+
+    <!-- Needed forWildflyLRACoordinatorDeployment class -->
+    <version.microprofile.lra>2.0</version.microprofile.lra>
     <version.org.codehaus.mojo.jboss-maven-plugin>1.5.0</version.org.codehaus.mojo.jboss-maven-plugin>
-    <version.org.eclipse.microprofile.openapi>1.1.2</version.org.eclipse.microprofile.openapi>
-    <version.org.eclipse.transformer>0.2.0</version.org.eclipse.transformer>
-    <version.org.hibernate.javax.persistence>1.0.1.Final</version.org.hibernate.javax.persistence>
+
+    <!-- This property is used in WarDeployment (XTS) -->
+    <version.org.dom4j>2.1.3</version.org.dom4j>
+
     <version.org.jacoco>0.8.8</version.org.jacoco>
-    <version.org.jboss.arquillian.container.weld>3.0.2.Final</version.org.jboss.arquillian.container.weld>
-    <version.org.jboss.arquillian.core>1.6.0.Final</version.org.jboss.arquillian.core>
     <version.org.jboss.as.plugins.jboss-as-maven-plugin>7.4.Final</version.org.jboss.as.plugins.jboss-as-maven-plugin>
-    <version.org.jboss.byteman>4.0.18</version.org.jboss.byteman>
-    <version.org.jboss.integration>6.0.0.CR1</version.org.jboss.integration>
-    <version.org.jboss.ironjacamar>1.1.1.Final</version.org.jboss.ironjacamar>
-    <version.org.jboss.jandex>2.1.1.Final</version.org.jboss.jandex>
-    <version.org.jboss.jboss-transaction-spi>7.6.1.Final</version.org.jboss.jboss-transaction-spi>
-    <version.org.jboss.jboss-transaction-spi-jakarta>7.6.1.Final</version.org.jboss.jboss-transaction-spi-jakarta>
-    <version.org.jboss.logging.jboss-logging>3.2.1.Final</version.org.jboss.logging.jboss-logging>
-    <version.org.jboss.logging.jboss-logging-processor>2.0.0.Final</version.org.jboss.logging.jboss-logging-processor>
-    <version.org.jboss.logmanager>1.5.1.Final</version.org.jboss.logmanager>
-    <version.org.jboss.openjdk-orb>8.1.9.Final</version.org.jboss.openjdk-orb>
-    <version.org.jboss.resteasy>4.7.4.Final</version.org.jboss.resteasy>
-    <version.org.jboss.spec.javax.ejb>1.0.2.Final</version.org.jboss.spec.javax.ejb>
-    <version.org.jboss.spec.javax.interceptor>2.0.0.Final</version.org.jboss.spec.javax.interceptor>
-    <version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>
-    <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.0.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
-    <version.org.jboss.spec.javax.servlet>1.0.2.Final</version.org.jboss.spec.javax.servlet>
-    <version.org.jboss.spec.javax.transaction>1.1.0.Final</version.org.jboss.spec.javax.transaction>
-    <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>2.0.1.Final</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>
-    <version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec>2.0.0.Final</version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec>
-    <version.org.jboss.weld>2.4.8.Final</version.org.jboss.weld>
-    <version.org.jboss.ws>1.1.2.Final</version.org.jboss.ws>
-    <version.org.mockito>3.8.0</version.org.mockito>
-    <version.org.slf4j>1.7.30</version.org.slf4j>
+    <version.org.jboss.byteman>4.0.19</version.org.jboss.byteman>
+    <!-- Needed forWildflyLRACoordinatorDeployment class -->
+    <version.org.jboss.resteasy>6.2.5.Final</version.org.jboss.resteasy>
     <version.org.sonatype.plugins.nexus-staging-maven-plugin>1.6.6</version.org.sonatype.plugins.nexus-staging-maven-plugin>
-    <version.org.wildfly.arquillian>3.0.1.Final</version.org.wildfly.arquillian>
-    <version.postgresql>42.3.1</version.postgresql>
-    <version.quarkus>2.10.0.Final</version.quarkus>
-    <version.smallrye-converter-api>1.0.10</version.smallrye-converter-api>
+    <version.quarkus-bom>3.0.1.Final</version.quarkus-bom>
+    <version.quarkus-maven-plugin>3.0.1.Final</version.quarkus-maven-plugin>
     <version.sortpom>3.0.0</version.sortpom>
-    <version.sun.jdk>jdk</version.sun.jdk>
+    <version.wildfly-maven-plugin>4.1.0.Final</version.wildfly-maven-plugin>
+
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>${version.javax.annotation}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
   <repositories>
     <repository>
       <id>jbossThirdParty</id>
@@ -351,6 +284,12 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
+          <!-- Remove this when org.jboss.logging becomes Jakarta compatible -->
+          <configuration>
+            <compilerArgs>
+              <arg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</arg>
+            </compilerArgs>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -373,6 +312,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
           <configuration>
             <argLine>${surefireArgLine}</argLine>
             <forkMode>pertest</forkMode>
@@ -467,6 +407,19 @@
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>io.smallrye</groupId>
+          <artifactId>jandex-maven-plugin</artifactId>
+          <version>${version.maven.jandex-plugin}</version>
+          <executions>
+            <execution>
+              <id>make-index</id>
+              <goals>
+                <goal>jandex</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

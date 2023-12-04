@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.hp.mwtests.ts.jta.cdi.transactional;
 
 import org.jboss.logging.Logger;
@@ -6,8 +10,8 @@ import org.junit.Assert;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 
 /**
  * @author paul.robinson@redhat.com 08/05/2013

@@ -1,11 +1,15 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wstx.tests.common;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.ejb.Stateless;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 /**
  *

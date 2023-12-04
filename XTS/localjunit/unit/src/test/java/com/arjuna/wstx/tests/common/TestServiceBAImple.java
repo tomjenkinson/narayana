@@ -1,3 +1,7 @@
+/*
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.wstx.tests.common;
 
 import java.io.Serializable;
@@ -6,10 +10,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ejb.Stateless;
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.ejb.Stateless;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 import com.arjuna.mw.wst11.BusinessActivityManager;
 import com.arjuna.mw.wst11.BusinessActivityManagerFactory;

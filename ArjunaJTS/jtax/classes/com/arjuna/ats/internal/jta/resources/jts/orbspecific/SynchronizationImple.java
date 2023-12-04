@@ -1,33 +1,9 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags.
- * See the copyright.txt in the distribution for a full listing
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2005-2006,
- * @author JBoss Inc.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
-/*
- * Copyright (C) 2001, 2002,
- *
- * Hewlett-Packard Arjuna Labs,
- * Newcastle upon Tyne,
- * Tyne and Wear,
- * UK.
- *
- * $Id: SynchronizationImple.java 2342 2006-03-30 13:06:17Z  $
- */
+
+
 
 package com.arjuna.ats.internal.jta.resources.jts.orbspecific;
 
@@ -52,7 +28,7 @@ import java.security.PrivilegedAction;
 public class SynchronizationImple implements org.omg.CosTransactions.SynchronizationOperations
 {
 
-    public SynchronizationImple (javax.transaction.Synchronization ptr)
+    public SynchronizationImple (jakarta.transaction.Synchronization ptr)
     {
 	_theSynch = ptr;
 	_theReference = null;
@@ -173,7 +149,7 @@ public class SynchronizationImple implements org.omg.CosTransactions.Synchroniza
 	}
     }
 
-    private javax.transaction.Synchronization       _theSynch;
+    private jakarta.transaction.Synchronization       _theSynch;
     private org.omg.CosTransactions.Synchronization _theReference;
     private org.omg.PortableServer.Servant _thePOATie;
     private ClassLoader _theClassLoader;

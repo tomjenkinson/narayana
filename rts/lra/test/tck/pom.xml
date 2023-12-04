@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright The Narayana Authors
+   SPDX short identifier: Apache-2.0
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.narayana.rts</groupId>
     <artifactId>lra-test</artifactId>
-    <version>5.12.8.Final-SNAPSHOT</version>
+    <version>7.0.1.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -12,7 +16,6 @@
   <name>LRA tests: MicroProfile TCK</name>
 
   <properties>
-    <lra.coordinator.jar.path>${project.basedir}/../../coordinator-quarkus/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
     <!-- TCK TckTests#timeLimit test needs a short, but non zero, delay -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skip.wildfly.plugin>false</skip.wildfly.plugin>
@@ -22,19 +25,22 @@
     <dependency>
       <groupId>org.eclipse.microprofile.lra</groupId>
       <artifactId>microprofile-lra-tck</artifactId>
-      <version>${version.microprofile.lra}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-proxy-api</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-test-arquillian-extension</artifactId>
-      <version>${project.version}</version>
+    </dependency>
+    <!--     jboss-threads version 2.x needed for Junit4 -->
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads</artifactId>
+      <version>2.4.0.Final</version>
     </dependency>
   </dependencies>
 
@@ -58,5 +64,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

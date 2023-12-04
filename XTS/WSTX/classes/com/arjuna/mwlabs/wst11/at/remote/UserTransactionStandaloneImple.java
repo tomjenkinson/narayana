@@ -1,3 +1,7 @@
+/*
+ * Copyright The Narayana Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.arjuna.mwlabs.wst11.at.remote;
 
 import com.arjuna.mw.wsc11.context.Context;
@@ -27,7 +31,7 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContext;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import java.util.Hashtable;
 
 /**

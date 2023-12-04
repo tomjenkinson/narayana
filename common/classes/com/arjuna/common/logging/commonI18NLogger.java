@@ -1,23 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates,
- * and individual contributors as indicated by the @author tags.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- *
- * (C) 2010,
- * @author JBoss, by Red Hat.
+   Copyright The Narayana Authors
+   SPDX-License-Identifier: Apache-2.0
  */
+
 package com.arjuna.common.logging;
 
 import static org.jboss.logging.Logger.Level.WARN;
@@ -66,12 +51,10 @@ public interface commonI18NLogger {
     public void warn_common_ClassloadingUtility_3(String arg0, String arg1, @Cause() Throwable arg2);
 
     @Message(id = 48006, value = "cannot create new instance of {0}", format = MESSAGE_FORMAT)
-    @LogMessage(level = WARN)
-    public void warn_common_ClassloadingUtility_4(String arg0, @Cause() Throwable arg1);
+    public String warn_common_ClassloadingUtility_4(String arg0, @Cause() Throwable arg1);
 
     @Message(id = 48007, value = "cannot access {0}", format = MESSAGE_FORMAT)
-    @LogMessage(level = WARN)
-    public void warn_common_ClassloadingUtility_5(String arg0, @Cause() Throwable arg1);
+    public String warn_common_ClassloadingUtility_5(String arg0, @Cause() Throwable arg1);
 
     @Message(id = 48008, value = "cannot initialize from string {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
