@@ -204,21 +204,30 @@ public class PeriodicRecovery extends Thread
    {
        synchronized (_stateLock)
        {
-           // see if suspension should delay until RecoveryModules that are instances of SuspendBlockingRecoveryModule have completed recovery
-           if (RecoveryManager.manager().isWaitForFinalRecovery()) {
+           // see if suspension should delay until certain types have recovered
+           if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
                // Need to make sure that we wait for TxControl to have been disabled
                while (TxControl.isEnabled()) {
                    // This should be done with better handling
-                    Thread.currentThread().sleep(1000);
+                   try {
+                       Thread.currentThread().sleep(1000);
+                   } catch (InterruptedException e) {
+                       // TODO
+                       throw new RuntimeException(e);
+                   }
                }
-
                // TODO Need some way to check the reaper is terminated
 
 
                while (getStatus() == Status.SCANNING) {
                    // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
                    // maybe it can be checked we are not in the middle of scanning rather than simply wait?
-                   _stateLock.wait();
+                   try {
+                       _stateLock.wait();
+                   } catch (InterruptedException e) {
+                       // TODO
+                       throw new RuntimeException(e);
+                   }
                }
                
                while (true) {
@@ -246,7 +255,7 @@ public class PeriodicRecovery extends Thread
                _stateLock.notifyAll();
            }
            // It is not expected that another scan could have started as the block about should have set it to suspended
-           if (!RecoveryManager.manager().isWaitForFinalRecovery() && !async) {
+           if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
