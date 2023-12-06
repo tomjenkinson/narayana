@@ -233,7 +233,12 @@ public class PeriodicRecovery extends Thread
                // Need to make sure that we wait for TxControl to have been disabled
                while (TxControl.isEnabled()) {
                    // This should be done with better handling
-                    Thread.currentThread().sleep(1000);
+                   try {
+                       Thread.currentThread().sleep(1000);
+                   } catch (InterruptedException e) {
+                       // TODO
+                       throw new RuntimeException(e);
+                   }
                }
                // TODO Need some way to check the reaper is terminated
 
@@ -241,7 +246,12 @@ public class PeriodicRecovery extends Thread
                while (getStatus() == Status.SCANNING) {
                    // Need to be sure that a scan has fully completed, for now illustrate this by waiting to be used outside of scanning
                    // maybe it can be checked we are not in the middle of scanning rather than simply wait?
-                   _stateLock.wait();
+                   try {
+                       _stateLock.wait();
+                   } catch (InterruptedException e) {
+                       // TODO
+                       throw new RuntimeException(e);
+                   }
                }
                
                while (true) {
