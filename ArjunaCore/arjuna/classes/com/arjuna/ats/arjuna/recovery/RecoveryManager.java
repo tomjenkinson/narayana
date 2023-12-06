@@ -42,8 +42,6 @@ class ScanThread extends Thread
         }
     }
 
-    private volatile boolean waitForRecovery;
-
     private RecoveryManagerImple _theImple;
     private RecoveryScan         _callback;
 }
@@ -369,25 +367,6 @@ public class RecoveryManager
         tsLogger.i18NLogger.info_recovery_RecoveryManager_4(socket.getInetAddress().getHostAddress(), Integer.toString(socket.getLocalPort()));
 
         return socket;
-    }
-
-    /**
-     * @return true if the recovery manager should wait for the object store to recover
-     * RecoveryModules that are instances of SuspendBlockingRecoveryModule before finally
-     * shutting down. Note that this necessitates the disabling of further transaction creation.
-     */
-    public boolean isWaitForFinalRecovery()
-    {
-        return waitForRecovery;
-    }
-
-    /**
-     * Configure shutdown behaviour.
-     * @param waitForRecovery @see getWaitForFinalRecovery()
-     */
-    public void setWaitForFinalRecovery(boolean waitForRecovery)
-    {
-        this.waitForRecovery = waitForRecovery;
     }
 
     /**

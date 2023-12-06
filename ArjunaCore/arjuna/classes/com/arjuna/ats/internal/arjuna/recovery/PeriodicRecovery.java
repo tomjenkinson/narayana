@@ -228,14 +228,13 @@ public class PeriodicRecovery extends Thread
    {
        synchronized (_stateLock)
        {
-           // see if suspension should delay until RecoveryModules that are instances of SuspendBlockingRecoveryModule have completed recovery
-           if (RecoveryManager.manager().isWaitForFinalRecovery()) {
+           // see if suspension should delay until certain types have recovered
+           if (recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery()) {
                // Need to make sure that we wait for TxControl to have been disabled
                while (TxControl.isEnabled()) {
                    // This should be done with better handling
                     Thread.currentThread().sleep(1000);
                }
-
                // TODO Need some way to check the reaper is terminated
 
 
@@ -278,7 +277,7 @@ public class PeriodicRecovery extends Thread
                _stateLock.notifyAll();
            }
            // It is not expected that another scan could have started as the block about should have set it to suspended
-           if (!RecoveryManager.manager().isWaitForFinalRecovery() && !async) {
+           if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForFinalRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
