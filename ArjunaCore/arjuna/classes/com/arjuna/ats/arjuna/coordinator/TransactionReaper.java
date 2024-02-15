@@ -108,7 +108,16 @@ public class TransactionReaper
                 // TODO close window where first can change - maybe record nextDynamicCheckTime before probing first,
                 // then use compareAndSet? Although something will need to check before sleeping anyhow...
                 if (reaperElement == null) {
-                    nextDynamicCheckTime.set(Long.MAX_VALUE);
+                    if (!_inShutdown)
+                        nextDynamicCheckTime.set(Long.MAX_VALUE);
+                    else {
+                        // If I am here during shutdown it means that _inShutdown was read from a cached value
+                        // during removeElementClient
+                        nextDynamicCheckTime.set(0);
+                        // Let's notify TransactionReaper.shutdown (ReaperThread will not wait at the next loop
+                        // as nextDynamicCheckTime is set to zero thus no need to use this.norifyAll())
+                        this.notify();
+                    }
                     return;
                 } else {
                     final long nextCheck = reaperElement.getNextCheckAbsoluteMillis();
