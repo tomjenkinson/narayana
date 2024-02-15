@@ -1044,5 +1044,5 @@ public class TransactionReaper
 
     private static int _zombieCount = 0;
 
-	private boolean _inShutdown = false;
+	private volatile boolean _inShutdown = false;
 }

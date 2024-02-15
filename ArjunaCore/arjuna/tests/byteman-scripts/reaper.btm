@@ -349,6 +349,5 @@ METHOD removeElementClient
 AT CALL remove
 BIND NOTHING
 IF TRUE
-DO rendezvous("controlledshutdown"),
-    $0._inShutdown = false;
+DO rendezvous("controlledshutdown")
 ENDRULE
