@@ -329,3 +329,26 @@ DO debug("removing latches on reaper and reaper worker"),
    deleteRendezvous("reaper1", 2),
    deleteRendezvous("reaperworker1", 2)   
 ENDRULE
+
+#########################################################################
+# ReaperTestCase4 syncs the shutdown with something being removed
+#
+
+RULE ReaperTestCase4 rendezvous in shutdown
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD shutdown
+AT CALL wait
+BIND NOTHING
+IF TRUE
+DO rendezvous("controlledshutdown")
+ENDRULE
+
+RULE ReaperTestCase4 rendezvous in removeElementClient
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD removeElementClient
+AT CALL remove
+BIND NOTHING
+IF TRUE
+DO rendezvous("controlledshutdown"),
+    $0._inShutdown = false;
+ENDRULE
