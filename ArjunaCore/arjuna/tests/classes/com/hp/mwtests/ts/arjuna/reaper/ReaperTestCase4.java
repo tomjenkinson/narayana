@@ -21,21 +21,21 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
 
     private static int _timeout = 5;
 
-    private Reapable reapable1 = new SimpleReapable();
-    // private Reapable reapable2 = new SimpleReapable();
+    private Reapable reapable = new SimpleReapable();
+
+    private volatile long beforeTerminate;
+    private volatile long afterWait;
 
     @Test
     public void test() throws InterruptedException {
         enableRendezvous("controlledshutdown", false);
         TransactionReaper transactionReaper = TransactionReaper.transactionReaper();
-        transactionReaper.insert(reapable1, _timeout);
-        // This second Reapable must not be removed as we should check if TransactionReaper waits for it
-        // even when waitForTransaction is false
-        // transactionReaper.insert(reapable2, _timeout);
+        transactionReaper.insert(reapable, _timeout);
 
         AtomicBoolean terminated = new AtomicBoolean(false);
         new Thread(() -> {
             // The shutdown is from another thread
+            this.beforeTerminate = System.currentTimeMillis();
             transactionReaper.terminate(false);
             synchronized (terminated) {
                 terminated.set(true);
@@ -43,16 +43,14 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
             }
         }).start();
         // This needs to be after the thread above has started so that the other thread can start a shutdown
-        transactionReaper.remove(reapable1);
+        transactionReaper.remove(reapable);
 
         synchronized (terminated) {
             if (!terminated.get()) {
                 try {
-                    // Give some time for the terminate to finish
-                    long beforeWait = System.currentTimeMillis();
                     terminated.wait();
-                    long afterWait = System.currentTimeMillis();
-                    long duration = afterWait - beforeWait;
+                    this.afterWait = System.currentTimeMillis();
+                    long duration = afterWait - beforeTerminate;
 
                     // The duration (_timeout * 1000) + 1000 is worked out by adding 1s to _timeout. This is needed
                     // as ReaperThread needs to wait the first timeout and then process the other transactions.
