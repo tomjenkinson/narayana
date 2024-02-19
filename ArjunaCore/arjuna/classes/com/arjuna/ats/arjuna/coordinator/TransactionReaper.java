@@ -780,6 +780,11 @@ public class TransactionReaper
     // cheaper than locking to recalculate the new time here.
     private final void removeElementClient(ReaperElement reaperElement)
     {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace(String.format("TransactionReaper::removeElementClient ( Removing transaction %s)",
+                    reaperElement._control.get_uid()));
+        }
+
         _reaperElements.remove(reaperElement);        
         _timeouts.remove(reaperElement._control);
 
@@ -802,6 +807,11 @@ public class TransactionReaper
     // new time is correct.
     private final void removeElementReaper(ReaperElement reaperElement)
     {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace(String.format("TransactionReaper::removeElementReaper ( Removing transaction %s)",
+                    reaperElement._control.get_uid()));
+        }
+
         _reaperElements.remove(reaperElement);
         _timeouts.remove(reaperElement._control);
 

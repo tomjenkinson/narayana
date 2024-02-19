@@ -329,3 +329,49 @@ DO debug("removing latches on reaper and reaper worker"),
    deleteRendezvous("reaper1", 2),
    deleteRendezvous("reaperworker1", 2)   
 ENDRULE
+
+#########################################################################
+# ReaperTestCase4 syncs the shutdown with something being removed
+#
+
+
+RULE ReaperTestCase4 rendezvous in shutdown
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD shutdown
+AT CALL wait
+BIND NOTHING
+IF TRUE
+DO rendezvous("controlledshutdown")
+ENDRULE
+
+RULE Set a flag
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD insert
+AT ENTRY
+BIND NOTHING
+IF TRUE
+DO flag("shutdown")
+ENDRULE
+
+RULE Return false (only once)
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD removeElementClient
+AT ENTRY
+BIND NOTHING
+IF flagged("shutdown") && $0._inShutdown
+DO rendezvous("controlledshutdown"),
+   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown),
+   $0._inShutdown = false,
+   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY after modification: value of _inShutdown is " + $0._inShutdown),
+   clear("shutdown")
+ENDRULE
+
+RULE Set _inShutdown to true
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD removeElementClient
+AT EXIT
+BIND NOTHING
+IF TRUE
+DO $0._inShutdown = true,
+   debug("**** BYTEMAN **** -> removeElementClient AT EXIT: value of _inShutdown is " + $0._inShutdown)
+ENDRULE
