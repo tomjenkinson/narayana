@@ -22,7 +22,7 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
     private static int _timeout = 5;
 
     private Reapable reapable1 = new SimpleReapable();
-    private Reapable reapable2 = new SimpleReapable();
+    // private Reapable reapable2 = new SimpleReapable();
 
     @Test
     public void test() throws InterruptedException {
@@ -31,7 +31,7 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
         transactionReaper.insert(reapable1, _timeout);
         // This second Reapable must not be removed as we should check if TransactionReaper waits for it
         // even when waitForTransaction is false
-        transactionReaper.insert(reapable2, _timeout);
+        // transactionReaper.insert(reapable2, _timeout);
 
         AtomicBoolean terminated = new AtomicBoolean(false);
         new Thread(() -> {

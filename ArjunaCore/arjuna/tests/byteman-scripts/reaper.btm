@@ -350,7 +350,7 @@ METHOD insert
 AT ENTRY
 BIND NOTHING
 IF TRUE
-DO flag("shutdown")
+DO flag("skipFirstNotifyAllInremoveElementClient")
 ENDRULE
 
 RULE Return false (only once)
@@ -358,12 +358,13 @@ CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
 METHOD removeElementClient
 AT ENTRY
 BIND NOTHING
-IF flagged("shutdown") && $0._inShutdown
+IF flagged("skipFirstNotifyAllInremoveElementClient") && $0._inShutdown
 DO rendezvous("controlledshutdown"),
    debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown),
+   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: simulating _inShutdown equal to false"),
    $0._inShutdown = false,
-   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY after modification: value of _inShutdown is " + $0._inShutdown),
-   clear("shutdown")
+   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown),
+   clear("skipFirstNotifyAllInremoveElementClient")
 ENDRULE
 
 RULE Set _inShutdown to true

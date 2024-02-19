@@ -108,14 +108,16 @@ public class TransactionReaper
                 // TODO close window where first can change - maybe record nextDynamicCheckTime before probing first,
                 // then use compareAndSet? Although something will need to check before sleeping anyhow...
                 if (reaperElement == null) {
+                    // Reading _inShutdown in this synchronized block makes sure that its value does not come from
+                    // a cache (i.e. its value has been read from memory and not from the CPU cache)
                     if (!_inShutdown)
                         nextDynamicCheckTime.set(Long.MAX_VALUE);
                     else {
-                        // If I am here during shutdown it means that _inShutdown was read from a cached value
-                        // during removeElementClient
-                        nextDynamicCheckTime.set(0);
-                        // Let's notify TransactionReaper.shutdown (ReaperThread will not wait at the next loop
-                        // as nextDynamicCheckTime is set to zero thus no need to use this.norifyAll())
+                        // If the JVM reaches the code then it means that the TransactionReaper is in shutdown and
+                        // either another thread has called removeElementClient but read a cached value for _inShutdown,
+                        // or the other thread is in the process of executing removeElementClient, and we preemptively
+                        // decide to notify here in case _inShutdown returns a stale value of false for that thread.
+                        // (ReaperThread will not wait at the next loop thus no need to use notifyAll())
                         this.notify();
                     }
                     return;
