@@ -113,7 +113,7 @@ public class TransactionReaper
                     if (!_inShutdown)
                         nextDynamicCheckTime.set(Long.MAX_VALUE);
                     else {
-                        // If the JVM reaches the code then it means that the TransactionReaper is in shutdown and
+                        // If the JVM reaches this code then it means that the TransactionReaper is in shutdown and
                         // either another thread has called removeElementClient but read a cached value for _inShutdown,
                         // or the other thread is in the process of executing removeElementClient, and we preemptively
                         // decide to notify here in case _inShutdown returns a stale value of false for that thread.
