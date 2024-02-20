@@ -27,8 +27,17 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
     private volatile long afterWait;
 
     @Test
-    public void test() throws InterruptedException {
+    public void testWithRendezvous() {
         enableRendezvous("controlledshutdown", false);
+        test();
+    }
+
+    @Test
+    public void testWithoutRendezvous() {
+        test();
+    }
+
+    private void test() {
         TransactionReaper transactionReaper = TransactionReaper.transactionReaper();
         transactionReaper.insert(reapable, _timeout);
 
@@ -70,7 +79,7 @@ public class ReaperTestCase4 extends ReaperTestCaseControl {
 
         @Override
         public boolean running() {
-            return false;
+            return true;
         }
 
         @Override

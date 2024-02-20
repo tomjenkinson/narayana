@@ -733,6 +733,16 @@ public class TransactionReaper
 
             if (!waitForTransactions) {
                 _reaperElements.setAllTimeoutsToZero();
+                /**
+                 * Setting nextDynamicCheckTime to zero means that ReaperThread will not sleep/wait again
+                 */
+                nextDynamicCheckTime.set(0);
+                /**
+                 * This notification's goal is waking up an asleep ReaperThread
+                 *
+                 * Note: ReaperThread *might* be also running, in which case, this notification will be ignored
+                 */
+                this.notify();
             }
 
             /*

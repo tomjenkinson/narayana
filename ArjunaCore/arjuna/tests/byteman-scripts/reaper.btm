@@ -340,7 +340,7 @@ CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
 METHOD shutdown
 AT CALL wait
 BIND NOTHING
-IF TRUE
+IF isRendezvous("controlledshutdown",2)
 DO rendezvous("controlledshutdown")
 ENDRULE
 
@@ -349,7 +349,7 @@ CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
 METHOD insert
 AT ENTRY
 BIND NOTHING
-IF TRUE
+IF isRendezvous("controlledshutdown",2)
 DO flag("skipFirstNotifyAllInremoveElementClient")
 ENDRULE
 
@@ -358,13 +358,20 @@ CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
 METHOD removeElementClient
 AT ENTRY
 BIND NOTHING
-IF flagged("skipFirstNotifyAllInremoveElementClient") && $0._inShutdown
+IF isRendezvous("controlledshutdown",2) && flagged("skipFirstNotifyAllInremoveElementClient") && $0._inShutdown
 DO rendezvous("controlledshutdown"),
-   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown),
    debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: simulating _inShutdown equal to false"),
    $0._inShutdown = false,
-   debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown),
    clear("skipFirstNotifyAllInremoveElementClient")
+ENDRULE
+
+RULE log _inShutdown value AT ENTRY
+CLASS com.arjuna.ats.arjuna.coordinator.TransactionReaper
+METHOD removeElementClient
+AT ENTRY
+BIND NOTHING
+IF TRUE
+DO debug("**** BYTEMAN **** -> removeElementClient AT ENTRY: value of _inShutdown is " + $0._inShutdown)
 ENDRULE
 
 RULE Set _inShutdown to true
