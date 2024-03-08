@@ -35,7 +35,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
-      <artifactId>arjunacore</artifactId>
+      <artifactId>arjuna</artifactId>
     </dependency>
     <!-- XTS: -->
     <dependency>
