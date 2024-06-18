@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 
 import javax.transaction.xa.XAException;
@@ -21,7 +22,7 @@ import javax.transaction.xa.Xid;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.jta.distributed.server.CompletionCounter;
 
-public class TestResource implements XAResource {
+public class TestResource implements XAResource, Serializable {
 	private XAException fatalError;
 
 	private Xid xid;
@@ -34,21 +35,17 @@ public class TestResource implements XAResource {
 
 	private String serverId;
 
-	private CompletionCounter completionCounter;
-
 	private boolean scanning;
 
     private transient boolean fatalCommit;
 	private Xid fatalXid;
 
 	public TestResource(String serverId, boolean readonly) {
-		this.completionCounter = CompletionCounter.getInstance();
 		this.serverId = serverId;
 		this.readonly = readonly;
 	}
 
 	public TestResource(String serverId, File file) throws IOException {
-		this.completionCounter = CompletionCounter.getInstance();
 		this.serverId = serverId;
 		this.file = file;
 		DataInputStream fis = new DataInputStream(new FileInputStream(file));
@@ -161,11 +158,12 @@ public class TestResource implements XAResource {
 
 	public synchronized void commit(Xid id, boolean onePhase) throws XAException {
 		System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_COMMIT  [" + id + "]");
-		completionCounter.incrementCommit(serverId);
+		CompletionCounter.getInstance().incrementCommit(serverId);
 		if (file != null) {
 			if (!file.delete()) {
 				throw new XAException(XAException.XA_RETRY);
 			}
+			file = null;
 		}
 		this.xid = null;
 		
@@ -180,7 +178,7 @@ public class TestResource implements XAResource {
 
 	public synchronized void rollback(Xid xid) throws XAException {
 		System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_ROLLBACK[" + xid + "]");
-		completionCounter.incrementRollback(serverId);
+		CompletionCounter.getInstance().incrementRollback(serverId);
 		if (file != null) {
 			if (!file.delete()) {
 				throw new XAException(XAException.XA_RETRY);
