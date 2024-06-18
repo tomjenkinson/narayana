@@ -22,6 +22,8 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.jta.distributed.server.CompletionCounter;
 
 public class TestResource implements XAResource {
+	private XAException fatalError;
+
 	private Xid xid;
 
 	protected int timeout = 0;
@@ -37,6 +39,7 @@ public class TestResource implements XAResource {
 	private boolean scanning;
 
     private transient boolean fatalCommit;
+	private Xid fatalXid;
 
 	public TestResource(String serverId, boolean readonly) {
 		this.completionCounter = CompletionCounter.getInstance();
@@ -112,6 +115,12 @@ public class TestResource implements XAResource {
        this.fatalCommit = fatalCommit;
     }
 
+	public TestResource(String nodeName, boolean b, boolean fatalCommit, XAException fatalError) {
+		this(nodeName, b);
+		this.fatalCommit = fatalCommit;
+		this.fatalError = fatalError;
+	}
+
     /**
 	 * This class declares that it throws an Error *purely for byteman* so that
 	 * we can crash the resource during this method:
@@ -161,7 +170,11 @@ public class TestResource implements XAResource {
 		this.xid = null;
 		
 		if (fatalCommit) {
-		    throw new Error();
+			if (fatalError == null) {
+				throw new Error();
+			}
+			this.fatalXid = id;
+		    throw fatalError;
 		}
 	}
 
@@ -248,5 +261,9 @@ public class TestResource implements XAResource {
 	public boolean setTransactionTimeout(int seconds) throws XAException {
 		timeout = seconds;
 		return (true);
+	}
+
+	public Xid getFatalXid() {
+		return fatalXid;
 	}
 }
