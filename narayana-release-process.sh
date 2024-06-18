@@ -13,7 +13,6 @@
 # 3 arguments: `./narayana-release-process.sh CURRENT NEXT WFLYISSUE`
 
 command -v ant >/dev/null 2>&1 || { echo >&2 "I require ant but it's not installed.  Aborting."; exit 1; }
-command -v awestruct >/dev/null 2>&1 || { echo >&2 "I require awestruct (http://awestruct.org/getting_started) but it's not installed.  Aborting."; exit 1; }
 read -p "Have you created a WFLY issue at https://issues.jboss.org/secure/CreateIssue.jspa and have the number?" WISSUEOK
 if [[ $WISSUEOK == n* ]]
 then
