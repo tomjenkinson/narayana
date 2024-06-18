@@ -138,6 +138,11 @@ public class SimpleIsolatedServers {
         // Make sure that the Xid of the testResource is expectedly listed as a heuristic
         String outcome = getLocalServer("1000").checkHeuristic(get_uid);
         assertTrue(outcome.contains(testResource.getFatalXid().toString()));
+
+        // Make sure that upon recovery an xa directive is issued
+        getLocalServer("1000").doRecoveryManagerScan(true);
+        assertTrue("" + completionCounter.getCommitCount("1000"), completionCounter.getCommitCount("1000") == 3);
+        assertTrue("" + completionCounter.getRollbackCount("1000"), completionCounter.getRollbackCount("1000") == 0);
     }
 
     private void reboot(String serverName) throws Exception {

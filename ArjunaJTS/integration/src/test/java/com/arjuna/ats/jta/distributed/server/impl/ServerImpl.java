@@ -270,6 +270,8 @@ public class ServerImpl implements LocalServer {
 
 		EditableAtomicAction editableAtomicAction = new EditableAtomicAction(new Uid(getUid));
 		String toReturn = editableAtomicAction.toString();
+		// Doesn't generate an error, just can log something
+		editableAtomicAction.moveHeuristicToPrepared(0);
 		Thread.currentThread().setContextClassLoader(classLoader);
 		return toReturn;
 	}
