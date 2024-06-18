@@ -215,4 +215,4 @@ fi
 
 
 # not sure why we need to look at CI at this point so commenting it out
-# xdg-open http://narayanaci1.eng.hst.ams2.redhat.com/ &
+# xdg-open https://ci-jenkins-csb-narayana.apps.ocp-c1.prod.psi.redhat.com/ &
