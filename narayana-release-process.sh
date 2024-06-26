@@ -111,9 +111,17 @@ then
     exit
   fi
   set -e
-  echo "Checking if there were any failed jobs, this may be interactive so please stand by"
-  JIRA_HOST=issues.redhat.com JENKINS_JOBS=narayana,narayana-catelyn,narayana-documentation,narayana-hqstore,narayana-jdbcobjectstore,narayana-quickstarts,narayana-quickstarts-catelyn\
-      ./scripts/release/pre_release.py
+  
+  #Jira blockers can be found at https://issues.redhat.com/issues/?jql=project%20%3D%20JBTM%20AND%20priority%20%3D%20Blocker%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC
+  read -p "Please check for Jira blockers and failed CI jobs (https://ci-jenkins-csb-narayana.apps.ocp-c1.prod.psi.redhat.com/) before continuing. Continue? y/n " NOBLOCKERS
+  if [[ $NOBLOCKERS == n* ]]
+  then
+    exit
+  fi
+  #pre_release.py commented because not working
+  #JIRA_HOST=issues.redhat.com JENKINS_JOBS=narayana,narayana-catelyn,narayana-documentation,narayana-hqstore,narayana-jdbcobjectstore,narayana-quickstarts,narayana-quickstarts-catelyn\
+  #    ./scripts/release/pre_release.py
+  
   echo "Executing pre-release script, this may be interactive so please stand by"
   (cd ./scripts/ ; ./pre-release.sh $CURRENT $NEXT)
   echo "This script is only interactive at the very end now, press enter to continue"
