@@ -181,17 +181,12 @@ git archive -o ../../narayana-full-$CURRENT-src.zip $CURRENT
 # build-release-pkgs.xml needs to be updated, update the website manually
 echo " narayana.io needs updating, please update the narayana.io repository (javadoc to unzip into api, project and product documentation and then upload to narayana.io"
 
-  read -p "Please update narayana.io before continuing. Continue? y/n " NARAYANAIO
-  if [[ $NARAYANAIO == n* ]]
-  then
-    exit
-  fi
-#ant -f build-release-pkgs.xml -Drsync.host=${RSYNC_HOST} -Drsync.enabled=${RSYNC_ENABLED} -Dawestruct.executable="awestruct" all
-#if [[ $? != 0 ]]
-#then
-#  echo 1>&2 COULD NOT BUILD Narayana RELEASE PKGS
-#  exit
-#fi
+read -p "Please update narayana.io before continuing. Continue? y/n " NARAYANAIO
+if [[ $NARAYANAIO == n* ]]
+then
+  exit
+fi
+
 cd -
 
 # After the release open a PR for the new Narayana release against lra-coordinator quarkus to upload the docker image to quay.io 
