@@ -19,13 +19,12 @@ then
   exit
 fi
 if [ $# -ne 4 ]; then
-  echo 1>&2 "$0: usage: CURRENT NEXT WFLYISSUE RSYNC_HOST"
+  echo 1>&2 "$0: usage: CURRENT NEXT WFLYISSUE"
   exit 2
 else
   CURRENT=$1
   NEXT=$2
   WFLYISSUE=$3
-  RSYNC_HOST=$4
 fi
 
 if [[ $(uname) == CYGWIN* ]]
@@ -41,7 +40,7 @@ then
     exit
   fi
 fi
-read -p "You will need: VPN, credentials for jbosstm@${RSYNC_HOST}, jira admin, github permissions on all jbosstm/ repo and nexus permissions. Do you have these?" ENVOK
+read -p "You will need: VPN, credentials for jbosstm host, jira admin, github permissions on all jbosstm/ repo and nexus permissions. Do you have these?" ENVOK
 if [[ $ENVOK == n* ]]
 then
   exit
@@ -63,10 +62,10 @@ if [[ $M2OK == n* ]]
 then
   exit
 fi
-read -p "To upload an lra-coordinator image to quay.io you will need to open a PR against https://github.com/jbosstm/lra-coordinator-quarkus. Prooceed?: " PROCEED
+read -p "To upload an lra-coordinator image to quay.io you will need to open a PR against https://github.com/jbosstm/lra-coordinator-quarkus. Proceed?: " PROCEED
 if [[ $PROCEED == n* ]]
 then
-    exit
+  exit
 fi
 read -p "Until ./scripts/release/update_jira.py -k JBTM -t 5.next -n $CURRENT is fixed you will need to go to https://issues.jboss.org/projects/JBTM?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=released-unreleased, rename (Actions -> Edit) 5.next to $CURRENT, create a new 5.next version, Actions -> Release on the new $CURRENT. Have you done this? y/n " JIRAOK
 if [[ $JIRAOK == n* ]]
@@ -112,15 +111,11 @@ then
   fi
   set -e
   
-  #Jira blockers can be found at https://issues.redhat.com/issues/?jql=project%20%3D%20JBTM%20AND%20priority%20%3D%20Blocker%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC
-  read -p "Please check for Jira blockers and failed CI jobs (https://ci-jenkins-csb-narayana.apps.ocp-c1.prod.psi.redhat.com/) before continuing. Continue? y/n " NOBLOCKERS
+  read -p "Please check for Jira blockers (https://issues.redhat.com/issues/?jql=project%20%3D%20JBTM%20AND%20priority%20%3D%20Blocker%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC) and failed CI jobs before continuing. Continue? y/n " NOBLOCKERS
   if [[ $NOBLOCKERS == n* ]]
   then
     exit
   fi
-  #pre_release.py commented because not working
-  #JIRA_HOST=issues.redhat.com JENKINS_JOBS=narayana,narayana-catelyn,narayana-documentation,narayana-hqstore,narayana-jdbcobjectstore,narayana-quickstarts,narayana-quickstarts-catelyn\
-  #    ./scripts/release/pre_release.py
   
   echo "Executing pre-release script, this may be interactive so please stand by"
   (cd ./scripts/ ; ./pre-release.sh $CURRENT $NEXT)
@@ -204,23 +199,27 @@ then
   exit
 fi
 git archive -o ../../narayana-full-$CURRENT-src.zip $CURRENT
-ant -f build-release-pkgs.xml -Drsync.host=${RSYNC_HOST} -Drsync.enabled=${RSYNC_ENABLED} -Dawestruct.executable="awestruct" all
-if [[ $? != 0 ]]
-then
-  echo 1>&2 COULD NOT BUILD Narayana RELEASE PKGS
-  exit
-fi
+# build-release-pkgs.xml needs to be updated, update the website manually
+echo " narayana.io needs updating, please update the narayana.io repository (javadoc to unzip into api, project and product documentation and then upload to narayana.io"
+
+  read -p "Please update narayana.io before continuing. Continue? y/n " NARAYANAIO
+  if [[ $NARAYANAIO == n* ]]
+  then
+    exit
+  fi
+#ant -f build-release-pkgs.xml -Drsync.host=${RSYNC_HOST} -Drsync.enabled=${RSYNC_ENABLED} -Dawestruct.executable="awestruct" all
+#if [[ $? != 0 ]]
+#then
+#  echo 1>&2 COULD NOT BUILD Narayana RELEASE PKGS
+#  exit
+#fi
 cd -
 
-# Building and pushing the lra coordinator docker image
-cd ~/tmp/narayana/$CURRENT/sources/jboss-dockerfiles/lra/lra-coordinator
-git checkout $CURRENT
-if [[ $? != 0 ]]
-then
-  echo 1>&2 jboss-dockerfiles: Tag $CURRENT did not exist
-  exit
-fi
+# After the release open a PR for the new Narayana release against lra-coordinator quarkus to upload the docker image to quay.io 
+read -p "Please open a PR to lra-coordinator-quarkus when the artifact is available on nexus. OK? y/n " QUAYIO
+  if [[ $QUAYIO == n* ]]
+  then
+    exit
+  fi
 
-
-# not sure why we need to look at CI at this point so commenting it out
-# xdg-open https://ci-jenkins-csb-narayana.apps.ocp-c1.prod.psi.redhat.com/ &
+"echo "Please visit Narayana CI and check the quickstarts are working with the release and obtain performance numbers for the blog post"
