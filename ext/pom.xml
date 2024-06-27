@@ -22,6 +22,19 @@
     <sortpom.skip>true</sortpom.skip>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <inherited>false</inherited>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <configuration>
+          <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>codeCoverage</id>
