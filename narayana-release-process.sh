@@ -129,33 +129,12 @@ else
   read
 fi
 
-if [ ! -d "jboss-as" ]
+#The release script should fail if it can't create the PR branches
+read -p "Please check it is possible to create the PR branch against WildFly (i.e. there shouldn't be an existing one) and check there are no conflicts. Continue? y/n " PRBRANCHOK
+if [[ $PRBRANCHOK == n* ]]
 then
-  (git clone git@github.com:jbosstm/jboss-as.git -o jbosstm; cd jboss-as; git remote add upstream git@github.com:wildfly/wildfly.git)
+  exit
 fi
-cd jboss-as
-git fetch jbosstm
-git branch | grep $WFLYISSUE
-if [[ $? != 0 ]]
-then
-  git fetch upstream; 
-  git checkout -b ${WFLYISSUE}
-  git reset --hard upstream/main
-  CURRENT_VERSION_IN_WFLY=`grep 'narayana>' pom.xml | cut -d \< -f 2|cut -d \> -f 2`
-  if [[ $(uname) == CYGWIN* ]]
-  then
-    sed -i "s/narayana>$CURRENT_VERSION_IN_WFLY/narayana>$CURRENT/g" pom.xml
-  else
-    sed -i "s/narayana>$CURRENT_VERSION_IN_WFLY/narayana>$CURRENT/g" pom.xml
-  fi
-  git add pom.xml
-  git commit -m "${WFLYISSUE} Upgrade Narayana to $CURRENT"
-  git push --set-upstream jbosstm ${WFLYISSUE}
-  git checkout 5_BRANCH
-  git reset --hard jbosstm/5_BRANCH
-  xdg-open https://github.com/jbosstm/jboss-as/pull/new/$WFLYISSUE &
-fi
-cd ..
 
 cd ~/tmp/narayana/$CURRENT/sources/documentation/
 git checkout $CURRENT
