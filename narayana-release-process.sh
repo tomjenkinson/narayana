@@ -139,6 +139,11 @@ fi
 
 rm -rf $PWD/localm2repo
 ./build.sh clean install -Dmaven.repo.local=${PWD}/localm2repo -Prelease
+if [[ $? != 0 ]]
+then
+  echo 1>&2 documentation: Could not be built
+  exit
+fi
 rm -rf $PWD/localrepo
 cd -
 cd ~/tmp/narayana/$CURRENT/sources/narayana/
