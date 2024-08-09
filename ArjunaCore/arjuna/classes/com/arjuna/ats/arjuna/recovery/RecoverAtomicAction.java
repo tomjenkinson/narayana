@@ -75,6 +75,10 @@ public class RecoverAtomicAction extends AtomicAction
            }
        }
    }
+
+   public boolean hasHeuristicParticipants() {
+       return heuristicList != null && heuristicList.size() > 0;
+   }
    
    // Current transaction status 
    // (retrieved from the TransactionStatusManager)

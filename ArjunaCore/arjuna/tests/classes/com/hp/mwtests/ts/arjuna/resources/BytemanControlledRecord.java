@@ -16,6 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BytemanControlledRecord extends AbstractRecord {
 
+    private static int _commitReturn;
+
+    public static void setCommitReturn(int _commitReturn) {
+        BytemanControlledRecord._commitReturn = _commitReturn;
+    }
+
     /* This is a counter used internally in BytemanControlledRecord to count how many
      * times the "topLevelCommit()" method was invoked.
      *

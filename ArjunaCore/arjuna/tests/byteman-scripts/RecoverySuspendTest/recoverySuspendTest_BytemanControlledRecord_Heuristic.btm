@@ -1,0 +1,25 @@
+########################################################################
+# Rule to skip heuristic AtomicAction instances through
+# isWaitForHeuristicsDuringRecovery()
+########################################################################
+
+RULE skipHeuristicDuringRecovery
+CLASS com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean
+METHOD isWaitForHeuristicsDuringRecovery
+AT EXIT
+IF flagged("greenFlag") && $!
+DO debug("[RecoveryEnvironmentBean] setting setWaitForHeuristicsDuringRecovery(boolean) to false"),
+   return false
+ENDRULE
+
+########################################################################
+# Rule to fail heuristicTest in case greenFlag is false
+########################################################################
+
+RULE failHeuristicTest
+CLASS com.hp.mwtests.ts.arjuna.recovery.RecoverySuspendTest
+METHOD heuristicTest
+AFTER INVOKE startTest
+IF !flagged("greenFlag")
+DO throw new RuntimeException("heuristicTest must fail as there should have been one recovery attempt")
+ENDRULE

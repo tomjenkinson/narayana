@@ -9,7 +9,9 @@ import java.util.Vector;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
+import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
@@ -99,11 +101,14 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
 
     }
 
-   private void doRecoverTransaction( Uid recoverUid )
+   private RecoverAtomicAction doRecoverTransaction(Uid recoverUid )
    {
       boolean commitThisTransaction = true ;
 
-      // Retrieve the transaction status from its original process.
+      /*
+       * Retrieve the transaction status from its original process.
+       * Note: this can be the status of the transaction from the object store
+       */
       int theStatus = _transactionStatusConnectionMgr.getTransactionStatus( _transactionType, recoverUid ) ;
 
       boolean inFlight = isTransactionInMidFlight( theStatus ) ;
@@ -116,12 +121,12 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                   " in flight is " + inFlight);
       }
 
+      RecoverAtomicAction rcvAtomicAction = null;
       if ( ! inFlight )
       {
          try
          {
-            RecoverAtomicAction rcvAtomicAction =
-               new RecoverAtomicAction( recoverUid, theStatus ) ;
+            rcvAtomicAction = new RecoverAtomicAction( recoverUid, theStatus ) ;
 
             rcvAtomicAction.replayPhase2() ;
          }
@@ -129,6 +134,8 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
              tsLogger.i18NLogger.warn_recovery_AtomicActionRecoveryModule_2(recoverUid, ex);
          }
       }
+
+       return rcvAtomicAction;
    }
 
    private boolean isTransactionInMidFlight( int status )
@@ -224,18 +231,20 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                 try {
                     if (_recoveryStore.currentState(currentUid,
                             _transactionType) != StateStatus.OS_UNKNOWN) {
-                        doRecoverTransaction(currentUid);
-                    }
+                        RecoverAtomicAction rcvAtomicAction = doRecoverTransaction(currentUid);
 
-                    /*
-                     * If the current AtomicAction has been recovered,
-                     * its StateStatus should be OS_UNKNOWN.
-                     * If that is not the case, it means that the current
-                     * AtomicAction still needs to be recovered
-                     */
-                    if (_recoveryStore.currentState(currentUid,
-                            _transactionType) != StateStatus.OS_UNKNOWN) {
-                        this.hasWork = true;
+                        /*
+                         * If the current AtomicAction has been recovered, its StateStatus should be OS_UNKNOWN.
+                         * If that is not the case, it means that the current AtomicAction still needs to be recovered
+                         */
+                        if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
+                            if (rcvAtomicAction.hasHeuristicParticipants() &&
+                                    !recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForHeuristicsDuringRecovery()) {
+                                tsLogger.i18NLogger.heuristic_atomic_action_silenced(currentUid);
+                            } else {
+                                this.hasWork = true;
+                            }
+                        }
                     }
 
                 } catch (ObjectStoreException ex) {

@@ -14,7 +14,7 @@
 # Rule to set waitForRecoveryFlag when invoking
 # RecoveryEnvironmentBean.isWaitForRecovery() in
 # PeriodicRecovery.suspendScan(boolean)
-#########################################################################
+########################################################################
 
 RULE setWaitForRecoveryFlag
 CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
@@ -29,7 +29,7 @@ ENDRULE
 ########################################################################
 # Rule to clear greenFlag when invoking 
 # BytemanControlledRecord.resetGreenFlag()
-#########################################################################
+########################################################################
 
 RULE resetGreenFlag
 CLASS com.hp.mwtests.ts.arjuna.resources.BytemanControlledRecord
@@ -43,7 +43,7 @@ ENDRULE
 ########################################################################
 # Rule to set greenFlag when
 # AtomicActionRecoveryModule.hasWork returns true
-#########################################################################
+########################################################################
 
 RULE setGreenFlag
 CLASS com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule
@@ -56,9 +56,8 @@ DO debug("[AtomicActionRecoveryModule] Setting greenFlag to true"),
 ENDRULE
 
 ########################################################################
-# Rule to artificially set greenFlag when
-# AtomicActionRecoveryModule.hasWork returns true
-#########################################################################
+# Rule to artificially set greenFlag
+########################################################################
 
 RULE artificiallySetGreenFlag
 CLASS com.hp.mwtests.ts.arjuna.resources.BytemanControlledRecord
@@ -73,14 +72,14 @@ ENDRULE
 # Rule to fail
 # BytemanControlledRecord.topLevelCommit()
 # until greenFlag gets set
-#########################################################################
+########################################################################
 
 RULE FailTopLevelCommit
 CLASS com.hp.mwtests.ts.arjuna.resources.BytemanControlledRecord
 METHOD topLevelCommit
 AT EXIT
 IF NOT flagged("greenFlag")
-DO debug("[BytemanControlledRecord] returning TwoPhaseOutcome.FINISH_ERROR"),
-   # TwoPhaseOutcome.FINISH_ERROR == 8
-   return 8
+DO debug("[BytemanControlledRecord.topLevelCommit] returning " +
+      com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome.stringForm(com.hp.mwtests.ts.arjuna.resources.BytemanControlledRecord._commitReturn)),
+   return com.hp.mwtests.ts.arjuna.resources.BytemanControlledRecord._commitReturn
 ENDRULE
