@@ -251,6 +251,9 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                     tsLogger.i18NLogger
                             .warn_recovery_AtomicActionRecoveryModule_3(
                                     currentUid, ex);
+
+                    // There might still be work to do if currentState throws an ObjectStoreException
+                    this.hasWork = true;
                 }
             }
         }
