@@ -221,10 +221,11 @@ public class RecoveryManager
     }
 
     /**
-     * <p>Suspend the recovery manager. If the recovery manager is in the process of
+     * Suspend the recovery manager. If the recovery manager is in the process of
      * doing recovery scans then it will be suspended afterwards, in order to
      * preserve data integrity.
-     * <p>Note that this method is also influenced by
+     * <p>
+     * Note that this method is also influenced by
      * {@link com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean#setWaitForRecovery}.
      * For more details, see {@link PeriodicRecovery#suspendScan(boolean)}
      *

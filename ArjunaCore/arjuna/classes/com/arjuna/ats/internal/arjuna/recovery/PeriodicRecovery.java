@@ -188,27 +188,31 @@ public class PeriodicRecovery extends Thread
    }
 
     /**
-     * <p>Make all scanning operations suspend.
-     * <p>This switches the recovery operation mode to <code>SUSPENDED</code>.
+     * Make all scanning operations suspend.
+     * <p>
+     * This switches the recovery operation mode to <code>SUSPENDED</code>.
      * Any attempt to start a new scan either by an ad hoc threads or by the periodic
      * recovery thread will suspend its thread until the mode changes.
      * If a scan is in progress when this method is called it will complete its scan
      * without suspending.
-     * <p>Note that this method is also influenced by
+     * <p>
+     * Note that this method is also influenced by
      * {@link com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean#setWaitForRecovery}.
-     * In case <code>{@link RecoveryEnvironmentBean#isWaitForRecovery()} == true</code>,
+     * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true,
      * it is <b>very important</b> that, before invoking this method, the following
      * pre-conditions are met:
-     * * The Transaction System gets disabled (i.e. {@link TxControl#disable()})
+     * <ul>
+     * <li>
+     * {@link TxControl#disable()} should be invoked to disable the Transaction System
      * (i.e. no new transactions will be created)
-     * * {@link com.arjuna.ats.arjuna.coordinator.TransactionReaper} finishes monitoring all in-flight
+     * <li>
+     * {@link com.arjuna.ats.arjuna.coordinator.TransactionReaper} finishes monitoring all in-flight
      * transactions
-     * * All transactions without a timeout are beyond the prepare phase of the 2PC protocol;
-     * to check when this condition is verified, {@link com.arjuna.ats.arjuna.coordinator.ActionManager}
-     * can be employed
-     *
+     * <li>
+     * All transactions without a timeout are beyond the prepare phase of the 2PC protocol
+     * </ul>
      * @param async false if the calling thread should wait for any in-progress scan to complete before returning.
-     * In case <code>{@link RecoveryEnvironmentBean#isWaitForRecovery()} == true</code>, this parameter is
+     * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true, this parameter is
      * override.
      * @return the previous mode before attempting the suspension
      */
@@ -225,7 +229,7 @@ public class PeriodicRecovery extends Thread
            if (currentMode == Mode.ENABLED && recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForRecovery()) {
 
                /*
-                * At least, one clear scan (after the Transaction Manager has been shut down)
+                * At least, one clear scan (after the Transaction System has been disabled)
                 * should be completed to make sure that there are no transactions to recover.
                 */
                doScanningWait();
@@ -233,19 +237,16 @@ public class PeriodicRecovery extends Thread
 
                /*
                 * Now, it is finally possible to start checking if there are transactions that
-                * are still in need of recovery (or completion, in case of heuristics).
+                * are still in need of recovery (or resolution, in case of heuristics).
                 * The Action Manager gets checked as in-flight transactions with timeout zero
                 * can still be around (as the Transaction Reaper doesn't handle those txns)
                 */
                while (_blockSuspension) {
-                   /*
-                    * There might be another thread (the embedded thread or a user-request scan)
-                    * running the recovery cycle.
-                    * It would be possible to use again doScanningWait() here to wait the end of
-                    * the ongoing scan, but the best bet is to wait for the end of the next
-                    * recovery cycle with doPeriodicWait()
-                    */
-                   doPeriodicWait();
+                   try {
+                       _stateLock.wait();
+                   } catch (InterruptedException e) {
+                       // we can ignore this exception
+                   }
                }
            }
 
@@ -258,10 +259,6 @@ public class PeriodicRecovery extends Thread
                _stateLock.notifyAll();
            }
 
-           // At this point, in case isWaitForRecovery is equal to true, an ongoing scan
-           // will not recover any transaction.
-           // In fact, all transactions have already recovered thanks to the above logic
-           // triggered with isWaitForRecovery == true.
            if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForRecovery() && !async) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {

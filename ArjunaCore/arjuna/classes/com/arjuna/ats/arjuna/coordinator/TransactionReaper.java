@@ -758,8 +758,9 @@ public class TransactionReaper
     }
 
     /**
-     * <p>Wait for all transactions to terminate normally.
-     * <p>Note: this method must only be used when the transaction system is
+     * Wait for all transactions to terminate normally.
+     * <p>
+     * Note: this method must only be used when the transaction system is
      * disabled (i.e. after {@link TxControl#disable()} is invoked).
      */
     public void waitForAllTxnsToTerminate() {

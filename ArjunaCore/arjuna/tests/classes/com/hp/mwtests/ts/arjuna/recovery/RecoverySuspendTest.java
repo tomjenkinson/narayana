@@ -201,13 +201,13 @@ public class RecoverySuspendTest {
         heuristicTest(false, TwoPhaseOutcome.HEURISTIC_HAZARD);
     }
 
-    private void heuristicTest(boolean waitForHeuristicsDuringRecovery, int heuristicType) {
+    private void heuristicTest(boolean waitForHeuristicsDuringSuspension, int heuristicType) {
         // Make sure that the test environment is ready
         BytemanControlledRecord.resetCommitCallCounter();
         BytemanControlledRecord.resetGreenFlag();
         BytemanControlledRecord.setCommitReturn(heuristicType);
 
-        _recoveryConfig.setWaitForHeuristicsDuringRecovery(waitForHeuristicsDuringRecovery);
+        _recoveryConfig.setWaitForHeuristicsDuringSuspension(waitForHeuristicsDuringSuspension);
 
         // BytemanControlledRecord.getCommitCallCounter() should be 1 as:
         // - One invocation from the normal commit procedure should fail

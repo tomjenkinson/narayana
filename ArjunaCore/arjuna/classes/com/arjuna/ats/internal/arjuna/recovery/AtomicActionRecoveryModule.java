@@ -11,7 +11,6 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
-import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
@@ -239,8 +238,8 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                          */
                         if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
                             if (rcvAtomicAction.hasHeuristicParticipants() &&
-                                    !recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForHeuristicsDuringRecovery()) {
-                                tsLogger.i18NLogger.heuristic_atomic_action_silenced(currentUid);
+                                    !recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForHeuristicsDuringSuspension()) {
+                                tsLogger.i18NLogger.trace_heuristic_atomic_action_silenced(currentUid);
                             } else {
                                 this.hasWork = true;
                             }
@@ -278,11 +277,6 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
    // processes(JVMs) on this system/node.
    private TransactionStatusConnectionManager _transactionStatusConnectionMgr ;
 
-   /*
-    * This class field is not declared as volatile as Recovery Module's
-    * first pass and second pass can only be invoked sequentially and by
-    * one thread per time.
-    */
    private boolean hasWork;
 
 }

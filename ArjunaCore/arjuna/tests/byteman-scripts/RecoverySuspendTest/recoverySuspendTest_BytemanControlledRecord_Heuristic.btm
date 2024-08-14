@@ -1,14 +1,14 @@
 ########################################################################
 # Rule to skip heuristic AtomicAction instances through
-# isWaitForHeuristicsDuringRecovery()
+# isWaitForHeuristicsDuringSuspension()
 ########################################################################
 
 RULE skipHeuristicDuringRecovery
 CLASS com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean
-METHOD isWaitForHeuristicsDuringRecovery
+METHOD isWaitForHeuristicsDuringSuspension
 AT EXIT
 IF flagged("greenFlag") && $!
-DO debug("[RecoveryEnvironmentBean] setting setWaitForHeuristicsDuringRecovery(boolean) to false"),
+DO debug("[RecoveryEnvironmentBean] setting setWaitForHeuristicsDuringSuspension(boolean) to false"),
    return false
 ENDRULE
 

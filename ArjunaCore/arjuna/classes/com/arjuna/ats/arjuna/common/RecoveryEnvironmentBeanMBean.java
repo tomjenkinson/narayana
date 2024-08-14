@@ -41,5 +41,5 @@ public interface RecoveryEnvironmentBeanMBean
 
     boolean isWaitForRecovery();
 
-    boolean isWaitForHeuristicsDuringRecovery();
+    boolean isWaitForHeuristicsDuringSuspension();
 }

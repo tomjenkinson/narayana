@@ -40,7 +40,7 @@ public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean
     private volatile int transactionStatusManagerExpiryTime = 12; // hours
 
     private volatile boolean waitForRecovery = false;
-    private volatile boolean waitForHeuristicsDuringRecovery = false;
+    private volatile boolean waitForHeuristicsDuringSuspension = false;
 
     @ConcatenationPrefix(prefix = "com.arjuna.ats.arjuna.recovery.expiryScanner")
     private volatile List<String> expiryScannerClassNames = new ArrayList<String>();
@@ -633,19 +633,19 @@ public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean
      * @return true if, during its suspension, {@link com.arjuna.ats.arjuna.recovery.RecoveryManager}
      * should wait for heuristic transactions to be recovered; false otherwise.
      */
-    public boolean isWaitForHeuristicsDuringRecovery() {
-        return waitForHeuristicsDuringRecovery;
+    public boolean isWaitForHeuristicsDuringSuspension() {
+        return waitForHeuristicsDuringSuspension;
     }
 
     /**
      * This method controls whether, during its suspension,
      * {@link com.arjuna.ats.arjuna.recovery.RecoveryManager} should wait for heuristic transactions
      * to be recovered.
-     * @param waitForHeuristicsDuringRecovery true if, during its suspension,
+     * @param waitForHeuristicsDuringSuspension true if, during its suspension,
      * {@link com.arjuna.ats.arjuna.recovery.RecoveryManager} should wait for heuristic transactions
      * to be recovered; false otherwise.
      */
-    public void setWaitForHeuristicsDuringRecovery(boolean waitForHeuristicsDuringRecovery) {
-        this.waitForHeuristicsDuringRecovery = waitForHeuristicsDuringRecovery;
+    public void setWaitForHeuristicsDuringSuspension(boolean waitForHeuristicsDuringSuspension) {
+        this.waitForHeuristicsDuringSuspension = waitForHeuristicsDuringSuspension;
     }
 }
