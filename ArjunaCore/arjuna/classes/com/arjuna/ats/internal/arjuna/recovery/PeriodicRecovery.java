@@ -199,18 +199,9 @@ public class PeriodicRecovery extends Thread
      * Note that this method is also influenced by
      * {@link com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean#setWaitForRecovery}.
      * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true,
-     * it is <b>very important</b> that, before invoking this method, the following
-     * pre-conditions are met:
-     * <ul>
-     * <li>
-     * {@link TxControl#disable()} should be invoked to disable the Transaction System
-     * (i.e. no new transactions will be created)
-     * <li>
-     * {@link com.arjuna.ats.arjuna.coordinator.TransactionReaper} finishes monitoring all in-flight
-     * transactions
-     * <li>
-     * All transactions without a timeout are beyond the prepare phase of the 2PC protocol
-     * </ul>
+     * it is <b>very important</b> that, before invoking this method, all in-flight
+     * transactions are beyond the prepare phase
+     *
      * @param async false if the calling thread should wait for any in-progress scan to complete before returning.
      * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true, this parameter is
      * override.

@@ -238,7 +238,9 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                          */
                         if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
                             if (rcvAtomicAction.hasHeuristicParticipants()) {
-                                tsLogger.i18NLogger.trace_heuristic_atomic_action_silenced(currentUid);
+                                tsLogger.logger.tracef(
+                                        "AtomicActionRecoveryModule.processTransactionsStatus heuristic action {0} " +
+                                                "was ignored during the assessment of leftover work.", currentUid);
                             } else {
                                 this.hasWork = true;
                             }
