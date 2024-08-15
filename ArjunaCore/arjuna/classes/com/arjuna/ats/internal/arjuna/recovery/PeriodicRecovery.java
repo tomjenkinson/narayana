@@ -200,7 +200,7 @@ public class PeriodicRecovery extends Thread
      * {@link com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean#setWaitForRecovery}.
      * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true,
      * it is <b>very important</b> that, before invoking this method, all in-flight
-     * transactions are beyond the prepare phase
+     * transactions have passed the prepare phase.
      *
      * @param async false if the calling thread should wait for any in-progress scan to complete before returning.
      * In case {@link RecoveryEnvironmentBean#isWaitForRecovery()} is true, this parameter is
