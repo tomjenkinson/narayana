@@ -162,33 +162,10 @@ public class RecoverySuspendTest {
     @Test
     @BMScripts(scripts = {
             @BMScript("RecoverySuspendTest/recoverySuspendTest_BytemanControlledRecord"),
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_BytemanControlledRecord_Heuristic"),
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_FailTest")
-    })
-    public void testSuspensionWhenThereIsAHeuristicMixedAtomicActionToRecover() {
-
-        heuristicTest(true, TwoPhaseOutcome.HEURISTIC_MIXED);
-    }
-
-    @Test
-    @BMScripts(scripts = {
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_BytemanControlledRecord"),
             @BMScript("RecoverySuspendTest/recoverySuspendTest_FailTest")
     })
     public void testSuspensionWhenThereIsAHeuristicMixedAtomicActionToRecoverButNotWaiting() {
-
-        heuristicTest(false, TwoPhaseOutcome.HEURISTIC_MIXED);
-    }
-
-    @Test
-    @BMScripts(scripts = {
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_BytemanControlledRecord"),
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_BytemanControlledRecord_Heuristic"),
-            @BMScript("RecoverySuspendTest/recoverySuspendTest_FailTest")
-    })
-    public void testSuspensionWhenThereIsAHeuristicHazardAtomicActionToRecover() {
-
-        heuristicTest(true, TwoPhaseOutcome.HEURISTIC_HAZARD);
+        heuristicTest(TwoPhaseOutcome.HEURISTIC_MIXED);
     }
 
     @Test
@@ -197,17 +174,14 @@ public class RecoverySuspendTest {
             @BMScript("RecoverySuspendTest/recoverySuspendTest_FailTest")
     })
     public void testSuspensionWhenThereIsAHeuristicHazardAtomicActionToRecoverButNotWaiting() {
-        
-        heuristicTest(false, TwoPhaseOutcome.HEURISTIC_HAZARD);
+        heuristicTest(TwoPhaseOutcome.HEURISTIC_HAZARD);
     }
 
-    private void heuristicTest(boolean waitForHeuristicsDuringSuspension, int heuristicType) {
+    private void heuristicTest(int heuristicType) {
         // Make sure that the test environment is ready
         BytemanControlledRecord.resetCommitCallCounter();
         BytemanControlledRecord.resetGreenFlag();
         BytemanControlledRecord.setCommitReturn(heuristicType);
-
-        _recoveryConfig.setWaitForHeuristicsDuringSuspension(waitForHeuristicsDuringSuspension);
 
         // BytemanControlledRecord.getCommitCallCounter() should be 1 as:
         // - One invocation from the normal commit procedure should fail

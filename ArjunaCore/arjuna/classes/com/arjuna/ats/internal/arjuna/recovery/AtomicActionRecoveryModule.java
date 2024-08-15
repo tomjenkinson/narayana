@@ -237,8 +237,7 @@ public class AtomicActionRecoveryModule implements RecoveryModule {
                          * If that is not the case, it means that the current AtomicAction still needs to be recovered
                          */
                         if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
-                            if (rcvAtomicAction.hasHeuristicParticipants() &&
-                                    !recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForHeuristicsDuringSuspension()) {
+                            if (rcvAtomicAction.hasHeuristicParticipants()) {
                                 tsLogger.i18NLogger.trace_heuristic_atomic_action_silenced(currentUid);
                             } else {
                                 this.hasWork = true;
