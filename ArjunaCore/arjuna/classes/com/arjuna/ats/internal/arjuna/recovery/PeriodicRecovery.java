@@ -13,7 +13,6 @@ import java.util.Vector;
 
 import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
-import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
@@ -219,18 +218,12 @@ public class PeriodicRecovery extends Thread
             */
            if (currentMode == Mode.ENABLED && recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForRecovery()) {
 
-               /*
-                * At least, one clear scan (after the Transaction System has been disabled)
-                * should be completed to make sure that there are no transactions to recover.
-                */
                doScanningWait();
                doWork();
 
                /*
                 * Now, it is finally possible to start checking if there are transactions that
                 * are still in need of recovery (or resolution, in case of heuristics).
-                * The Action Manager gets checked as in-flight transactions with timeout zero
-                * can still be around (as the Transaction Reaper doesn't handle those txns)
                 */
                while (_blockSuspension) {
                    try {
@@ -250,7 +243,7 @@ public class PeriodicRecovery extends Thread
                _stateLock.notifyAll();
            }
 
-           if (!recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForRecovery() && !async) {
+           if (!async && !recoveryPropertyManager.getRecoveryEnvironmentBean().isWaitForRecovery()) {
                // synchronous, so we keep waiting until the currently active scan stops
                while (getStatus() == Status.SCANNING) {
                    try {
