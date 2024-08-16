@@ -76,6 +76,10 @@ public class RecoverAtomicAction extends AtomicAction
        }
    }
 
+    public boolean hasFailedParticipants() {
+        return failedList != null && failedList.size() > 0;
+    }
+
    public boolean hasHeuristicParticipants() {
        return heuristicList != null && heuristicList.size() > 0;
    }
