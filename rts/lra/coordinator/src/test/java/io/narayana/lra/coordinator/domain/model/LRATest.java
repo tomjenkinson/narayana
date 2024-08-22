@@ -814,6 +814,35 @@ public class LRATest {
         }
     }
 
+
+    @Test
+    public void testJoinAfterTimeout() {
+        //1. Service 1 calls POST /lra-coordinator/start to start a Saga.
+        URI lraId = lraClient.startLRA(null, "testTimeLimit", 100L, ChronoUnit.MILLIS);
+
+        //2. Service 2 calls PUT /lra-coordinator/{LraId} to join the Saga.
+        lraClient.joinLRA(lraId, null, lraId, null);
+        // 3. Service 3 calls PUT /lra-coordinator/{LraId} to join the same Saga.
+        lraClient.joinLRA(lraId, null, lraId, null);
+        // 4. A timeout exception occurs in Service 1, leading it to call PUT /lra-coordinator/{LraId}/cancel to cancel the Saga.
+        //5. The LRA Coordinator calls the compensation API /saga/compensate registered by Service 2 and Service 3.
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        //6. Service 2 receives the /saga/compensate call and begins compensating, which takes more than 2 seconds.
+        //7. Before step 6 is completed, Service 4 calls PUT /lra-coordinator/{LraId} to attempt to join the Saga.
+        try {
+            // 8. The LRA Coordinator crashes
+            lraClient.joinLRA(lraId, null, lraId, null);
+        }catch(WebApplicationException e) {
+
+        }
+        lraClient.closeLRA(lraId);
+
+    }
+
     private void runLRA(boolean cancel) {
         URI parentId = lraClient.startLRA("parent");
         URI childId = lraClient.startLRA(parentId, "child", 0L, ChronoUnit.SECONDS);
