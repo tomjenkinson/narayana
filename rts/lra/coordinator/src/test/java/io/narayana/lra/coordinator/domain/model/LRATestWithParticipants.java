@@ -90,6 +90,10 @@ public class LRATestWithParticipants {
     private String coordinatorPath;
     @Rule
     public TestName testName = new TestName();
+    private static Object lock = new Object();
+    private static boolean joinAttempted;
+    private static boolean compensateCalled;
+
     @Path("/test")
     public static class Participant {
 
@@ -181,13 +185,18 @@ public class LRATestWithParticipants {
         @Compensate
         public Response compensate(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI contextLRA,
                 @HeaderParam(LRA_HTTP_PARENT_CONTEXT_HEADER) URI parentLRA) {
-            try {
-                log.info("starting compensating from");
-                TimeUnit.SECONDS.sleep(5);
-                log.info("finishing compensating from");
+            synchronized (lock) {
+                compensateCalled = true;
+                lock.notify();
             }
-            catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            synchronized (lock) {
+                while (!joinAttempted) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        fail("Could not wait");
+                    }
+                }
             }
             if (acceptCount.getAndDecrement() <= 0) {
                 compensateCount.incrementAndGet();
@@ -289,7 +298,7 @@ public class LRATestWithParticipants {
     @Test
     public void testJoinAfterTimeout() {
         // 1. Service 1 calls POST /lra-coordinator/start to start a Saga.
-        URI lraId = lraClient.startLRA(null, "testTimeLimit", 10000L, ChronoUnit.MILLIS);
+        URI lraId = lraClient.startLRA(null, "testTimeLimit", 1000L, ChronoUnit.MILLIS);
         // 2. Service 2 calls PUT /lra-coordinator/{LraId} to join the Saga.
         lraClient.joinLRA(lraId, null, URI.create("http://localhost:8081/service2/test"), null);
         // 3. Service 3 calls PUT /lra-coordinator/{LraId} to join the same Saga.
@@ -299,7 +308,7 @@ public class LRATestWithParticipants {
         // 5. The LRA Coordinator calls the compensation API /saga/compensate registered
         // by Service 2 and Service 3.
         try {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(2);
         }
         catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -308,11 +317,24 @@ public class LRATestWithParticipants {
         // which takes more than 2 seconds.
         // 7. Before step 6 is completed, Service 4 calls PUT /lra-coordinator/{LraId}
         // to attempt to join the Saga.
-        try {
-            // 8. The LRA Coordinator crashes
-            lraClient.joinLRA(lraId, null, URI.create("http://localhost:8081/service4/test/compensate"), null);
-        }
-        catch (WebApplicationException e) {
+        synchronized (lock) {
+            while (!compensateCalled) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    fail("Could not wait");
+                }
+            }
+            try {
+                // 8. The LRA Coordinator crashes
+                lraClient.joinLRA(lraId, null, URI.create("http://localhost:8081/service4/test/compensate"), null);
+                fail("I presume it's not expected to be able to joinLRA when the LRA is compensating");
+            } catch (WebApplicationException e) {
+
+            } finally {
+                joinAttempted = true;
+                lock.notify();
+            }
         }
         // test the coordinator is still alive
         lraClient.getRecoveryUrl();
