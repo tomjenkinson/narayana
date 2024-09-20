@@ -14,17 +14,29 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
+
+import jakarta.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.SystemException;
 import jakarta.transaction.UserTransaction;
 
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.jnp.server.NamingBeanImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
+import static org.junit.Assert.fail;
+
+@RunWith(BMUnitRunner.class)
 public class SimpleJdbcTest {
 	private static final String DB_USER1 = "user1";
 	private static final String DB_USER2 = "user2";
@@ -64,6 +76,50 @@ public class SimpleJdbcTest {
 		insert(connection2);
 
 		userTransaction.commit();
+	}
+
+	@Test
+	@BMRule(
+			name = "XA_RBINTEGRITY in prepare",
+			targetClass = "com.arjuna.ats.internal.jdbc.IsSameRMOverrideXAResource",
+			targetMethod = "prepare",
+			// Action should also be wrappedXAResource.rollback(arg0);
+			action = "throw new XAException(XAException.XA_RBINTEGRITY)",
+			targetLocation = "AT ENTRY"
+	)
+	public void testRollbackXA_RBINTEGRITY() throws SQLException, NamingException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SystemException, NotSupportedException, RollbackException, HeuristicRollbackException, HeuristicMixedException {
+
+		final DataSource dataSource1 = getDataSource(DB_USER1, "resource: "
+				+ DB_USER1);
+		final DataSource dataSource2 = getDataSource(DB_USER2, "resource: "
+				+ DB_USER2);
+
+		prepare(dataSource1);
+		prepare(dataSource2);
+
+
+		jakarta.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+				.transactionManager();
+
+		tm.begin();
+
+
+		final Connection connection1 = dataSource1.getConnection();
+		final Connection connection2 = dataSource2.getConnection();
+
+		insert(connection1);
+		insert(connection2);
+
+		try {
+			tm.commit();
+			fail("Should not have committed");
+		} catch (RollbackException e) {
+			// Expected
+		} finally {
+			// Without a connection close the underlying connection will not close
+			connection1.close();
+			connection2.close();
+		}
 	}
 
 	private static void insert(Connection connection) throws SQLException {

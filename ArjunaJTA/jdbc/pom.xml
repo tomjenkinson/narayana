@@ -145,7 +145,6 @@
               <exclude>**/utils/plugins/**</exclude>
               <exclude>**/DBPlugin.java</exclude>
               <exclude>**/*JNDISetup.java</exclude>
-              <exclude>**/*SimpleJdbcTest.java</exclude>
               <exclude>**/*StableConnections.java</exclude>
             </excludes>
           </configuration>
