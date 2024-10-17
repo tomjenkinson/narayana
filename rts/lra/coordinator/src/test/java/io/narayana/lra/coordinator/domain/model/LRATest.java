@@ -27,6 +27,7 @@ import io.narayana.lra.LRAConstants;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.hamcrest.MatcherAssert;
 import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.test.TestPortProvider;
@@ -759,9 +760,14 @@ public class LRATest extends LRATestBase {
     }
 
     @Test
-    @BMRule(name = "Call a helper", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
-            targetMethod = "timeoutBeforeJoin", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
-            action = "help();")
+    @BMRules(rules={
+        @BMRule(name = "Rendezvous business and compensate 1", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
+                targetMethod = "timeoutBeforeJoin", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
+                action = "rendezvousBusinessAndCompensateBusiness();"),
+        @BMRule(name = "Rendezvous business and compensate 2", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
+                targetMethod = "compensate", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
+                action = "rendezvousBusinessAndCompensateCompensate();")
+    })
     public void testTimeoutWhileJoining() throws URISyntaxException {
         String target = TestPortProvider.generateURL("/base/test/timeout-while-joining");
         int compensations = compensateCount.get();
