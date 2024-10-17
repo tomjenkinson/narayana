@@ -26,6 +26,8 @@ import java.util.stream.IntStream;
 import io.narayana.lra.LRAConstants;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.hamcrest.MatcherAssert;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.test.TestPortProvider;
 import org.junit.After;
@@ -55,7 +57,9 @@ import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.junit.runner.RunWith;
 
+@RunWith(BMUnitRunner.class)
 public class LRATest extends LRATestBase {
     static final String LRA_API_VERSION_HEADER_NAME = "Narayana-LRA-API-version";
     static final String RECOVERY_HEADER_NAME = "Long-Running-Action-Recovery";
@@ -80,6 +84,7 @@ public class LRATest extends LRATestBase {
             classes.add(AfterLRAListener.class);
             classes.add(ServerLRAFilter.class);
             classes.add(ParticipantStatusOctetStreamProvider.class);
+            classes.add(BytemanHelper.class);
             return classes;
         }
     }
@@ -754,6 +759,9 @@ public class LRATest extends LRATestBase {
     }
 
     @Test
+    @BMRule(name = "Call a helper", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
+            targetMethod = "timeoutBeforeJoin", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
+            action = "help();")
     public void testTimeoutWhileJoining() throws URISyntaxException {
         String target = TestPortProvider.generateURL("/base/test/timeout-while-joining");
         int compensations = compensateCount.get();
