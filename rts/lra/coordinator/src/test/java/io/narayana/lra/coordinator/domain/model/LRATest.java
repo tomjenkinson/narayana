@@ -761,12 +761,12 @@ public class LRATest extends LRATestBase {
 
     @Test
     @BMRules(rules={
-        @BMRule(name = "Rendezvous business and compensate 1", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
-                targetMethod = "timeoutBeforeJoin", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
-                action = "rendezvousBusinessAndCompensateBusiness();"),
-        @BMRule(name = "Rendezvous business and compensate 2", targetClass = "io.narayana.lra.coordinator.domain.model.LRATestBase$Participant",
-                targetMethod = "compensate", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
-                action = "rendezvousBusinessAndCompensateCompensate();")
+        @BMRule(name = "Rendezvous doEnlistParticipant", targetClass = "io.narayana.lra.coordinator.domain.model.LongRunningAction",
+                targetMethod = "enlistParticipant", targetLocation = "ENTRY", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
+                action = "rendezvousEnlistAbort();"),
+        @BMRule(name = "Rendezvous abortLRA", targetClass = "io.narayana.lra.coordinator.domain.model.LongRunningAction",
+                targetMethod = "abortLRA", targetLocation = "EXIT", helper = "io.narayana.lra.coordinator.domain.model.BytemanHelper",
+                action = "rendezvousAbortEnlist();")
     })
     public void testTimeoutWhileJoining() throws URISyntaxException {
         String target = TestPortProvider.generateURL("/base/test/timeout-while-joining");
