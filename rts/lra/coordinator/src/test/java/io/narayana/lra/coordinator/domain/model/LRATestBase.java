@@ -146,7 +146,7 @@ public class LRATestBase {
         @Produces(MediaType.APPLICATION_JSON)
         @LRA(value = LRA.Type.REQUIRED, timeLimit = 1000, timeUnit = ChronoUnit.MILLIS)
         public Response timeoutBeforeJoin(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
-            return Response.status(Response.Status.OK).entity("success").build();
+            return Response.status(Response.Status.CONFLICT).entity("success").build();
         }
 
         @GET
