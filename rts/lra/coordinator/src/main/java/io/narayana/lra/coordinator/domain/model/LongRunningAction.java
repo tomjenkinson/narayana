@@ -415,6 +415,8 @@ public class LongRunningAction extends BasicAction {
 
     boolean isFinished() {
         switch (status) {
+            case Active:
+                return false;
             case Closed:
                 /* FALLTHROUGH */
             case Cancelled:
@@ -809,6 +811,10 @@ public class LongRunningAction extends BasicAction {
             p.setRecoveryURI(recoveryUrlBase, this.get_uid().fileStringForm(), pid);
         }
 
+        if (isInEndState()) {
+            return null;
+        }
+
         if (add(p) != AddOutcome.AR_REJECTED) {
             setTimeLimit(timeLimit);
 
@@ -1117,7 +1123,8 @@ public class LongRunningAction extends BasicAction {
         return Response.Status.OK.getStatusCode();
     }
 
-    private void abortLRA() {
+    // abortLRA is package private because it gets used by one of the byteman rules
+    void abortLRA() {
         ReentrantLock lock = tryLockTransaction();
 
         if (lock != null) {
