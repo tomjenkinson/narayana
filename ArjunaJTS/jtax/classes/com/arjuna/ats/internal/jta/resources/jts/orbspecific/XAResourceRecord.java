@@ -406,7 +406,9 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                                      */
                                     destroyState = false;
                                 }
-                                break;
+                                // We don't want to report a heuristic as we don't know it won't rollback so throw UNKNOWN
+                                // (noting we end up in the finally for further processing)
+                                throw new UNKNOWN();
                             default:
                                 destroyState();
 
