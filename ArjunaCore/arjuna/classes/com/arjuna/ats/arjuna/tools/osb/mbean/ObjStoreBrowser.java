@@ -263,6 +263,19 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         return true;
     }
 
+    public void addType(String typeName, OSBTypeHandler osbTypeHandler) {
+        osbTypeMap.put(typeName, osbTypeHandler);
+    }
+
+    /**
+     * Expose a method to passing in a type handler that can be used as a factory to create
+     * @param typeName
+     * @param osbTypeHander
+     */
+    public void addOSBTypeHandler(String typeName, OSBTypeHandler osbTypeHander) {
+        osbTypeMap.put(typeName, osbTypeHander);
+    }
+
     /**
      * @param handler specification for handling object store types
      * @return the previous value associated with type handler, or null if there was no previous handler.
@@ -500,11 +513,8 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
         String beanType = osbType == null ? OSEntryBean.class.getName() : osbType.getBeanClass();
         String stateType = osbType == null ? null : osbType.getRecordClass();
-        UidWrapper w = new UidWrapper(this, beanType, type, stateType, uid, registerBean);
 
-        w.createMBean();
-
-        return w;
+        return osbType.createMBean(this, beanType, type, stateType, uid, registerBean);
     }
 
     private Collection<Uid> getUids(String type) throws MBeanException {
