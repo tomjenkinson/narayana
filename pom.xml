@@ -176,8 +176,7 @@
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
-    <skipMavenDeployMojo>false</skipMavenDeployMojo>
-    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+
     <!-- Sortpom is enabled by default, but it could be disabled in sub-modules setting sortpom.skip = true -->
     <sortpom.skip>false</sortpom.skip>
     <!-- The surefire/failsafe test execution logs goes to a file by default -->
@@ -283,34 +282,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <configuration>
-            <skip>${skipMavenDeployMojo}</skip>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>${version.org.sonatype.plugins.nexus-staging-maven-plugin}</version>
-          <extensions>true</extensions>
-          <configuration>
-            <serverId>jboss-releases-repository</serverId>
-            <nexusUrl>https://repository.jboss.org/nexus/</nexusUrl>
-            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            <skipNexusStagingDeployMojo>${skipNexusStagingDeployMojo}</skipNexusStagingDeployMojo>
-          </configuration>
-          <executions>
-            <execution>
-              <id>nexus-deploy</id>
-              <goals>
-                <goal>deploy</goal>
-              </goals>
-              <phase>deploy</phase>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>${surefireArgLine}</argLine>
@@ -412,6 +383,44 @@
     </pluginManagement>
 
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>3.1.4</version>
+        <executions>
+          <execution>
+            <id>default-deploy</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nxrm3-maven-plugin</artifactId>
+        <version>1.0.7</version>
+        <configuration>
+          <serverId>narayana</serverId>
+          <nexusUrl>https://repository.jboss.org/nexus/</nexusUrl>
+          <repository>narayana</repository>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-prepare-deploy</id>
+            <goals>
+              <goal>prepare-deploy</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-deploy</id>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
