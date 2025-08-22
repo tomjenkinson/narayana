@@ -34,9 +34,12 @@ public class RecoveryManagerTestCase {
 
         ParticipantsContainer.getInstance().clear();
         ParticipantsManagerFactory.getInstance().setBaseUrl("");
-        RecoveryManager.getInstance().persistParticipantInformation(participantInformationBefore);
-        RecoveryManager.getInstance().registerDeserializer(APPLICATION_ID + "2", new TestParticipantDeserializer());
-
+        try {
+            RecoveryManager.getInstance().persistParticipantInformation(participantInformationBefore);
+            RecoveryManager.getInstance().registerDeserializer(APPLICATION_ID + "2", new TestParticipantDeserializer());
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
         final ParticipantInformation participantInformationAfter = ParticipantsContainer.getInstance()
                 .getParticipantInformation(participantId);
         Assert.assertNull(participantInformationAfter);
