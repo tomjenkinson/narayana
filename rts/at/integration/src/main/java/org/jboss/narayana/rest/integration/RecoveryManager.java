@@ -73,8 +73,10 @@ public final class RecoveryManager {
             recoverParticipants();
         }
     }
-/* Participant implementations must implement either PersistableParticipant Or java.io.Serializable*/
-    public void persistParticipantInformation(final ParticipantInformation participantInformation) {
+       /*
+       * Participant implementations must implement either PersistableParticipant Or java.io.Serializable
+       */
+    public void persistParticipantInformation(final ParticipantInformation participantInformation) throws IOException, ObjectStoreException {
         if (LOG.isTraceEnabled()) {
             LOG.trace("RecoveryManager.persistParticipantInformation: participantInformation=" + participantInformation);
         }
@@ -87,7 +89,7 @@ public final class RecoveryManager {
             return;
         }
 
-        try {
+        //try {
             final RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
             final OutputObjectState state = getParticipantInformationOutputState(participantInformation);
             final Uid uid = new Uid(participantInformation.getId());
@@ -95,9 +97,9 @@ public final class RecoveryManager {
             recoveryStore.write_committed(uid, PARTICIPANT_INFORMATION_RECORD_TYPE, state);
             // to identify the uid from the participant persisted into the object store in order to delete it later
             persistedParticipants.put(participantInformation.getId(), uid);
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-        }
+        }*/
     }
 
     public void removeParticipantInformation(final ParticipantInformation participantInformation) {
