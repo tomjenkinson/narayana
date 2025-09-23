@@ -93,7 +93,7 @@ public final class ParticipantResource {
     @Consumes(TxMediaType.TX_STATUS_MEDIA_TYPE)
     @Produces(TxMediaType.TX_STATUS_MEDIA_TYPE)
     public Response terminate(@PathParam("participantId") final String participantId, final String content)
-            throws HeuristicException, ObjectStoreException, IOException {
+            throws ParticipantException,HeuristicException {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("PUT request on ParticipantResource. ParticipantId: " + participantId + ", content: " + content);
@@ -175,7 +175,7 @@ public final class ParticipantResource {
         return Response.status(412).build();
     }
 
-    private Vote prepare(final ParticipantInformation participantInformation) throws HeuristicException, ObjectStoreException, IOException {
+    private Vote prepare(final ParticipantInformation participantInformation) throws ParticipantException,HeuristicException {
         if (isHeuristic(participantInformation)) {
             return prepareHeuristic(participantInformation);
         }
@@ -190,7 +190,7 @@ public final class ParticipantResource {
                 RESTATLogger.atI18NLogger.warn_prepareParticipantResource(e.getMessage(), e); // JBTM-3990
             }
             participantInformation.setStatus(TxStatus.TransactionActive.name());
-            throw e;
+            throw (e);
         }
 
         if (vote instanceof Aborted) {
@@ -214,7 +214,7 @@ public final class ParticipantResource {
         }
     }
 
-    private void commit(final ParticipantInformation participantInformation) throws HeuristicException, ObjectStoreException, IOException {
+    private void commit(final ParticipantInformation participantInformation) throws ParticipantException,HeuristicException{
         if (isHeuristic(participantInformation)) {
             commitHeuristic(participantInformation);
         } else {
@@ -271,7 +271,7 @@ public final class ParticipantResource {
         }
     }
 
-    private void rollback(final ParticipantInformation participantInformation) throws HeuristicException, ObjectStoreException, IOException {
+    private void rollback(final ParticipantInformation participantInformation) throws HeuristicException, ParticipantException {
         if (isHeuristic(participantInformation)) {
             rollbackHeuristic(participantInformation);
         } else {

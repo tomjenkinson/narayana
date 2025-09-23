@@ -73,11 +73,7 @@ public final class RecoveryManager {
             recoverParticipants();
         }
     }
-       /*
-       *  Participant implementations must implement either {@link PersistableParticipant} or {@link java.io.Serializable}
-        * @param participantInformation
-        * @throw ParticipantException
-        */
+
     public void persistParticipantInformation(final ParticipantInformation participantInformation) throws ParticipantException {
         if (LOG.isTraceEnabled()) {
             LOG.trace("RecoveryManager.persistParticipantInformation: participantInformation=" + participantInformation);
@@ -86,6 +82,7 @@ public final class RecoveryManager {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("RecoveryManager.persistParticipantInformation: participant is not recoverable");
             }
+
             return;
         }
         try {
