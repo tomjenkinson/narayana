@@ -23,7 +23,7 @@
     <main.verticle>ClientVerticle</main.verticle>
     <narayana.version>${project.version}</narayana.version>
     <skip.release>true</skip.release>
-    <vertx.version>3.9.15</vertx.version>
+    <vertx.version>5.0.5</vertx.version>
   </properties>
 
   <dependencies>
