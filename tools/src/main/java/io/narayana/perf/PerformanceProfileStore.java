@@ -6,19 +6,8 @@
 
 package io.narayana.perf;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Enumeration;
+import java.io.*;
+import java.util.*;
 
 /**
  * Maintain performance data and check for regressions.

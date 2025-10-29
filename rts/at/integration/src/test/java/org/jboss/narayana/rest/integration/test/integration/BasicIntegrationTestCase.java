@@ -5,16 +5,20 @@
 package org.jboss.narayana.rest.integration.test.integration;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import jakarta.xml.bind.JAXBException;
 
 import org.jboss.jbossts.star.logging.RESTATLogger;
-import org.jboss.narayana.rest.integration.api.*;
+import org.jboss.narayana.rest.integration.api.Aborted;
+import org.jboss.narayana.rest.integration.api.ParticipantsManagerFactory;
+import org.jboss.narayana.rest.integration.api.Prepared;
+import org.jboss.narayana.rest.integration.api.ReadOnly;
+import org.jboss.narayana.rest.integration.api.HeuristicType;
+import org.jboss.narayana.rest.integration.api.ParticipantException;
+
 import org.junit.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;

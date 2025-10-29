@@ -4,12 +4,14 @@
  */
 package org.jboss.narayana.rest.integration.test.functional;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.net.MalformedURLException;
 
-import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
-import org.jboss.narayana.rest.integration.api.*;
+import org.jboss.narayana.rest.integration.api.ParticipantsManager;
+import org.jboss.narayana.rest.integration.api.ParticipantsManagerFactory;
+import org.jboss.narayana.rest.integration.api.Prepared;
+import org.jboss.narayana.rest.integration.api.HeuristicType;
+import org.jboss.narayana.rest.integration.api.Participant;
+
 import org.junit.Assert;
 
 import org.jboss.jbossts.star.util.TxStatus;
@@ -18,6 +20,7 @@ import org.jboss.narayana.rest.integration.ParticipantsContainer;
 import org.jboss.narayana.rest.integration.test.common.LoggingParticipant;
 import org.junit.Before;
 import org.junit.Test;
+
 import com.arjuna.ats.arjuna.common.Uid;
 
 public final class ParticipantsManagerTestCase {
@@ -46,7 +49,7 @@ public final class ParticipantsManagerTestCase {
     }
 
     @Test
-    public void testReportHeuristic() throws MalformedURLException , IOException, ObjectStoreException {
+    public void testReportHeuristic() throws MalformedURLException  {
         final String participantId = new Uid().toString();
         registerParticipant(participantId, new LoggingParticipant(new Prepared()));
         final ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(participantId);

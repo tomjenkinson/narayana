@@ -4,7 +4,6 @@
  */
 package org.jboss.narayana.rest.integration;
 
-import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -34,7 +33,6 @@ import org.jboss.narayana.rest.integration.api.Vote;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
-import java.io.IOException;
 
 /**
  *
@@ -93,7 +91,7 @@ public final class ParticipantResource {
     @Consumes(TxMediaType.TX_STATUS_MEDIA_TYPE)
     @Produces(TxMediaType.TX_STATUS_MEDIA_TYPE)
     public Response terminate(@PathParam("participantId") final String participantId, final String content)
-            throws ParticipantException,HeuristicException {
+            throws ParticipantException, HeuristicException {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("PUT request on ParticipantResource. ParticipantId: " + participantId + ", content: " + content);
@@ -190,7 +188,7 @@ public final class ParticipantResource {
                 RESTATLogger.atI18NLogger.warn_prepareParticipantResource(e.getMessage(), e); // JBTM-3990
             }
             participantInformation.setStatus(TxStatus.TransactionActive.name());
-            throw (e);
+            throw e;
         }
 
         if (vote instanceof Aborted) {

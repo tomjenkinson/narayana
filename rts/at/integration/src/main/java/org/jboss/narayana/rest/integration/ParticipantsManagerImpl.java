@@ -4,7 +4,6 @@
  */
 package org.jboss.narayana.rest.integration;
 
-import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import org.jboss.jbossts.star.provider.HttpResponseException;
 import org.jboss.jbossts.star.util.TxLinkNames;
 import org.jboss.jbossts.star.util.TxStatus;
@@ -18,8 +17,6 @@ import org.jboss.narayana.rest.integration.api.ParticipantsManager;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import org.jboss.narayana.rest.integration.api.VolatileParticipant;
-
-import java.io.IOException;
 
 /**
  *
@@ -113,7 +110,7 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
     }
 
     @Override
-    public void reportHeuristic(String participantId, HeuristicType heuristicType) throws ObjectStoreException, IOException {
+    public void reportHeuristic(String participantId, HeuristicType heuristicType)  {
         if (LOG.isTraceEnabled()) {
             LOG.trace("ParticipantsManagerImpl.reportHeuristic: participantId=" + participantId + ", heuristicType="
                     + heuristicType);

@@ -7,24 +7,11 @@ package io.narayana.perf;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author <a href="mailto:mmusgrov@redhat.com">M Musgrove</a>
@@ -44,7 +31,7 @@ public class Measurement<T> implements Serializable {
     private int numberOfWarmupCalls = 0; //number of iterations before starting the measurement
     private String info;
 
-    RegressionChecker config; // holds file based measurement data
+    RegressionChecker config; // holds file based  measurment data
 
     private T context;
     private final Set<T> contexts = new HashSet<T>();
