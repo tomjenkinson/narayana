@@ -57,7 +57,6 @@ public final class ParticipantsManagerTestCase {
 
         participantsManager.reportHeuristic(participantId, HeuristicType.HEURISTIC_ROLLBACK);
 
-
         Assert.assertEquals(TxStatus.TransactionHeuristicRollback.name(), participantInformation.getStatus());
     }
 

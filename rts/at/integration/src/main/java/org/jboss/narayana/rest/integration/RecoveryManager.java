@@ -29,13 +29,12 @@ import jakarta.ws.rs.core.Response;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-//import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.io.IOException;
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -100,7 +99,7 @@ public final class RecoveryManager {
         }
     }
 
-      public void removeParticipantInformation(final ParticipantInformation participantInformation) {
+    public void removeParticipantInformation(final ParticipantInformation participantInformation) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("RecoveryManager.removeParticipantInformation: participantInformation=" + participantInformation);
         }
@@ -137,33 +136,23 @@ public final class RecoveryManager {
         }
     }
 
-        private byte[] getParticipantBytes(final Participant participant) throws ParticipantException {
-        try {
+    private byte[] getParticipantBytes(final Participant participant) throws IOException  {
             if (participant instanceof Serializable) {
                 return serializeParticipant((Serializable) participant);
             } else if (participant instanceof PersistableParticipant) {
                 return ((PersistableParticipant) participant).getRecoveryState();
-            }
-        } catch (Exception e) {
-            String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-            throw new ParticipantException(msg, e);
-        }
+           }
 
         // Shouldn't happen
         return new byte[] {};
     }
 
-    private byte[] serializeParticipant(final Serializable participant) throws ParticipantException {
-        try {
+    private byte[] serializeParticipant(final Serializable participant) throws IOException {
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             objectOutputStream.writeObject(participant);
 
             return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-            throw new ParticipantException(msg, e);
-        }
     }
 
     private boolean isRecoverableParticipant(final Participant participant) {

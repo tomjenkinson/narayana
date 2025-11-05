@@ -91,7 +91,7 @@ public final class ParticipantResource {
     @Consumes(TxMediaType.TX_STATUS_MEDIA_TYPE)
     @Produces(TxMediaType.TX_STATUS_MEDIA_TYPE)
     public Response terminate(@PathParam("participantId") final String participantId, final String content)
-            throws ParticipantException, HeuristicException {
+            throws HeuristicException {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("PUT request on ParticipantResource. ParticipantId: " + participantId + ", content: " + content);

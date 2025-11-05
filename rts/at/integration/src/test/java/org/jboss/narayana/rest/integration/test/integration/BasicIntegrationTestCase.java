@@ -180,12 +180,7 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
                     txSupport.getDurableParticipantEnlistmentURI(), p);
         }
 
-        try {
-            ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_ROLLBACK);
-        } catch (Exception e) {
-            String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-            throw new ParticipantException(msg, e);
-        }
+        ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_ROLLBACK);
 
         final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
