@@ -5,6 +5,7 @@
 package org.jboss.narayana.rest.integration;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
@@ -110,16 +111,15 @@ public final class RecoveryManager {
             try {
                 recoveryStore.remove_committed(new Uid(participantId), PARTICIPANT_INFORMATION_RECORD_TYPE);
                 persistedParticipants.remove(participantId);
-            } catch (Exception e) {
-                String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-                throw new ParticipantException(msg, e);
+            } catch (ObjectStoreException ose) {
+                RESTATLogger.atI18NLogger.warn_failureRemovingParticipantObjectStore("Failure while removing participant information from the object store.", ose);
             }
         }
     }
 
     private OutputObjectState getParticipantInformationOutputState(final ParticipantInformation participantInformation)
-            throws ParticipantException {
-        try {
+            throws IOException {
+
             final Uid uid = new Uid(participantInformation.getId());
             final OutputObjectState state = new OutputObjectState(uid, PARTICIPANT_INFORMATION_RECORD_TYPE);
 
@@ -130,11 +130,7 @@ public final class RecoveryManager {
             state.packBytes(getParticipantBytes(participantInformation.getParticipant()));
 
             return state;
-        } catch (Exception e) {
-            String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-            throw new ParticipantException(msg, e);
         }
-    }
 
     private byte[] getParticipantBytes(final Participant participant) throws IOException  {
             if (participant instanceof Serializable) {
@@ -180,9 +176,10 @@ public final class RecoveryManager {
                         }
                     }
                 }
-            } catch (Exception e) {
-                String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-                throw new ParticipantException(msg, e);
+            } catch (ObjectStoreException e) {
+                RESTATLogger.atI18NLogger.warn_recoverParticipantsRecoveryManager(e.getMessage(), e);
+            } catch(IOException e) {
+                RESTATLogger.atI18NLogger.warn_ioRecoverParticipantsRecoveryManager(e.getMessage(), e);
             }
         } else {
             LOG.warn("Participants cannot be loaded from the object store, because base URL was not set.");
@@ -190,10 +187,11 @@ public final class RecoveryManager {
     }
 
     private ParticipantInformation recreateParticipantInformation(final RecoveryStore recoveryStore, final Uid uid)
-            throws Exception {
+            throws ObjectStoreException, IOException {
 
             final InputObjectState inputObjectState = recoveryStore.read_committed(uid, PARTICIPANT_INFORMATION_RECORD_TYPE);
             final String id = inputObjectState.unpackString();
+
             if (ParticipantsContainer.getInstance().getParticipantInformation(id) != null) {
                 // Participant is already loaded.
                 return null;
@@ -237,9 +235,8 @@ public final class RecoveryManager {
     }
 
     private Participant recreateParticipant(final InputObjectState inputObjectState, final String applicationId)
-            throws ParticipantException {
+            throws IOException {
 
-        try {
             final ParticipantDeserializer deserializer = deserializers.get(applicationId);
             final byte[] participantBytes = inputObjectState.unpackBytes();
 
@@ -251,12 +248,9 @@ public final class RecoveryManager {
 
                 participant = deserializer.deserialize(objectInputStream);
             }
+
             return participant;
-        }catch (Exception e) {
-            String msg = RESTATLogger.atI18NLogger.warn_persistParticipantInformationRecoveryManager(e.getMessage(), e);
-            throw new ParticipantException(msg, e);
         }
-    }
 
     private boolean synchronizeParticipantUrlWithCoordinator(final ParticipantInformation participantInformation) {
         final String participantUrl = getParticipantUrl(participantInformation.getId());
