@@ -73,7 +73,7 @@ public final class RecoveryManager {
         }
     }
 
-    public void persistParticipantInformation(final ParticipantInformation participantInformation) throws ParticipantException {
+    public void persistParticipantInformation(final ParticipantInformation participantInformation) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("RecoveryManager.persistParticipantInformation: participantInformation=" + participantInformation);
         }

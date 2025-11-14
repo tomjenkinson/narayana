@@ -173,7 +173,7 @@ public final class ParticipantResource {
         return Response.status(412).build();
     }
 
-    private Vote prepare(final ParticipantInformation participantInformation) throws ParticipantException,HeuristicException {
+    private Vote prepare(final ParticipantInformation participantInformation) throws HeuristicException {
         if (isHeuristic(participantInformation)) {
             return prepareHeuristic(participantInformation);
         }
@@ -212,7 +212,7 @@ public final class ParticipantResource {
         }
     }
 
-    private void commit(final ParticipantInformation participantInformation) throws ParticipantException,HeuristicException{
+    private void commit(final ParticipantInformation participantInformation) throws HeuristicException {
         if (isHeuristic(participantInformation)) {
             commitHeuristic(participantInformation);
         } else {
@@ -269,7 +269,7 @@ public final class ParticipantResource {
         }
     }
 
-    private void rollback(final ParticipantInformation participantInformation) throws HeuristicException, ParticipantException {
+    private void rollback(final ParticipantInformation participantInformation) throws HeuristicException {
         if (isHeuristic(participantInformation)) {
             rollbackHeuristic(participantInformation);
         } else {
