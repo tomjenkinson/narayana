@@ -5,30 +5,10 @@
 #
 ########################################################################
 
-RULE syncRecoveryCycleWithTestingThread
-CLASS com.arjuna.ats.arjuna.recovery.RecoveryManager
-METHOD manager(int)
-AT EXIT
-IF TRUE
-DO debug("[RecoveryManager.manager(int)] Rendezvous for " + Thread.currentThread().getName());
-    rendezvous("initialiseRecoveryCycle", 2);
-    debug("[RecoveryManager.manager(int)] " + Thread.currentThread().getName() + " released");
-ENDRULE
-
-RULE syncTestingThreadWithRecoveryCycle
-CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
-METHOD run
-AT ENTRY
-IF TRUE
-DO debug("[PeriodicRecovery.run] Rendezvous for " + Thread.currentThread().getName());
-    rendezvous("initialiseRecoveryCycle", 2);
-    debug("[PeriodicRecovery.run] " + Thread.currentThread().getName() + " released");
-ENDRULE
-
 RULE rendezvousForTheRecoveryThread
 CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
 METHOD run
-AT ENTRY
+AFTER INVOKE doWorkInternal
 IF TRUE
 DO debug("[PeriodicRecovery.run] Rendezvous for " + Thread.currentThread().getName());
     rendezvous("sync", 2);
