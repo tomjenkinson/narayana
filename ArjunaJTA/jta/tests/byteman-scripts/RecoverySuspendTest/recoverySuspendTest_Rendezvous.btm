@@ -1,0 +1,46 @@
+########################################################################
+#
+# Byteman script used to create a rendezvous to force the recovery
+# thread to wait for the testing thread
+#
+########################################################################
+
+RULE syncRecoveryCycleWithTestingThread
+CLASS com.arjuna.ats.arjuna.recovery.RecoveryManager
+METHOD manager(int)
+AT EXIT
+IF TRUE
+DO debug("[RecoveryManager.manager(int)] Rendezvous for " + Thread.currentThread().getName());
+    rendezvous("initialiseRecoveryCycle", 2);
+    debug("[RecoveryManager.manager(int)] " + Thread.currentThread().getName() + " released");
+ENDRULE
+
+RULE syncTestingThreadWithRecoveryCycle
+CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
+METHOD run
+AT ENTRY
+IF TRUE
+DO debug("[PeriodicRecovery.run] Rendezvous for " + Thread.currentThread().getName());
+    rendezvous("initialiseRecoveryCycle", 2);
+    debug("[PeriodicRecovery.run] " + Thread.currentThread().getName() + " released");
+ENDRULE
+
+RULE rendezvousForTheRecoveryThread
+CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
+METHOD run
+AT ENTRY
+IF TRUE
+DO debug("[PeriodicRecovery.run] Rendezvous for " + Thread.currentThread().getName());
+    rendezvous("sync", 2);
+    debug("[PeriodicRecovery.run] " + Thread.currentThread().getName() + " released");
+ENDRULE
+
+RULE rendezvousForTheTestingThread
+CLASS com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery
+METHOD suspendScan(boolean,boolean)
+AT ENTRY
+IF TRUE
+DO debug("[PeriodicRecovery.suspendScan(boolean,boolean)] Rendezvous for " + Thread.currentThread().getName());
+    rendezvous("sync", 2);
+    debug("[PeriodicRecovery.suspendScan(boolean,boolean)] " + Thread.currentThread().getName() + " released");
+ENDRULE
